@@ -26,13 +26,13 @@ function sb_handle_file_upload($file, $max_size) {
     return $upload['url']; // Return the file URL on success
 }
 
-// Register the shortcode
+// Register the add business form shortcode
 function sb_register_add_business_form_shortcode() {
     add_shortcode('sb_add_business_form', 'sb_render_add_business_form');
 }
 add_action('init', 'sb_register_add_business_form_shortcode');
 
-// Shortcode rendering function
+// Shortcode rendering function for adding business form
 function sb_render_add_business_form() {
     ob_start(); // Start output buffering
     ?>
@@ -112,7 +112,7 @@ function sb_render_add_business_form() {
     return ob_get_clean(); // Return the buffered content
 }
 
-// Handle form submission
+// Handle form submission for adding business
 function sb_handle_form_submission() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sb_submit_business'])) {
         // Sanitize and validate input fields
@@ -180,6 +180,7 @@ function sb_handle_form_submission() {
             'post_type' => 'business_listing',
             'post_title' => $business_name,
             'post_status' => 'pending', // Set to Pending Review
+            'post_author' => get_current_user_id(), // Explicitly set the post author
             'tax_input' => array(
                 'business_category' => array($category_slug), // Assign category
                 'post_tag' => $tags, // Assign tags
@@ -208,3 +209,31 @@ function sb_handle_form_submission() {
     }
 }
 add_action('init', 'sb_handle_form_submission');
+
+// Shortcode to render the edit business form
+function sb_render_edit_business_form_shortcode($atts) {
+    // Parse shortcode attributes
+    $atts = shortcode_atts(
+        array(
+            'post_id' => 0, // Default to 0 if no post_id is provided
+        ),
+        $atts
+    );
+
+    // Ensure post_id is valid
+    $post_id = intval($atts['post_id']);
+    if ($post_id <= 0) {
+        return '<p style="color: red;">Invalid or missing business listing ID.</p>';
+    }
+
+    // Include the template file from the templates directory
+    $template_path = plugin_dir_path(__FILE__) . '../templates/edit-business-form.php';
+    if (file_exists($template_path)) {
+        ob_start();
+        include $template_path;
+        return ob_get_clean();
+    } else {
+        return '<p style="color: red;">Form template not found.</p>';
+    }
+}
+add_shortcode('sb_edit_business_form', 'sb_render_edit_business_form_shortcode');
