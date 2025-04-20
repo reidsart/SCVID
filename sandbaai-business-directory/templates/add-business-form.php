@@ -54,7 +54,7 @@ function sb_render_add_business_form() {
                     echo '</label><br>';
                 }
             } else {
-                echo 'No tags available.';
+                echo '<p>No tags available.</p>';
             }
             ?>
         </div>
