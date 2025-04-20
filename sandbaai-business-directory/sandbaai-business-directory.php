@@ -25,7 +25,7 @@ require_once SB_DIR_PATH . 'includes/directory-handler.php';
 
 // Enqueue assets
 function sb_enqueue_assets() {
-    wp_enqueue_style('sb-styles', SB_DIR_URL . 'assets/css/styles.css', array(), '1.0');
+    wp_enqueue_style('sb-styles', SB_DIR_URL . 'assets/css/css_styles.css', array(), '1.0');
 }
 add_action('wp_enqueue_scripts', 'sb_enqueue_assets');
 
