@@ -99,13 +99,15 @@ function sb_render_add_business_form() {
 }
 
 // Automatically add https:// to website or Facebook URL if missing
-add_action('pre_post', function () {
-    if (!empty($_POST['website']) && !preg_match('/^https?:\/\//', $_POST['website'])) {
-        $_POST['website'] = 'https://' . $_POST['website'];
+function sb_sanitize_urls($post_data) {
+    if (!empty($post_data['website']) && !preg_match('/^https?:\/\//', $post_data['website'])) {
+        $post_data['website'] = 'https://' . $post_data['website'];
     }
-    if (!empty($_POST['facebook']) && !preg_match('/^https?:\/\//', $_POST['facebook'])) {
-        $_POST['facebook'] = 'https://' . $_POST['facebook'];
+    if (!empty($post_data['facebook']) && !preg_match('/^https?:\/\//', $post_data['facebook'])) {
+        $post_data['facebook'] = 'https://' . $post_data['facebook'];
     }
-});
+    return $post_data;
+}
+add_filter('pre_post_form_submission_data', 'sb_sanitize_urls'); // Ensure the hook matches your form's workflow
 
 add_shortcode('sb_add_business_form', 'sb_render_add_business_form');
