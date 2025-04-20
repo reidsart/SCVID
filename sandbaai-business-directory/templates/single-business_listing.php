@@ -24,7 +24,6 @@ get_header(); ?>
             $gallery = get_post_meta(get_the_ID(), 'gallery', true);
             $tags = get_post_meta(get_the_ID(), 'tags', true);
             $address_privacy = get_post_meta(get_the_ID(), 'address_privacy', true);
-            $suggestions = get_post_meta(get_the_ID(), 'suggestions', true);
             ?>
             <div class="business-details">
                 <h1 class="business-title"><?php the_title(); ?></h1>
@@ -76,10 +75,6 @@ get_header(); ?>
 
                 <?php if (!empty($tags)) : ?>
                     <p><strong>Tags:</strong> <?php echo esc_html($tags); ?></p>
-                <?php endif; ?>
-
-                <?php if (!empty($suggestions)) : ?>
-                    <p><strong>Suggestions:</strong> <?php echo esc_html($suggestions); ?></p>
                 <?php endif; ?>
             </div>
         <?php endwhile;
