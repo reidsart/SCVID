@@ -16,7 +16,10 @@ function sb_render_add_business_form() {
         <label for="business_address">Business Address:</label>
         <input type="text" id="business_address" name="business_address" required>
 
-        <label for="business_suburb">Suburb:</label>
+        <label for="address_privacy">Keep Address Private:</label>
+        <input type="checkbox" id="address_privacy" name="address_privacy" value="1">
+
+        <label for="business_suburb">Business Suburb:</label>
         <input type="text" id="business_suburb" name="business_suburb" value="Sandbaai" required>
 
         <label for="business_phone">Business Phone:</label>
@@ -34,25 +37,26 @@ function sb_render_add_business_form() {
         <label for="business_whatsapp">WhatsApp Number:</label>
         <input type="text" id="business_whatsapp" name="business_whatsapp">
 
-        <label for="facebook">Facebook Page:</label>
+        <label for="facebook">Business Facebook Page:</label>
         <input type="url" id="facebook" name="facebook">
 
         <label for="tags">Tags (comma-separated):</label>
         <input type="text" id="tags" name="tags">
 
-        <label for="address_privacy">Keep Address Private:</label>
-        <input type="checkbox" id="address_privacy" name="address_privacy" value="1">
-
         <label for="suggestions">Suggestions or Feedback:</label>
         <textarea id="suggestions" name="suggestions"></textarea>
 
-        <label for="logo">Upload Logo:</label>
+        <label for="logo">Upload Business Logo:</label>
         <input type="file" id="logo" name="logo">
 
-        <label for="gallery">Upload Gallery Images:</label>
+        <label for="gallery">Upload photos for your business:</label>
         <input type="file" id="gallery" name="gallery[]" multiple>
 
+        <br>
+
         <input type="submit" name="sb_submit_business" value="Submit">
+
+        <br>
     </form>
     <?php
     return ob_get_clean(); // Return the buffered content
