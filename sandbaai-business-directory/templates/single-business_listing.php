@@ -35,7 +35,7 @@ get_header(); ?>
                 <?php endif; ?>
 
                 <div class="business-meta">
-                    <?php if ($address_privacy !== 'yes' && !empty($business_address)) : ?>
+                    <?php if ($address_privacy !== '1' && !empty($business_address)) : ?>
                         <p><strong>Address:</strong> <?php echo esc_html($business_address); ?>, <?php echo esc_html($business_suburb); ?></p>
                     <?php endif; ?>
 
