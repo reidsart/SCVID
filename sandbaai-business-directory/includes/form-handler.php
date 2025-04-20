@@ -13,43 +13,43 @@ function sb_render_add_business_form() {
         <label for="business_name">Business Name:</label>
         <input type="text" id="business_name" name="business_name" required>
 
-        <label for="address">Address:</label>
-        <input type="text" id="address" name="address" required>
+        <label for="business_address">Business Address:</label>
+        <input type="text" id="business_address" name="business_address" required>
 
-        <label for="suburb">Suburb:</label>
-        <input type="text" id="suburb" name="suburb" required>
+        <label for="business_suburb">Suburb:</label>
+        <input type="text" id="business_suburb" name="business_suburb" value="Sandbaai" required>
 
-        <label for="phone">Phone:</label>
-        <input type="text" id="phone" name="phone" required>
+        <label for="business_phone">Business Phone:</label>
+        <input type="text" id="business_phone" name="business_phone" required>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
+        <label for="business_email">Business Email:</label>
+        <input type="email" id="business_email" name="business_email" required>
 
-        <label for="description">Description:</label>
-        <textarea id="description" name="description" required></textarea>
+        <label for="business_description">Business Description:</label>
+        <textarea id="business_description" name="business_description" required></textarea>
 
-        <label for="website">Website:</label>
-        <input type="url" id="website" name="website">
+        <label for="business_website">Business Website:</label>
+        <input type="url" id="business_website" name="business_website">
 
-        <label for="whatsapp">WhatsApp:</label>
-        <input type="text" id="whatsapp" name="whatsapp">
+        <label for="business_whatsapp">WhatsApp Number:</label>
+        <input type="text" id="business_whatsapp" name="business_whatsapp">
 
-        <label for="facebook">Facebook:</label>
+        <label for="facebook">Facebook Page:</label>
         <input type="url" id="facebook" name="facebook">
 
-        <label for="tags">Tags:</label>
-        <input type="text" id="tags" name="tags" placeholder="Enter comma-separated tags">
+        <label for="tags">Tags (comma-separated):</label>
+        <input type="text" id="tags" name="tags">
 
-        <label for="address_privacy">Address Privacy:</label>
-        <input type="checkbox" id="address_privacy" name="address_privacy" value="1"> Keep Address Private
+        <label for="address_privacy">Keep Address Private:</label>
+        <input type="checkbox" id="address_privacy" name="address_privacy" value="1">
 
-        <label for="suggestions">Suggestions:</label>
+        <label for="suggestions">Suggestions or Feedback:</label>
         <textarea id="suggestions" name="suggestions"></textarea>
 
-        <label for="logo">Logo:</label>
+        <label for="logo">Upload Logo:</label>
         <input type="file" id="logo" name="logo">
 
-        <label for="gallery">Gallery:</label>
+        <label for="gallery">Upload Gallery Images:</label>
         <input type="file" id="gallery" name="gallery[]" multiple>
 
         <input type="submit" name="sb_submit_business" value="Submit">
@@ -63,16 +63,16 @@ function sb_handle_form_submission() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sb_submit_business'])) {
         // Sanitize and validate input fields
         $business_name = sanitize_text_field($_POST['business_name']);
-        $business_address = sanitize_text_field($_POST['address']); // Updated to match 'business_address'
-        $business_suburb = sanitize_text_field($_POST['suburb']); // Updated to match 'business_suburb'
-        $business_phone = sanitize_text_field($_POST['phone']); // Updated to match 'business_phone'
-        $business_email = sanitize_email($_POST['email']); // Updated to match 'business_email'
-        $business_description = sanitize_textarea_field($_POST['description']); // Updated to match 'business_description'
-        $business_website = !empty($_POST['website']) ? esc_url($_POST['website']) : ''; // Updated to match 'business_website'
-        $business_whatsapp = sanitize_text_field($_POST['whatsapp']); // Updated to match 'business_whatsapp'
+        $business_address = sanitize_text_field($_POST['business_address']);
+        $business_suburb = sanitize_text_field($_POST['business_suburb']);
+        $business_phone = sanitize_text_field($_POST['business_phone']);
+        $business_email = sanitize_email($_POST['business_email']);
+        $business_description = sanitize_textarea_field($_POST['business_description']);
+        $business_website = !empty($_POST['business_website']) ? esc_url($_POST['business_website']) : '';
+        $business_whatsapp = sanitize_text_field($_POST['business_whatsapp']);
         $facebook = !empty($_POST['facebook']) ? esc_url($_POST['facebook']) : '';
-        $tags = !empty($_POST['tags']) ? array_map('intval', $_POST['tags']) : array(); // Tags as array
-        $address_privacy = sanitize_text_field($_POST['address_privacy']);
+        $tags = !empty($_POST['tags']) ? array_map('intval', explode(',', $_POST['tags'])) : array();
+        $address_privacy = isset($_POST['address_privacy']) ? '1' : '0';
         $suggestions = sanitize_textarea_field($_POST['suggestions']);
 
         // Process file uploads (logo and gallery)
@@ -130,13 +130,13 @@ function sb_handle_form_submission() {
                 'post_tag' => $tags, // Assign tags
             ),
             'meta_input' => array(
-                'business_address' => $business_address, // Changed key
-                'business_suburb' => $business_suburb, // Changed key
-                'business_phone' => $business_phone, // Changed key
-                'business_email' => $business_email, // Changed key
-                'business_description' => $business_description, // Changed key
-                'business_website' => $business_website, // Changed key
-                'business_whatsapp' => $business_whatsapp, // Changed key
+                'business_address' => $business_address,
+                'business_suburb' => $business_suburb,
+                'business_phone' => $business_phone,
+                'business_email' => $business_email,
+                'business_description' => $business_description,
+                'business_website' => $business_website,
+                'business_whatsapp' => $business_whatsapp,
                 'facebook' => $facebook,
                 'logo' => $logo,
                 'gallery' => $gallery,
