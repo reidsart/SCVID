@@ -7,12 +7,11 @@ function sb_render_add_business_form() {
 
         <!-- Required Fields -->
         <label for="business_name">Business Name (required):</label>
-        <input type="text" id="business_name" name="business_name" required>
+        <input type="text" id="business_name" name="post_title" required> <!-- Save as Post Title -->
 
         <label for="business_address">Business Address (required):</label>
         <input type="text" id="business_address" name="business_address" required>
 
-        <!-- Move "Hide Address?" field here -->
         <label for="address_privacy">Hide Address? (yes/no):</label>
         <input type="radio" id="address_privacy_yes" name="address_privacy" value="yes"> Yes
         <input type="radio" id="address_privacy_no" name="address_privacy" value="no" checked> No
