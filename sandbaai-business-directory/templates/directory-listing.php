@@ -2,6 +2,25 @@
 function sb_render_directory_listing() {
     ob_start();
 
+    // Display Tags Table
+    $tags = get_tags(array('orderby' => 'name', 'order' => 'ASC', 'hide_empty' => false));
+
+    if (!empty($tags)) {
+        echo '<h2>Tags</h2>';
+        echo '<table class="tags-table">';
+        echo '<thead><tr><th>Tag Name</th></tr></thead>';
+        echo '<tbody>';
+        foreach ($tags as $tag) {
+            if ($tag->count > 0) { // Only show tags used 1 or more times
+                echo '<tr>';
+                echo '<td><a href="' . esc_url(get_tag_link($tag->term_id)) . '">' . esc_html($tag->name) . '</a></td>';
+                echo '</tr>';
+            }
+        }
+        echo '</tbody>';
+        echo '</table>';
+    }
+
     // Query Sandbaai Businesses
     $sandbaai_query = new WP_Query(array(
         'post_type' => 'business_listing',
