@@ -1,4 +1,63 @@
 <?php
+// Register the shortcode
+function sb_register_add_business_form_shortcode() {
+    add_shortcode('sb_add_business_form', 'sb_render_add_business_form');
+}
+add_action('init', 'sb_register_add_business_form_shortcode');
+
+// Shortcode rendering function
+function sb_render_add_business_form() {
+    ob_start(); // Start output buffering
+    ?>
+    <form method="post" enctype="multipart/form-data" action="">
+        <label for="business_name">Business Name:</label>
+        <input type="text" id="business_name" name="business_name" required>
+
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address" required>
+
+        <label for="suburb">Suburb:</label>
+        <input type="text" id="suburb" name="suburb" required>
+
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" name="phone" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea>
+
+        <label for="website">Website:</label>
+        <input type="url" id="website" name="website">
+
+        <label for="whatsapp">WhatsApp:</label>
+        <input type="text" id="whatsapp" name="whatsapp">
+
+        <label for="facebook">Facebook:</label>
+        <input type="url" id="facebook" name="facebook">
+
+        <label for="tags">Tags:</label>
+        <input type="text" id="tags" name="tags" placeholder="Enter comma-separated tags">
+
+        <label for="address_privacy">Address Privacy:</label>
+        <input type="checkbox" id="address_privacy" name="address_privacy" value="1"> Keep Address Private
+
+        <label for="suggestions">Suggestions:</label>
+        <textarea id="suggestions" name="suggestions"></textarea>
+
+        <label for="logo">Logo:</label>
+        <input type="file" id="logo" name="logo">
+
+        <label for="gallery">Gallery:</label>
+        <input type="file" id="gallery" name="gallery[]" multiple>
+
+        <input type="submit" name="sb_submit_business" value="Submit">
+    </form>
+    <?php
+    return ob_get_clean(); // Return the buffered content
+}
+
 // Handle form submission
 function sb_handle_form_submission() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sb_submit_business'])) {
@@ -94,3 +153,4 @@ function sb_handle_form_submission() {
     }
 }
 add_action('init', 'sb_handle_form_submission');
+?>
