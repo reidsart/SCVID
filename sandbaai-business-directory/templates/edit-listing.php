@@ -2,6 +2,8 @@
 /**
  * Edit Listing Page
  */
+// Debug 
+error_log('Edit listing template loaded at: ' . $_SERVER['REQUEST_URI']);
 
 if (!defined('ABSPATH')) {
     exit; // Prevent direct access
