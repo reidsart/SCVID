@@ -1,4 +1,31 @@
 <?php
+// Function to handle file uploads
+function sb_handle_file_upload($file, $max_size) {
+    // Check for upload errors
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        return new WP_Error('upload_error', 'File upload failed.');
+    }
+
+    // Validate file size
+    if ($file['size'] > $max_size) {
+        return new WP_Error('file_size_error', 'File exceeds the maximum allowed size.');
+    }
+
+    // Validate file type (allow only JPEG and PNG)
+    $allowed_types = array('image/jpeg', 'image/png');
+    if (!in_array($file['type'], $allowed_types)) {
+        return new WP_Error('file_type_error', 'Invalid file type. Only JPEG and PNG are allowed.');
+    }
+
+    // Upload the file to WordPress uploads directory
+    $upload = wp_handle_upload($file, array('test_form' => false));
+    if (isset($upload['error'])) {
+        return new WP_Error('upload_error', $upload['error']);
+    }
+
+    return $upload['url']; // Return the file URL on success
+}
+
 // Register the shortcode
 function sb_register_add_business_form_shortcode() {
     add_shortcode('sb_add_business_form', 'sb_render_add_business_form');
@@ -102,16 +129,17 @@ function sb_handle_form_submission() {
         $address_privacy = isset($_POST['address_privacy']) ? '1' : '0';
         $suggestions = sanitize_textarea_field($_POST['suggestions']);
 
-        // Process file uploads (logo and gallery)
+        // Process logo upload
         $logo = '';
         if (!empty($_FILES['logo']['name'])) {
             $logo = sb_handle_file_upload($_FILES['logo'], 500 * 1024); // 500KB limit
             if (is_wp_error($logo)) {
-                echo '<p style="color: red;">' . $logo->get_error_message() . '</p>';
+                echo '<p style="color: red;">Logo Upload Error: ' . $logo->get_error_message() . '</p>';
                 return;
             }
         }
 
+        // Process gallery uploads
         $gallery = array();
         if (!empty($_FILES['gallery']['name'][0])) {
             foreach ($_FILES['gallery']['name'] as $key => $value) {
@@ -125,7 +153,7 @@ function sb_handle_form_submission() {
 
                 $upload = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
                 if (is_wp_error($upload)) {
-                    echo '<p style="color: red;">' . $upload->get_error_message() . '</p>';
+                    echo '<p style="color: red;">Gallery Upload Error: ' . $upload->get_error_message() . '</p>';
                     return;
                 }
 
@@ -180,4 +208,3 @@ function sb_handle_form_submission() {
     }
 }
 add_action('init', 'sb_handle_form_submission');
-?>
