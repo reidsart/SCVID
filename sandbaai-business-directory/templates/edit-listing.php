@@ -1,48 +1,65 @@
 <?php
 /**
  * Edit Listing Page
- * 
- * This page allows users to edit their own business listing.
- * Non-admin users can only edit their own listing.
  */
 
-// Include required files - adjusted for templates folder placement
-require_once '../includes/config.php';
-require_once '../includes/db.php';
-require_once '../includes/functions.php';
-
-// Start session if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+if (!defined('ABSPATH')) {
+    exit; // Prevent direct access
 }
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    $_SESSION['message'] = "You must be logged in to edit your listing.";
-    $_SESSION['message_type'] = "error";
-    header("Location: ../login.php");
+// Check if the user is logged in
+if (!is_user_logged_in()) {
+    error_log("Debug: User not logged in. Redirecting to login page.");
+    wp_redirect(wp_login_url());
     exit();
 }
 
-$userId = $_SESSION['user_id'];
-$isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1;
-$conn = getDbConnection();
+// Get the logged-in user's ID
+$userId = get_current_user_id();
+$isAdmin = current_user_can('manage_options');
+
+// Debugging
+error_log("Debug: WordPress detects logged-in user with ID: " . $userId);
+
+// Define the plugin's includes directory path
+define('SB_INCLUDES_PATH', plugin_dir_path(__DIR__) . 'includes/');
+
+// Include required files with error handling
+$functions_path = SB_INCLUDES_PATH . 'functions.php';
+$db_path = SB_INCLUDES_PATH . 'database.php';
+
+if (!file_exists($functions_path)) {
+    die("Error: The required file 'functions.php' is missing.");
+}
+if (!file_exists($db_path)) {
+    die("Error: The required file 'database.php' is missing.");
+}
+
+require_once $functions_path;
+require_once $db_path;
+
+global $wpdb;
+$table_name = $wpdb->prefix . 'businesses'; // Ensure the table name is correct
+
+// Check if the table exists
+$table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$table_name}'") === $table_name;
+if (!$table_exists) {
+    error_log("Table {$table_name} does not exist");
+    wp_die("The businesses table doesn't exist in the database. Please activate the plugin again to create it.");
+}
 
 // Get user's listing
-$stmt = $conn->prepare("SELECT * FROM businesses WHERE user_id = ?");
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$result = $stmt->get_result();
+$listing = $wpdb->get_row(
+    $wpdb->prepare("SELECT * FROM {$table_name} WHERE user_id = %d", $userId),
+    ARRAY_A
+);
 
-if ($result->num_rows === 0) {
+if (!$listing) {
     // User doesn't have a listing yet
-    $_SESSION['message'] = "You don't have a business listing yet. Create one first.";
-    $_SESSION['message_type'] = "error";
-    header("Location: ../add-listing.php");
+    wp_redirect(home_url('/add-listing'));
     exit();
 }
 
-$listing = $result->fetch_assoc();
 $listingId = $listing['id'];
 
 // Process form submission
@@ -122,156 +139,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // If no errors, update the listing
     if (empty($errors)) {
-        $stmt = $conn->prepare("UPDATE businesses SET 
-            business_name = ?, 
-            category_id = ?, 
-            business_description = ?, 
-            business_address = ?, 
-            business_phone = ?, 
-            business_email = ?, 
-            business_website = ?, 
-            business_facebook = ?, 
-            business_instagram = ?, 
-            business_twitter = ?, 
-            business_logo = ?,
-            updated_at = NOW()
-            WHERE id = ? AND user_id = ?");
-            
-        $stmt->bind_param("sisssssssssii", 
-            $business_name, 
-            $category_id, 
-            $business_description, 
-            $business_address, 
-            $business_phone, 
-            $business_email, 
-            $business_website, 
-            $business_facebook, 
-            $business_instagram, 
-            $business_twitter, 
-            $business_logo,
-            $listingId,
-            $userId
+        $wpdb->update(
+            $table_name,
+            [
+                'business_name' => $business_name,
+                'category_id' => $category_id,
+                'business_description' => $business_description,
+                'business_address' => $business_address,
+                'business_phone' => $business_phone,
+                'business_email' => $business_email,
+                'business_website' => $business_website,
+                'business_facebook' => $business_facebook,
+                'business_instagram' => $business_instagram,
+                'business_twitter' => $business_twitter,
+                'business_logo' => $business_logo,
+                'updated_at' => current_time('mysql')
+            ],
+            ['id' => $listingId, 'user_id' => $userId]
         );
-        
-        if ($stmt->execute()) {
-            $_SESSION['message'] = "Your business listing has been updated successfully!";
-            $_SESSION['message_type'] = "success";
-            header("Location: ../view-listing.php?id=" . $listingId);
-            exit();
-        } else {
-            $errors[] = "Failed to update listing: " . $conn->error;
-        }
-    }
-}
 
-// Get all categories for dropdown
-$categories = [];
-$categoryResult = $conn->query("SELECT * FROM categories ORDER BY name");
-while ($category = $categoryResult->fetch_assoc()) {
-    $categories[] = $category;
+        $_SESSION['message'] = "Your business listing has been updated successfully!";
+        $_SESSION['message_type'] = "success";
+        wp_redirect(home_url("/view-listing?id={$listingId}"));
+        exit();
+    }
 }
 
 // Include header
 include '../includes/header.php';
 ?>
-
-<div class="container mt-5 mb-5">
-    <div class="row">
-        <div class="col-md-8 mx-auto">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="card-title mb-0">Edit Your Business Listing</h3>
-                </div>
-                <div class="card-body">
-                    <?php if (!empty($errors)): ?>
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                <?php foreach ($errors as $error): ?>
-                                    <li><?php echo htmlspecialchars($error); ?></li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </div>
-                    <?php endif; ?>
-
-                    <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST" enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <label for="business_name" class="form-label">Business Name *</label>
-                            <input type="text" class="form-control" id="business_name" name="business_name" value="<?php echo htmlspecialchars($listing['business_name']); ?>" required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="category_id" class="form-label">Category *</label>
-                            <select class="form-select" id="category_id" name="category_id" required>
-                                <option value="">Select a category</option>
-                                <?php foreach ($categories as $category): ?>
-                                    <option value="<?php echo $category['id']; ?>" <?php echo ($category['id'] == $listing['category_id']) ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($category['name']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="business_description" class="form-label">Description *</label>
-                            <textarea class="form-control" id="business_description" name="business_description" rows="4" required><?php echo htmlspecialchars($listing['business_description']); ?></textarea>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="business_address" class="form-label">Address *</label>
-                            <textarea class="form-control" id="business_address" name="business_address" rows="2" required><?php echo htmlspecialchars($listing['business_address']); ?></textarea>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="business_phone" class="form-label">Phone Number *</label>
-                            <input type="tel" class="form-control" id="business_phone" name="business_phone" value="<?php echo htmlspecialchars($listing['business_phone']); ?>" required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="business_email" class="form-label">Email Address *</label>
-                            <input type="email" class="form-control" id="business_email" name="business_email" value="<?php echo htmlspecialchars($listing['business_email']); ?>" required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="business_website" class="form-label">Website</label>
-                            <input type="url" class="form-control" id="business_website" name="business_website" value="<?php echo htmlspecialchars($listing['business_website']); ?>" placeholder="https://example.com">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="business_facebook" class="form-label">Facebook</label>
-                            <input type="text" class="form-control" id="business_facebook" name="business_facebook" value="<?php echo htmlspecialchars($listing['business_facebook']); ?>" placeholder="Facebook page URL or username">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="business_instagram" class="form-label">Instagram</label>
-                            <input type="text" class="form-control" id="business_instagram" name="business_instagram" value="<?php echo htmlspecialchars($listing['business_instagram']); ?>" placeholder="Instagram handle">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="business_twitter" class="form-label">Twitter</label>
-                            <input type="text" class="form-control" id="business_twitter" name="business_twitter" value="<?php echo htmlspecialchars($listing['business_twitter']); ?>" placeholder="Twitter handle">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="business_logo" class="form-label">Logo</label>
-                            <?php if (!empty($listing['business_logo'])): ?>
-                                <div class="mb-2">
-                                    <img src="<?php echo '../' . htmlspecialchars($listing['business_logo']); ?>" alt="Current Logo" class="img-thumbnail" style="max-height: 100px;">
-                                    <p class="small text-muted">Current logo</p>
-                                </div>
-                            <?php endif; ?>
-                            <input type="file" class="form-control" id="business_logo" name="business_logo" accept="image/jpeg,image/png,image/gif">
-                            <div class="form-text">Upload a new logo if you want to change the current one. Leave empty to keep the current logo.</div>
-                        </div>
-                        
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Update Listing</button>
-                            <a href="../view-listing.php?id=<?php echo $listingId; ?>" class="btn btn-secondary">Cancel</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<?php include '../includes/footer.php'; ?>
