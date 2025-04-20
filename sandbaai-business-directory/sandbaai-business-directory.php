@@ -89,9 +89,60 @@ add_filter('single_template', 'sb_load_custom_template');
 
 // Load edit listing page
 function render_edit_listing_page() {
-    // Include the edit-listing.php file
+    // Don't execute during any admin requests
+    if (is_admin()) {
+        return '[edit_listing]'; // Just return the placeholder during admin operations
+    }
+    
+    // Start output buffering
     ob_start();
-    include plugin_dir_path(__FILE__) . 'templates/edit-listing.php';
+    
+    // Get necessary data for the template
+    global $post;
+    $current_user = wp_get_current_user();
+    
+    // Only process form submission when POST data exists and we're not in admin
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['listing_id'])) {
+        // Form processing logic would go here
+        // We'll move this from edit-listing.php
+        $listing_id = intval($_POST['listing_id']);
+        
+        // Check if the current user is allowed to edit this listing
+        $listing_author = get_post_field('post_author', $listing_id);
+        if ($listing_author == $current_user->ID || current_user_can('administrator')) {
+            // Process the form submission
+            // Update post data
+            $listing_data = array(
+                'ID' => $listing_id,
+                'post_title' => sanitize_text_field($_POST['listing_title']),
+                'post_content' => wp_kses_post($_POST['listing_description']),
+            );
+            
+            $update_success = wp_update_post($listing_data);
+            
+            // Update meta fields (copied from edit-listing.php)
+            if ($update_success) {
+                update_post_meta($listing_id, '_listing_phone', sanitize_text_field($_POST['listing_phone']));
+                update_post_meta($listing_id, '_listing_email', sanitize_email($_POST['listing_email']));
+                update_post_meta($listing_id, '_listing_website', esc_url_raw($_POST['listing_website']));
+                update_post_meta($listing_id, '_listing_address', sanitize_text_field($_POST['listing_address']));
+                
+                // Handle category if needed
+                if (!empty($_POST['listing_category'])) {
+                    wp_set_object_terms($listing_id, intval($_POST['listing_category']), 'listing_category');
+                }
+                
+                // Redirect after update
+                $listing_url = get_permalink($listing_id);
+                wp_redirect($listing_url);
+                exit;
+            }
+        }
+    }
+    
+    // Now include the template view part only (no processing logic)
+    include plugin_dir_path(__FILE__) . 'templates/edit-listing-view.php';
+    
     return ob_get_clean();
 }
 add_shortcode('edit_listing', 'render_edit_listing_page');
