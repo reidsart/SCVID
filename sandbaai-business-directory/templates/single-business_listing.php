@@ -12,14 +12,13 @@ get_header(); ?>
             the_post();
 
             // Get custom fields
-            $address = get_post_meta(get_the_ID(), 'address', true);
-            $suburb = get_post_meta(get_the_ID(), 'suburb', true);
-            $phone = get_post_meta(get_the_ID(), 'phone', true);
-            $email = get_post_meta(get_the_ID(), 'email', true);
-            $description = get_post_meta(get_the_ID(), 'description', true);
-            $location = get_post_meta(get_the_ID(), 'location', true);
-            $website = get_post_meta(get_the_ID(), 'website', true);
-            $whatsapp = get_post_meta(get_the_ID(), 'whatsapp', true);
+            $business_address = get_post_meta(get_the_ID(), 'business_address', true);
+            $business_suburb = get_post_meta(get_the_ID(), 'business_suburb', true);
+            $business_phone = get_post_meta(get_the_ID(), 'business_phone', true);
+            $business_email = get_post_meta(get_the_ID(), 'business_email', true);
+            $business_description = get_post_meta(get_the_ID(), 'business_description', true);
+            $business_website = get_post_meta(get_the_ID(), 'business_website', true);
+            $business_whatsapp = get_post_meta(get_the_ID(), 'business_whatsapp', true);
             $facebook = get_post_meta(get_the_ID(), 'facebook', true);
             $logo = get_post_meta(get_the_ID(), 'logo', true);
             $gallery = get_post_meta(get_the_ID(), 'gallery', true);
@@ -27,7 +26,6 @@ get_header(); ?>
             $address_privacy = get_post_meta(get_the_ID(), 'address_privacy', true);
             $suggestions = get_post_meta(get_the_ID(), 'suggestions', true);
             ?>
-
             <div class="business-details">
                 <h1 class="business-title"><?php the_title(); ?></h1>
 
@@ -38,36 +36,32 @@ get_header(); ?>
                 <?php endif; ?>
 
                 <div class="business-meta">
-                    <?php if ($address_privacy !== 'yes' && !empty($address)) : ?>
-                        <p><strong>Address:</strong> <?php echo esc_html($address); ?>, <?php echo esc_html($suburb); ?></p>
+                    <?php if ($address_privacy !== 'yes' && !empty($business_address)) : ?>
+                        <p><strong>Address:</strong> <?php echo esc_html($business_address); ?>, <?php echo esc_html($business_suburb); ?></p>
                     <?php endif; ?>
 
-                    <?php if (!empty($phone)) : ?>
-                        <p><strong>Phone:</strong> <?php echo esc_html($phone); ?></p>
+                    <?php if (!empty($business_phone)) : ?>
+                        <p><strong>Phone:</strong> <?php echo esc_html($business_phone); ?></p>
                     <?php endif; ?>
 
-                    <?php if (!empty($email)) : ?>
-                        <p><strong>Email:</strong> <a href="mailto:<?php echo esc_attr($email); ?>"><?php echo esc_html($email); ?></a></p>
+                    <?php if (!empty($business_email)) : ?>
+                        <p><strong>Email:</strong> <a href="mailto:<?php echo esc_attr($business_email); ?>"><?php echo esc_html($business_email); ?></a></p>
                     <?php endif; ?>
 
-                    <?php if (!empty($website)) : ?>
-                        <p><strong>Website:</strong> <a href="<?php echo esc_url($website); ?>" target="_blank"><?php echo esc_html($website); ?></a></p>
+                    <?php if (!empty($business_website)) : ?>
+                        <p><strong>Website:</strong> <a href="<?php echo esc_url($business_website); ?>" target="_blank"><?php echo esc_html($business_website); ?></a></p>
                     <?php endif; ?>
 
-                    <?php if (!empty($whatsapp)) : ?>
-                        <p><strong>WhatsApp:</strong> <?php echo esc_html($whatsapp); ?></p>
+                    <?php if (!empty($business_whatsapp)) : ?>
+                        <p><strong>WhatsApp:</strong> <?php echo esc_html($business_whatsapp); ?></p>
                     <?php endif; ?>
 
                     <?php if (!empty($facebook)) : ?>
                         <p><strong>Facebook:</strong> <a href="<?php echo esc_url($facebook); ?>" target="_blank"><?php echo esc_html($facebook); ?></a></p>
                     <?php endif; ?>
 
-                    <?php if (!empty($location)) : ?>
-                        <p><strong>Location in Sandbaai:</strong> <?php echo esc_html($location); ?></p>
-                    <?php endif; ?>
-
-                    <?php if (!empty($description)) : ?>
-                        <p><strong>Description:</strong> <?php echo esc_html($description); ?></p>
+                    <?php if (!empty($business_description)) : ?>
+                        <p><strong>Description:</strong> <?php echo esc_html($business_description); ?></p>
                     <?php endif; ?>
                 </div>
 
@@ -88,7 +82,6 @@ get_header(); ?>
                     <p><strong>Suggestions:</strong> <?php echo esc_html($suggestions); ?></p>
                 <?php endif; ?>
             </div>
-
         <?php endwhile;
     else : ?>
         <p>No business details found.</p>
