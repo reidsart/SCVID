@@ -9,34 +9,34 @@ function sb_render_add_business_form() {
         <label for="business_name">Business Name (required):</label>
         <input type="text" id="business_name" name="business_name" required>
 
-        <label for="address">Business Address (required):</label>
-        <input type="text" id="address" name="address" required>
+        <label for="business_address">Business Address (required):</label>
+        <input type="text" id="business_address" name="business_address" required>
 
         <!-- Move "Hide Address?" field here -->
         <label for="address_privacy">Hide Address? (yes/no):</label>
         <input type="radio" id="address_privacy_yes" name="address_privacy" value="yes"> Yes
         <input type="radio" id="address_privacy_no" name="address_privacy" value="no" checked> No
 
-        <label for="suburb">Business Suburb (default: Sandbaai):</label>
-        <input type="text" id="suburb" name="suburb" value="Sandbaai">
+        <label for="business_suburb">Business Suburb (default: Sandbaai):</label>
+        <input type="text" id="business_suburb" name="business_suburb" value="Sandbaai">
 
-        <label for="phone">Business Phone (required):</label>
-        <input type="text" id="phone" name="phone" required>
+        <label for="business_phone">Business Phone (required):</label>
+        <input type="text" id="business_phone" name="business_phone" required>
 
-        <label for="email">Business Email (required):</label>
-        <input type="email" id="email" name="email" required>
+        <label for="business_email">Business Email (required):</label>
+        <input type="email" id="business_email" name="business_email" required>
 
-        <label for="description">Business Description (required):</label>
-        <textarea id="description" name="description" required></textarea>
+        <label for="business_description">Business Description (required):</label>
+        <textarea id="business_description" name="business_description" required></textarea>
 
         <hr>
 
         <!-- Optional Fields -->
-        <label for="website">Business Website:</label>
-        <input type="url" id="website" name="website">
+        <label for="business_website">Business Website:</label>
+        <input type="url" id="business_website" name="business_website">
 
-        <label for="whatsapp">Business WhatsApp Number:</label>
-        <input type="text" id="whatsapp" name="whatsapp">
+        <label for="business_whatsapp">Business WhatsApp Number:</label>
+        <input type="text" id="business_whatsapp" name="business_whatsapp">
 
         <label for="facebook">Facebook Page URL:</label>
         <input type="url" id="facebook" name="facebook">
@@ -65,9 +65,6 @@ function sb_render_add_business_form() {
         </div>
 
         <br>
-        <label for="suggestions">Suggestions:</label>
-        <textarea id="suggestions" name="suggestions"></textarea>
-
         <input type="hidden" id="category" name="category" value=""> <!-- Default empty -->
         <br>
         <input type="submit" name="sb_submit_business" value="Submit Business">
@@ -85,7 +82,7 @@ function sb_render_add_business_form() {
         }
 
         // JavaScript to check Suburb field and set category
-        document.getElementById('suburb').addEventListener('change', function () {
+        document.getElementById('business_suburb').addEventListener('change', function () {
             const categoryInput = document.getElementById('category');
             if (this.value.toLowerCase() === 'sandbaai') {
                 categoryInput.value = 'sb_business';
@@ -100,8 +97,8 @@ function sb_render_add_business_form() {
 
 // Automatically add https:// to website or Facebook URL if missing
 function sb_sanitize_urls($post_data) {
-    if (!empty($post_data['website']) && !preg_match('/^https?:\/\//', $post_data['website'])) {
-        $post_data['website'] = 'https://' . $post_data['website'];
+    if (!empty($post_data['business_website']) && !preg_match('/^https?:\/\//', $post_data['business_website'])) {
+        $post_data['business_website'] = 'https://' . $post_data['business_website'];
     }
     if (!empty($post_data['facebook']) && !preg_match('/^https?:\/\//', $post_data['facebook'])) {
         $post_data['facebook'] = 'https://' . $post_data['facebook'];
