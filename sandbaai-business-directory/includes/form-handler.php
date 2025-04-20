@@ -40,8 +40,31 @@ function sb_render_add_business_form() {
         <label for="facebook">Business Facebook Page:</label>
         <input type="url" id="facebook" name="facebook">
 
-        <label for="tags">Tags (comma-separated):</label>
-        <input type="text" id="tags" name="tags">
+        <!-- Dropdowns for Tags -->
+        <label for="tag_1">Tag 1:</label>
+        <select id="tag_1" name="tags[]" required>
+            <option value="">Select Tag 1</option>
+            <?php
+            $tags = get_tags(array('hide_empty' => false)); // Fetch all tags
+            if ($tags) {
+                foreach ($tags as $tag) {
+                    echo '<option value="' . esc_attr($tag->term_id) . '">' . esc_html($tag->name) . '</option>';
+                }
+            }
+            ?>
+        </select>
+
+        <label for="tag_2">Tag 2:</label>
+        <select id="tag_2" name="tags[]" required>
+            <option value="">Select Tag 2</option>
+            <?php
+            if ($tags) { // Reuse the fetched tags
+                foreach ($tags as $tag) {
+                    echo '<option value="' . esc_attr($tag->term_id) . '">' . esc_html($tag->name) . '</option>';
+                }
+            }
+            ?>
+        </select>
 
         <label for="suggestions">Suggestions or Feedback:</label>
         <textarea id="suggestions" name="suggestions"></textarea>
@@ -75,7 +98,7 @@ function sb_handle_form_submission() {
         $business_website = !empty($_POST['business_website']) ? esc_url($_POST['business_website']) : '';
         $business_whatsapp = sanitize_text_field($_POST['business_whatsapp']);
         $facebook = !empty($_POST['facebook']) ? esc_url($_POST['facebook']) : '';
-        $tags = !empty($_POST['tags']) ? array_map('intval', explode(',', $_POST['tags'])) : array();
+        $tags = !empty($_POST['tags']) ? array_map('intval', $_POST['tags']) : array();
         $address_privacy = isset($_POST['address_privacy']) ? '1' : '0';
         $suggestions = sanitize_textarea_field($_POST['suggestions']);
 
