@@ -9,16 +9,15 @@ function sb_handle_form_submission() {
         $phone = sanitize_text_field($_POST['phone']);
         $email = sanitize_email($_POST['email']);
         $description = sanitize_textarea_field($_POST['description']);
-        $location = sanitize_text_field($_POST['location']);
         $website = !empty($_POST['website']) ? esc_url($_POST['website']) : '';
         $whatsapp = sanitize_text_field($_POST['whatsapp']);
         $facebook = !empty($_POST['facebook']) ? esc_url($_POST['facebook']) : '';
-        $tags = !empty($_POST['tags']) ? sanitize_text_field($_POST['tags']) : '';
+        $tags = !empty($_POST['tags']) ? array_map('intval', $_POST['tags']) : array(); // Tags as array
         $address_privacy = sanitize_text_field($_POST['address_privacy']);
         $suggestions = sanitize_textarea_field($_POST['suggestions']);
 
         // Validate required fields
-        if (empty($business_name) || empty($address) || empty($phone) || empty($email) || empty($description) || empty($location)) {
+        if (empty($business_name) || empty($address) || empty($phone) || empty($email) || empty($description)) {
             echo '<p style="color: red;">Error: Please fill in all required fields.</p>';
             return;
         }
@@ -26,37 +25,6 @@ function sb_handle_form_submission() {
         if (!is_email($email)) {
             echo '<p style="color: red;">Error: Invalid email format.</p>';
             return;
-        }
-
-        // Process file uploads (logo and gallery)
-        $logo = '';
-        if (!empty($_FILES['logo']['name'])) {
-            $logo = sb_handle_file_upload($_FILES['logo'], 500 * 1024); // 500KB limit
-            if (is_wp_error($logo)) {
-                echo '<p style="color: red;">' . $logo->get_error_message() . '</p>';
-                return;
-            }
-        }
-
-        $gallery = array();
-        if (!empty($_FILES['gallery']['name'][0])) {
-            foreach ($_FILES['gallery']['name'] as $key => $value) {
-                $file = array(
-                    'name' => $_FILES['gallery']['name'][$key],
-                    'type' => $_FILES['gallery']['type'][$key],
-                    'tmp_name' => $_FILES['gallery']['tmp_name'][$key],
-                    'error' => $_FILES['gallery']['error'][$key],
-                    'size' => $_FILES['gallery']['size'][$key],
-                );
-
-                $upload = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
-                if (is_wp_error($upload)) {
-                    echo '<p style="color: red;">' . $upload->get_error_message() . '</p>';
-                    return;
-                }
-
-                $gallery[] = $upload;
-            }
         }
 
         // Determine category based on suburb
@@ -69,6 +37,7 @@ function sb_handle_form_submission() {
             'post_status' => 'pending', // Set to Pending Review
             'tax_input' => array(
                 'business_category' => array($category_slug), // Assign category
+                'post_tag' => $tags, // Assign tags
             ),
             'meta_input' => array(
                 'address' => $address,
@@ -76,13 +45,9 @@ function sb_handle_form_submission() {
                 'phone' => $phone,
                 'email' => $email,
                 'description' => $description,
-                'location' => $location,
                 'website' => $website,
                 'whatsapp' => $whatsapp,
                 'facebook' => $facebook,
-                'logo' => $logo,
-                'gallery' => $gallery,
-                'tags' => $tags,
                 'address_privacy' => $address_privacy,
                 'suggestions' => $suggestions,
             ),
@@ -96,20 +61,6 @@ function sb_handle_form_submission() {
     }
 }
 add_action('init', 'sb_handle_form_submission');
-
-// Handle file uploads
-function sb_handle_file_upload($file, $max_size) {
-    if ($file['size'] > $max_size) {
-        return new WP_Error('upload_error', 'File size exceeds the limit.');
-    }
-
-    $upload = wp_handle_upload($file, array('test_form' => false));
-    if (isset($upload['error'])) {
-        return new WP_Error('upload_error', $upload['error']);
-    }
-
-    return $upload['url'];
-}
 
 // Render the Add Business Form (Shortcode Function)
 function sb_render_add_business_form() {
@@ -137,9 +88,6 @@ function sb_render_add_business_form() {
         <label for="description">Description (required):</label>
         <textarea id="description" name="description" required></textarea>
 
-        <label for="location">Location in Sandbaai? (yes/no):</label>
-        <input type="text" id="location" name="location" required>
-
         <hr>
 
         <!-- Optional Fields -->
@@ -152,25 +100,46 @@ function sb_render_add_business_form() {
         <label for="facebook">Facebook Page URL:</label>
         <input type="url" id="facebook" name="facebook" placeholder="https://">
 
-        <label for="logo">Logo (JPEG/PNG, max 500KB):</label>
-        <input type="file" id="logo" name="logo" accept="image/jpeg, image/png">
-
-        <label for="gallery">Photo Gallery (up to 5, max 2MB each):</label>
-        <input type="file" id="gallery" name="gallery[]" accept="image/jpeg, image/png" multiple>
-
-        <label for="tags">Tags (separate with commas, add up to 2):</label>
-        <input type="text" id="tags" name="tags">
+        <label for="tags">Tags (select up to 2):</label>
+        <div id="tags-table">
+            <?php
+            $tags = get_tags(); // Fetch WordPress post tags
+            if ($tags) {
+                foreach ($tags as $tag) {
+                    echo '<label>';
+                    echo '<input type="checkbox" name="tags[]" value="' . esc_attr($tag->term_id) . '" onchange="limitTagSelection()"> ';
+                    echo esc_html($tag->name);
+                    echo '</label><br>';
+                }
+            } else {
+                echo '<p>No tags available.</p>';
+            }
+            ?>
+        </div>
 
         <label for="address_privacy">Hide Address? (yes/no):</label>
         <input type="radio" id="address_privacy_yes" name="address_privacy" value="yes"> Yes
         <input type="radio" id="address_privacy_no" name="address_privacy" value="no" checked> No
 
+        <br>
         <label for="suggestions">Suggestions:</label>
         <textarea id="suggestions" name="suggestions"></textarea>
 
         <br>
         <input type="submit" name="sb_submit_business" value="Submit Business">
     </form>
+
+    <script>
+        // JavaScript to limit tag selection to 2
+        function limitTagSelection() {
+            const checkboxes = document.querySelectorAll('input[name="tags[]"]');
+            const checked = Array.from(checkboxes).filter(cb => cb.checked);
+            if (checked.length > 2) {
+                alert('You can select up to 2 tags only.');
+                this.checked = false;
+            }
+        }
+    </script>
     <?php
     return ob_get_clean();
 }
