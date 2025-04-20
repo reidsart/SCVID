@@ -46,22 +46,30 @@ function sb_render_add_business_form() {
         <label for="gallery">Photo Gallery (up to 5, max 2MB each):</label>
         <input type="file" id="gallery" name="gallery[]" accept="image/jpeg, image/png" multiple>
 
-        <label for="tags">Tags (select up to 2):</label>
-        <div id="tags-table">
-            <?php
-            $tags = get_tags(); // Fetch WordPress post tags
-            if ($tags) {
-                foreach ($tags as $tag) {
-                    echo '<label>';
-                    echo '<input type="checkbox" name="tags[]" value="' . esc_attr($tag->term_id) . '" onchange="limitTagSelection()"> ';
-                    echo esc_html($tag->name);
-                    echo '</label><br>';
+        <label for="tags">Select up to 2 Tags:</label>
+        <table id="tags-table" border="1" cellpadding="5" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Tag Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $tags = get_tags(); // Fetch WordPress post tags
+                if ($tags) {
+                    foreach ($tags as $tag) {
+                        echo '<tr>';
+                        echo '<td><input type="checkbox" name="tags[]" value="' . esc_attr($tag->term_id) . '" onchange="limitTagSelection(this)"></td>';
+                        echo '<td>' . esc_html($tag->name) . '</td>';
+                        echo '</tr>';
+                    }
+                } else {
+                    echo '<tr><td colspan="2">No tags available.</td></tr>';
                 }
-            } else {
-                echo '<p>No tags available.</p>';
-            }
-            ?>
-        </div>
+                ?>
+            </tbody>
+        </table>
 
         <br>
         <input type="hidden" id="category" name="category" value=""> <!-- Default empty -->
@@ -71,12 +79,12 @@ function sb_render_add_business_form() {
 
     <script>
         // JavaScript to limit tag selection to 2
-        function limitTagSelection() {
+        function limitTagSelection(checkbox) {
             const checkboxes = document.querySelectorAll('input[name="tags[]"]');
             const checked = Array.from(checkboxes).filter(cb => cb.checked);
             if (checked.length > 2) {
                 alert('You can select up to 2 tags only.');
-                this.checked = false;
+                checkbox.checked = false;
             }
         }
 
