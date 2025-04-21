@@ -236,12 +236,17 @@ function sb_handle_edit_form_submission() {
 
         // Sanitize and update post fields
         $updated_title = sanitize_text_field($_POST['listing_title']);
-        $updated_description = sanitize_textarea_field($_POST['listing_description']);
-        $updated_phone = sanitize_text_field($_POST['listing_phone']);
-        $updated_email = sanitize_email($_POST['listing_email']);
-        $updated_address = sanitize_text_field($_POST['listing_address']);
+        $updated_description = sanitize_textarea_field($_POST['business_description']);
+        $updated_phone = sanitize_text_field($_POST['business_phone']);
+        $updated_email = sanitize_email($_POST['business_email']);
+        $updated_address = sanitize_text_field($_POST['business_address']);
         $updated_website = esc_url_raw($_POST['listing_website']);
+        $updated_whatsapp = sanitize_text_field($_POST['business_whatsapp']);
+        $updated_facebook = esc_url_raw($_POST['facebook']);
+        $updated_address_privacy = isset($_POST['address_privacy']) ? sanitize_text_field($_POST['address_privacy']) : 'no';
+        $updated_tags = !empty($_POST['tags']) ? array_map('intval', $_POST['tags']) : array();
 
+        // Update the post
         wp_update_post(array(
             'ID' => $listing_id,
             'post_title' => $updated_title,
@@ -253,6 +258,12 @@ function sb_handle_edit_form_submission() {
         update_post_meta($listing_id, '_business_email', $updated_email);
         update_post_meta($listing_id, '_business_address', $updated_address);
         update_post_meta($listing_id, '_business_website', $updated_website);
+        update_post_meta($listing_id, '_business_whatsapp', $updated_whatsapp);
+        update_post_meta($listing_id, '_facebook', $updated_facebook);
+        update_post_meta($listing_id, '_address_privacy', $updated_address_privacy);
+
+        // Update tags
+        wp_set_post_terms($listing_id, $updated_tags, 'post_tag');
 
         echo '<p style="color: green;">Listing updated successfully.</p>';
     }
