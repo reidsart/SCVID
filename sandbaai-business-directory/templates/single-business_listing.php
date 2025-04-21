@@ -24,6 +24,10 @@ get_header(); ?>
             $gallery = get_post_meta(get_the_ID(), 'gallery', true);
             $tags = get_post_meta(get_the_ID(), 'tags', true);
             $address_privacy = get_post_meta(get_the_ID(), 'address_privacy', true);
+
+            // Check if the logged-in user is the author of the post
+            $current_user_id = get_current_user_id();
+            $post_author_id = get_the_author_meta('ID');
             ?>
             <div class="business-details">
                 <h1 class="business-title"><?php the_title(); ?></h1>
@@ -77,6 +81,16 @@ get_header(); ?>
                     <p><strong>Tags:</strong> <?php echo esc_html($tags); ?></p>
                 <?php endif; ?>
             </div>
+
+            <!-- Add Edit Listing Button -->
+            <?php if ($current_user_id === $post_author_id) : ?>
+                <div class="edit-listing-button">
+                    <a href="<?php echo esc_url(home_url('/edit-listing/?listing_id=' . get_the_ID())); ?>" class="button" style="background-color: #0073aa; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;"
+                    >Edit This Listing</a>
+    
+                </div>
+            <?php endif; ?>
+
         <?php endwhile;
     else : ?>
         <p>No business details found.</p>
