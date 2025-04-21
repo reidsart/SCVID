@@ -235,10 +235,14 @@ function sb_handle_edit_form_submission() {
             return;
         }
 
+        // Get the post title from the form input
+        $post_title = isset($_POST['post_title']) ? sanitize_text_field($_POST['post_title']) : $listing->post_title;
+        
         // Log the current title for debugging
         error_log("Current title before update: " . $listing->post_title);
+        error_log("Title from form: " . $post_title);
 
-        // Sanitize and update post fields (excluding the title)
+        // Sanitize and update post fields
         $updated_description = sanitize_textarea_field($_POST['business_description']);
         $updated_phone = sanitize_text_field($_POST['business_phone']);
         $updated_email = sanitize_email($_POST['business_email']);
@@ -287,18 +291,33 @@ function sb_handle_edit_form_submission() {
             }
         }
 
-        // Preserve the current title explicitly
-        $preserved_title = $listing->post_title;
-
-        // Update the post
-        wp_update_post(array(
+        // FIXED: Update the post with the title from the form
+        $post_data = array(
             'ID' => $listing_id,
-            'post_title' => $preserved_title, // Explicitly preserve the current title
-        ));
+            'post_title' => $post_title,
+            'post_content' => $updated_description,
+        );
+        
+        $update_result = wp_update_post($post_data, true);
 
-        // Log the title after update for debugging
-        $updated_listing = get_post($listing_id);
-        error_log("Title after update: " . $updated_listing->post_title);
+        // Log any errors or success from wp_update_post
+        if (is_wp_error($update_result)) {
+            error_log("Post update error: " . $update_result->get_error_message());
+        } else {
+            error_log("Post updated successfully with ID: " . $update_result);
+        }
+
+        // Check title immediately after update to verify
+        $check_post = get_post($listing_id);
+        error_log("Title immediately after wp_update_post: " . $check_post->post_title);
+
+        // SOLUTION: Temporarily remove the Paystack hook before updating meta fields
+        if (has_action('save_post', 'paystack_save_post_meta')) {
+            $paystack_priority = has_filter('save_post', 'paystack_save_post_meta');
+            remove_action('save_post', 'paystack_save_post_meta', $paystack_priority);
+            $removed_paystack_hook = true;
+            error_log("Temporarily removed Paystack save_post_meta hook");
+        }
 
         // Update meta fields
         update_post_meta($listing_id, 'business_description', $updated_description);
@@ -312,6 +331,16 @@ function sb_handle_edit_form_submission() {
 
         // Save tags
         wp_set_post_terms($listing_id, $updated_tags, 'post_tag');
+
+        // Add the Paystack hook back if it was removed
+        if (isset($removed_paystack_hook) && $removed_paystack_hook && isset($paystack_priority)) {
+            add_action('save_post', 'paystack_save_post_meta', $paystack_priority, 2);
+            error_log("Re-added Paystack save_post_meta hook");
+        }
+
+        // Log the final title after all updates
+        $updated_listing = get_post($listing_id);
+        error_log("Title after update: " . $updated_listing->post_title);
 
         echo '<p style="color: green;">Listing updated successfully.</p>';
     }
