@@ -201,9 +201,17 @@ function sb_handle_form_submission() {
             ),
         ));
 
+// If the listing was created successfully
         if ($post_id) {
             echo '<p style="color: green;">Success: Your business listing has been submitted for review.</p>';
+            if ($listing_id) {
+// Redirect to the edit page with the new listing ID
+            $edit_page_url = home_url('/edit-listing/?listing_id=' . $listing_id);
+    wp_redirect($edit_page_url);
+    exit;
+}
         } else {
+// If the listing was not created successfully
             echo '<p style="color: red;">Error: Unable to save your business listing. Please try again later.</p>';
         }
     }
