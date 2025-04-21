@@ -49,10 +49,6 @@ if ($query->have_posts()) {
         // IMPORTANT: Add a hidden field for the post title so it gets submitted with the form
         echo '<input type="hidden" name="post_title" value="' . esc_attr($listing_title) . '">';
 
-        // Business Name (commented out - users can't edit it)
-        //echo '<label for="listing_title_' . esc_attr($listing_id) . '">Business Name:</label>';
-        //echo '<input type="text" id="listing_title_' . esc_attr($listing_id) . '" name="post_title" value="' . esc_attr($listing_title) . '" required>';
-
         // Business Address
         echo '<label for="listing_address_' . esc_attr($listing_id) . '">Business Address:</label>';
         echo '<input type="text" id="listing_address_' . esc_attr($listing_id) . '" name="business_address" value="' . esc_attr($listing_address) . '" required>';
@@ -111,34 +107,117 @@ if ($query->have_posts()) {
         }
         echo '</select><br><br>';
 
-        // Business Logo
-        $listing_logo = get_post_meta($listing_id, 'logo', true);
-        if (!empty($listing_logo)) {
-            echo '<label for="logo_' . esc_attr($listing_id) . '">Current Logo:</label>';
-            echo '<img src="' . esc_url($listing_logo) . '" alt="Logo" style="max-width: 100px; display: block;">';
-        }
-        echo '<label for="logo_' . esc_attr($listing_id) . '">Upload New Logo:</label>';
-        echo '<input type="file" id="logo_' . esc_attr($listing_id) . '" name="logo">';
+// Fetch the listing data and display logo and photos to edit
+$listing_id = isset($_GET['listing_id']) ? intval($_GET['listing_id']) : 0;
+$listing = get_post($listing_id);
 
-        // Gallery Photos
-        $listing_gallery = get_post_meta($listing_id, 'gallery', true);
-        if (!empty($listing_gallery) && is_array($listing_gallery)) {
-            echo '<label for="gallery_' . esc_attr($listing_id) . '">Current Gallery:</label>';
-            foreach ($listing_gallery as $photo_url) {
-                echo '<img src="' . esc_url($photo_url) . '" alt="Gallery Photo" style="max-width: 100px; display: inline-block; margin-right: 10px;">';
-            }
-        }
-        echo '<label for="gallery_' . esc_attr($listing_id) . '">Upload New Photos:</label>';
-        echo '<input type="file" id="gallery_' . esc_attr($listing_id) . '" name="gallery[]" multiple>';
+if (!$listing) {
+    echo '<p style="color: red;">Invalid listing ID.</p>';
+    return;
+}
 
+// Get the existing gallery and logo
+$gallery = get_post_meta($listing_id, 'gallery', true);
+$logo = get_post_meta($listing_id, 'logo', true);
 
-        // Submit Button
-        echo '<button type="submit" class="submit-button" name="update_listing" value="' . esc_attr($listing_id) . '">Update Listing</button>';
-        echo '</form>';
-        echo '</div><br>';
+echo '<form method="post" action="" enctype="multipart/form-data">';
+// Other form fields for editing the listing
+
+// Display existing photos
+if (!empty($logo)): ?>
+    <div>
+        <label>Current Logo:</label><br>
+        <img src="<?php echo esc_url($logo); ?>" alt="Logo" style="max-width: 150px;"><br>
+        <input type="checkbox" name="remove_logo" value="1"> Remove Logo
+    </div>
+<?php endif; ?>
+
+<?php if (!empty($gallery) && is_array($gallery)): ?>
+    <div>
+        <label>Current Gallery:</label><br>
+        <?php foreach ($gallery as $key => $photo_url): ?>
+            <div style="margin-bottom: 10px;">
+                <img src="<?php echo esc_url($photo_url); ?>" alt="Gallery Photo" style="max-width: 150px;"><br>
+                <input type="checkbox" name="remove_gallery[]" value="<?php echo esc_attr($key); ?>"> Remove Photo
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+
+<!-- File upload for new photos -->
+<label for="gallery">Upload New Photos:</label>
+<input type="file" id="gallery" name="gallery[]" multiple><br>
+
+<label for="logo">Upload New Logo:</label>
+<input type="file" id="logo" name="logo"><br>
+
+<!-- Submit button -->
+<input type="submit" name="update_listing" value="Update Listing">
+
+<?php
+// Backend handling for removals and updates
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_listing'])) {
+    // Handle logo removal
+    if (isset($_POST['remove_logo']) && $_POST['remove_logo'] == '1') {
+        delete_post_meta($listing_id, 'logo');
     }
 
-    echo '</div>';
+    // Handle gallery photo removal
+    if (isset($_POST['remove_gallery']) && is_array($_POST['remove_gallery'])) {
+        $current_gallery = get_post_meta($listing_id, 'gallery', true);
+        foreach ($_POST['remove_gallery'] as $key_to_remove) {
+            if (isset($current_gallery[$key_to_remove])) {
+                unset($current_gallery[$key_to_remove]);
+            }
+        }
+        update_post_meta($listing_id, 'gallery', array_values($current_gallery)); // Reset keys to avoid gaps
+    }
+
+    // Handle new logo upload
+    if (!empty($_FILES['logo']['name'])) {
+        $uploaded_logo = sb_handle_file_upload($_FILES['logo'], 500 * 1024); // 500KB limit
+        if (!is_wp_error($uploaded_logo)) {
+            update_post_meta($listing_id, 'logo', $uploaded_logo);
+        } else {
+            echo '<p style="color: red;">Error uploading logo: ' . $uploaded_logo->get_error_message() . '</p>';
+        }
+    }
+
+    // Handle new gallery photo uploads
+    if (!empty($_FILES['gallery']['name'][0])) {
+        $current_gallery = get_post_meta($listing_id, 'gallery', true);
+        $current_gallery = is_array($current_gallery) ? $current_gallery : array(); // Ensure it's an array
+        foreach ($_FILES['gallery']['name'] as $key => $value) {
+            if (!empty($value)) {
+                $file = array(
+                    'name' => $_FILES['gallery']['name'][$key],
+                    'type' => $_FILES['gallery']['type'][$key],
+                    'tmp_name' => $_FILES['gallery']['tmp_name'][$key],
+                    'error' => $_FILES['gallery']['error'][$key],
+                    'size' => $_FILES['gallery']['size'][$key],
+                );
+                $uploaded_file = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
+                if (!is_wp_error($uploaded_file)) {
+                    $current_gallery[] = $uploaded_file;
+                } else {
+                    echo '<p style="color: red;">Error uploading gallery photo: ' . $uploaded_file->get_error_message() . '</p>';
+                }
+            }
+        }
+        update_post_meta($listing_id, 'gallery', $current_gallery);
+    }
+
+    echo '<p style="color: green;">Listing updated successfully.</p>';
+}
+?>
+<?php
+    // Submit Button
+    echo '<button type="submit" class="submit-button" name="update_listing" value="' . esc_attr($listing_id) . '">Update Listing</button>';
+    echo '</form>';
+    echo '</div><br>';
+}
+
+echo '</div>';
 } else {
     echo '<p>You have not created any listings yet.</p>';
 }
