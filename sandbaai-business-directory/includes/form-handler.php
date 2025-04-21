@@ -221,6 +221,7 @@ add_action('init', 'sb_handle_form_submission');
 // Edit business listings
 add_action('init', 'sb_handle_edit_form_submission');
 
+// Function to handle editing listing updates
 function sb_handle_edit_form_submission() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_listing'])) {
         $listing_id = intval($_POST['update_listing']);
@@ -234,8 +235,10 @@ function sb_handle_edit_form_submission() {
             return;
         }
 
+        // Log the current title for debugging
+        error_log("Current title before update: " . $listing->post_title);
+
         // Sanitize and update post fields (excluding the title)
-        // $updated_title = !empty($_POST['post_title']) ? sanitize_text_field($_POST['post_title']) : $listing->post_title;
         $updated_description = sanitize_textarea_field($_POST['business_description']);
         $updated_phone = sanitize_text_field($_POST['business_phone']);
         $updated_email = sanitize_email($_POST['business_email']);
@@ -255,40 +258,47 @@ function sb_handle_edit_form_submission() {
             if (!is_wp_error($uploaded_logo)) {
                 update_post_meta($listing_id, 'logo', $uploaded_logo);
             } else {
-               echo '<p style="color: red;">Error uploading logo: ' . $uploaded_logo->get_error_message() . '</p>';
-           }
+                echo '<p style="color: red;">Error uploading logo: ' . $uploaded_logo->get_error_message() . '</p>';
+            }
         }
 
         // Handle file uploads for gallery
         if (!empty($_FILES['gallery']['name'][0])) {
             $uploaded_gallery = array();
             foreach ($_FILES['gallery']['name'] as $key => $value) {
-        if (!empty($value)) {
-            $file = array(
-                'name' => $_FILES['gallery']['name'][$key],
-                'type' => $_FILES['gallery']['type'][$key],
-                'tmp_name' => $_FILES['gallery']['tmp_name'][$key],
-                'error' => $_FILES['gallery']['error'][$key],
-                'size' => $_FILES['gallery']['size'][$key],
-            );
-            $uploaded_file = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
-            if (!is_wp_error($uploaded_file)) {
-                $uploaded_gallery[] = $uploaded_file;
-            } else {
-                echo '<p style="color: red;">Error uploading gallery photo: ' . $uploaded_file->get_error_message() . '</p>';
+                if (!empty($value)) {
+                    $file = array(
+                        'name' => $_FILES['gallery']['name'][$key],
+                        'type' => $_FILES['gallery']['type'][$key],
+                        'tmp_name' => $_FILES['gallery']['tmp_name'][$key],
+                        'error' => $_FILES['gallery']['error'][$key],
+                        'size' => $_FILES['gallery']['size'][$key],
+                    );
+                    $uploaded_file = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
+                    if (!is_wp_error($uploaded_file)) {
+                        $uploaded_gallery[] = $uploaded_file;
+                    } else {
+                        echo '<p style="color: red;">Error uploading gallery photo: ' . $uploaded_file->get_error_message() . '</p>';
+                    }
+                }
+            }
+            if (!empty($uploaded_gallery)) {
+                update_post_meta($listing_id, 'gallery', $uploaded_gallery);
             }
         }
-    }
-    if (!empty($uploaded_gallery)) {
-        update_post_meta($listing_id, 'gallery', $uploaded_gallery);
-    }
-}
+
+        // Preserve the current title explicitly
+        $preserved_title = $listing->post_title;
 
         // Update the post
-        // Do not update the post_title to ensure it remains unchanged
         wp_update_post(array(
             'ID' => $listing_id,
+            'post_title' => $preserved_title, // Explicitly preserve the current title
         ));
+
+        // Log the title after update for debugging
+        $updated_listing = get_post($listing_id);
+        error_log("Title after update: " . $updated_listing->post_title);
 
         // Update meta fields
         update_post_meta($listing_id, 'business_description', $updated_description);
@@ -297,8 +307,8 @@ function sb_handle_edit_form_submission() {
         update_post_meta($listing_id, 'business_address', $updated_address);
         update_post_meta($listing_id, 'business_website', $updated_website);
         update_post_meta($listing_id, 'address_privacy', $updated_address_privacy);
-        update_post_meta($listing_id, 'business_whatsapp', $updated_whatsapp); // Fix: Add WhatsApp number
-        update_post_meta($listing_id, 'facebook', $updated_facebook); // Fix: Add Facebook page URL
+        update_post_meta($listing_id, 'business_whatsapp', $updated_whatsapp);
+        update_post_meta($listing_id, 'facebook', $updated_facebook);
 
         // Save tags
         wp_set_post_terms($listing_id, $updated_tags, 'post_tag');
