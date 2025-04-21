@@ -87,7 +87,11 @@ if ($query->have_posts()) {
         $tags = get_tags(array('hide_empty' => false));
         $selected_tags = array_values($selected_tags); // Ensure selected tags are indexed numerically
 
+        // Tag Dropdowns Container
+        echo '<div style="display: flex; align-items: center; gap: 10px;">';
+
         // Tag 1 Dropdown
+        echo '<div>';
         echo '<label for="tag_1">Tag 1:</label>';
         echo '<select id="tag_1" name="tags[]" required>';
         echo '<option value="">Select Tag 1</option>';
@@ -96,8 +100,10 @@ if ($query->have_posts()) {
             echo '<option value="' . esc_attr($tag->term_id) . '" ' . $selected . '>' . esc_html($tag->name) . '</option>';
         }
         echo '</select>';
+        echo '</div>';
 
         // Tag 2 Dropdown
+        echo '<div>';
         echo '<label for="tag_2">Tag 2:</label>';
         echo '<select id="tag_2" name="tags[]">';
         echo '<option value="">Select Tag 2</option>';
@@ -105,7 +111,10 @@ if ($query->have_posts()) {
             $selected = (isset($selected_tags[1]) && $tag->term_id == $selected_tags[1]) ? 'selected' : '';
             echo '<option value="' . esc_attr($tag->term_id) . '" ' . $selected . '>' . esc_html($tag->name) . '</option>';
         }
-        echo '</select><br><br>';
+        echo '</select>';
+        echo '</div>';
+
+        echo '</div><br><br>';
 
         // Gallery and Logo Handling
         $gallery = get_post_meta($listing_id, 'gallery', true);
