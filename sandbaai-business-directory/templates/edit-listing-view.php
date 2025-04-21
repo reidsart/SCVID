@@ -47,8 +47,8 @@ if ($query->have_posts()) {
         echo '<input type="hidden" name="listing_id" value="' . esc_attr($listing_id) . '">';
 
         // Business Name
-        echo '<label for="listing_title_' . esc_attr($listing_id) . '">Business Name:</label>';
-        echo '<input type="text" id="listing_title_' . esc_attr($listing_id) . '" name="post_title" value="' . esc_attr($listing_title) . '" required>';
+//        echo '<label for="listing_title_' . esc_attr($listing_id) . '">Business Name:</label>';
+//        echo '<input type="text" id="listing_title_' . esc_attr($listing_id) . '" name="post_title" value="' . esc_attr($listing_title) . '" required>';
 
         // Business Address
         echo '<label for="listing_address_' . esc_attr($listing_id) . '">Business Address:</label>';
