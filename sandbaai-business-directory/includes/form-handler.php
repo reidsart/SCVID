@@ -218,6 +218,46 @@ function sb_handle_form_submission() {
 }
 add_action('init', 'sb_handle_form_submission');
 
+// Edit business listings
+add_action('init', 'sb_handle_edit_form_submission');
+
+function sb_handle_edit_form_submission() {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_listing'])) {
+        $listing_id = intval($_POST['update_listing']);
+
+        // Check if the current user is the author of the listing
+        $current_user_id = get_current_user_id();
+        $listing = get_post($listing_id);
+
+        if (!$listing || $listing->post_author != $current_user_id) {
+            echo '<p style="color: red;">You do not have permission to edit this listing.</p>';
+            return;
+        }
+
+        // Sanitize and update post fields
+        $updated_title = sanitize_text_field($_POST['listing_title']);
+        $updated_description = sanitize_textarea_field($_POST['listing_description']);
+        $updated_phone = sanitize_text_field($_POST['listing_phone']);
+        $updated_email = sanitize_email($_POST['listing_email']);
+        $updated_address = sanitize_text_field($_POST['listing_address']);
+        $updated_website = esc_url_raw($_POST['listing_website']);
+
+        wp_update_post(array(
+            'ID' => $listing_id,
+            'post_title' => $updated_title,
+            'post_content' => $updated_description,
+        ));
+
+        // Update meta fields
+        update_post_meta($listing_id, '_business_phone', $updated_phone);
+        update_post_meta($listing_id, '_business_email', $updated_email);
+        update_post_meta($listing_id, '_business_address', $updated_address);
+        update_post_meta($listing_id, '_business_website', $updated_website);
+
+        echo '<p style="color: green;">Listing updated successfully.</p>';
+    }
+}
+
 // Shortcode to render the edit business form
 function sb_render_edit_business_form_shortcode($atts) {
     // Parse shortcode attributes
