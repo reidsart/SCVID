@@ -234,36 +234,37 @@ function sb_handle_edit_form_submission() {
             return;
         }
 
+        // Debugging: Check if `post_title` is present in `$_POST`
+        if (empty($_POST['post_title'])) {
+            echo '<p style="color: red;">Error: Business name (post_title) is missing!</p>';
+            return;
+        }
+
         // Sanitize and update post fields
-        $updated_title = sanitize_text_field($_POST['listing_title']);
+        $updated_title = sanitize_text_field($_POST['post_title']); // Ensure post_title is sanitized
         $updated_description = sanitize_textarea_field($_POST['business_description']);
         $updated_phone = sanitize_text_field($_POST['business_phone']);
         $updated_email = sanitize_email($_POST['business_email']);
         $updated_address = sanitize_text_field($_POST['business_address']);
-        $updated_website = esc_url_raw($_POST['listing_website']);
-        $updated_whatsapp = sanitize_text_field($_POST['business_whatsapp']);
-        $updated_facebook = esc_url_raw($_POST['facebook']);
-        $updated_address_privacy = isset($_POST['address_privacy']) ? sanitize_text_field($_POST['address_privacy']) : 'no';
-        $updated_tags = !empty($_POST['tags']) ? array_map('intval', $_POST['tags']) : array();
+        $updated_website = esc_url_raw($_POST['business_website']);
+        $updated_address_privacy = sanitize_text_field($_POST['address_privacy']);
+
+        // Debugging: Output the sanitized title
+        // echo '<p>Updated Title: ' . esc_html($updated_title) . '</p>';
 
         // Update the post
         wp_update_post(array(
             'ID' => $listing_id,
-            'post_title' => $updated_title,
-            'post_content' => $updated_description,
+            'post_title' => $updated_title, // Save the sanitized title
         ));
 
         // Update meta fields
-        update_post_meta($listing_id, '_business_phone', $updated_phone);
-        update_post_meta($listing_id, '_business_email', $updated_email);
-        update_post_meta($listing_id, '_business_address', $updated_address);
-        update_post_meta($listing_id, '_business_website', $updated_website);
-        update_post_meta($listing_id, '_business_whatsapp', $updated_whatsapp);
-        update_post_meta($listing_id, '_facebook', $updated_facebook);
-        update_post_meta($listing_id, '_address_privacy', $updated_address_privacy);
-
-        // Update tags
-        wp_set_post_terms($listing_id, $updated_tags, 'post_tag');
+        update_post_meta($listing_id, 'business_description', $updated_description);
+        update_post_meta($listing_id, 'business_phone', $updated_phone);
+        update_post_meta($listing_id, 'business_email', $updated_email);
+        update_post_meta($listing_id, 'business_address', $updated_address);
+        update_post_meta($listing_id, 'business_website', $updated_website);
+        update_post_meta($listing_id, 'address_privacy', $updated_address_privacy);
 
         echo '<p style="color: green;">Listing updated successfully.</p>';
     }
