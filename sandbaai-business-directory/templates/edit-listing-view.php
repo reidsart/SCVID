@@ -100,13 +100,34 @@ if ($query->have_posts()) {
 
         // Tag 2 Dropdown
         echo '<label for="tag_2">Tag 2:</label>';
-        echo '<select id="tag_2" name="tags[]" required>';
+        echo '<select id="tag_2" name="tags[]">';
         echo '<option value="">Select Tag 2</option>';
         foreach ($tags as $tag) {
             $selected = (isset($selected_tags[1]) && $tag->term_id == $selected_tags[1]) ? 'selected' : '';
             echo '<option value="' . esc_attr($tag->term_id) . '" ' . $selected . '>' . esc_html($tag->name) . '</option>';
         }
         echo '</select><br><br>';
+
+        // Business Logo
+        $listing_logo = get_post_meta($listing_id, 'logo', true);
+        if (!empty($listing_logo)) {
+            echo '<label for="logo_' . esc_attr($listing_id) . '">Current Logo:</label>';
+            echo '<img src="' . esc_url($listing_logo) . '" alt="Logo" style="max-width: 100px; display: block;">';
+        }
+        echo '<label for="logo_' . esc_attr($listing_id) . '">Upload New Logo:</label>';
+        echo '<input type="file" id="logo_' . esc_attr($listing_id) . '" name="logo">';
+
+        // Gallery Photos
+        $listing_gallery = get_post_meta($listing_id, 'gallery', true);
+        if (!empty($listing_gallery) && is_array($listing_gallery)) {
+            echo '<label for="gallery_' . esc_attr($listing_id) . '">Current Gallery:</label>';
+            foreach ($listing_gallery as $photo_url) {
+                echo '<img src="' . esc_url($photo_url) . '" alt="Gallery Photo" style="max-width: 100px; display: inline-block; margin-right: 10px;">';
+            }
+        }
+        echo '<label for="gallery_' . esc_attr($listing_id) . '">Upload New Photos:</label>';
+        echo '<input type="file" id="gallery_' . esc_attr($listing_id) . '" name="gallery[]" multiple>';
+
 
         // Submit Button
         echo '<button type="submit" class="submit-button" name="update_listing" value="' . esc_attr($listing_id) . '">Update Listing</button>';
