@@ -318,7 +318,7 @@ function sb_handle_edit_form_submission() {
         $post_data = array(
             'ID' => $listing_id,
             'post_title' => $post_title,
-            'post_content' => $updated_description
+            'post_content' => $updated_description // Ensure this is correct if description is stored as post content
         );
 
         // Update the post
@@ -332,6 +332,7 @@ function sb_handle_edit_form_submission() {
         }
 
         // Save meta fields explicitly
+        update_post_meta($listing_id, 'business_description', $updated_description); // Explicitly update the description in meta
         update_post_meta($listing_id, 'business_phone', $updated_phone);
         update_post_meta($listing_id, 'business_email', $updated_email);
         update_post_meta($listing_id, 'business_address', $updated_address);
