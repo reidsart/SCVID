@@ -116,6 +116,8 @@ if (!$listing) {
     return;
 }
 
+// debugging
+error_log('Gallery meta for listing ' . $listing_id . ': ' . print_r($gallery, true));
 // Get the existing gallery and logo
 $gallery = get_post_meta($listing_id, 'gallery', true);
 $logo = get_post_meta($listing_id, 'logo', true);
@@ -135,7 +137,10 @@ if (!empty($logo)): ?>
 <?php if (!empty($gallery) && is_array($gallery)): ?>
     <div>
         <label>Current Gallery:</label><br>
-        <?php foreach ($gallery as $key => $photo_url): ?>
+        <?php foreach ($gallery as $key => $photo_url): 
+        // debugging
+        error_log('Gallery image URL to display for listing ' . $listing_id . ': ' . $photo_url);
+        ?>
             <div style="margin-bottom: 10px;">
                 <img src="<?php echo esc_url($photo_url); ?>" alt="Gallery Photo" style="max-width: 150px;"><br>
                 <input type="checkbox" name="remove_gallery[]" value="<?php echo esc_attr($key); ?>"> Remove Photo
@@ -171,6 +176,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_listing'])) {
             }
         }
         update_post_meta($listing_id, 'gallery', array_values($current_gallery)); // Reset keys to avoid gaps
+        // debugging
+        error_log('Updated gallery meta for listing ' . $listing_id . ': ' . print_r(get_post_meta($listing_id, 'gallery', true), true));
     }
 
     // Handle new logo upload
@@ -198,8 +205,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_listing'])) {
                 );
                 $uploaded_file = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
                 if (!is_wp_error($uploaded_file)) {
+                    // debugging
+                    error_log('New gallery photo uploaded for listing ' . $listing_id . ': ' . $uploaded_file);
                     $current_gallery[] = $uploaded_file;
                 } else {
+                    // debugging
+                    error_log('Error uploading gallery photo for listing ' . $listing_id . ': ' . $uploaded_file->get_error_message());
                     echo '<p style="color: red;">Error uploading gallery photo: ' . $uploaded_file->get_error_message() . '</p>';
                 }
             }
