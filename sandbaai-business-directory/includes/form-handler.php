@@ -242,6 +242,8 @@ function sb_handle_edit_form_submission() {
         $updated_address = sanitize_text_field($_POST['business_address']);
         $updated_website = esc_url_raw($_POST['business_website']);
         $updated_address_privacy = sanitize_text_field($_POST['address_privacy']);
+        $updated_whatsapp = sanitize_text_field($_POST['business_whatsapp']);
+        $updated_facebook = esc_url_raw($_POST['facebook']);
         $updated_tags = isset($_POST['tags']) ? array_map('intval', $_POST['tags']) : array();
 
         // Remove duplicates from tags array
@@ -260,6 +262,8 @@ function sb_handle_edit_form_submission() {
         update_post_meta($listing_id, 'business_address', $updated_address);
         update_post_meta($listing_id, 'business_website', $updated_website);
         update_post_meta($listing_id, 'address_privacy', $updated_address_privacy);
+        update_post_meta($listing_id, 'business_whatsapp', $updated_whatsapp); // Fix: Add WhatsApp number
+        update_post_meta($listing_id, 'facebook', $updated_facebook); // Fix: Add Facebook page URL
 
         // Save tags
         wp_set_post_terms($listing_id, $updated_tags, 'post_tag');
