@@ -223,7 +223,16 @@ add_action('init', 'sb_handle_edit_form_submission');
 
 // Function to handle editing listing updates
 function sb_handle_edit_form_submission() {
+    global $sb_is_updating_post;
+    
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_listing'])) {
+        // Set the flag to prevent recursive updates
+        if ($sb_is_updating_post) {
+            error_log("Preventing recursive post update");
+            return;
+        }
+        $sb_is_updating_post = true;
+        
         $listing_id = intval($_POST['update_listing']);
 
         // Check if the current user is the author of the listing
@@ -232,6 +241,7 @@ function sb_handle_edit_form_submission() {
 
         if (!$listing || $listing->post_author != $current_user_id) {
             echo '<p style="color: red;">You do not have permission to edit this listing.</p>';
+            $sb_is_updating_post = false; // Reset flag before returning
             return;
         }
 
@@ -311,7 +321,7 @@ function sb_handle_edit_form_submission() {
         $check_post = get_post($listing_id);
         error_log("Title immediately after wp_update_post: " . $check_post->post_title);
 
-        // SOLUTION: Temporarily remove the Paystack hook before updating meta fields
+        // Temporarily remove the Paystack hook before updating meta fields
         if (has_action('save_post', 'paystack_save_post_meta')) {
             $paystack_priority = has_filter('save_post', 'paystack_save_post_meta');
             remove_action('save_post', 'paystack_save_post_meta', $paystack_priority);
@@ -343,6 +353,9 @@ function sb_handle_edit_form_submission() {
         error_log("Title after update: " . $updated_listing->post_title);
 
         echo '<p style="color: green;">Listing updated successfully.</p>';
+        
+        // Reset the flag at the end of the function
+        $sb_is_updating_post = false;
     }
 }
 
