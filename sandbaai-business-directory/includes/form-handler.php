@@ -234,28 +234,23 @@ function sb_handle_edit_form_submission() {
             return;
         }
 
-        // Debugging: Check if `post_title` is present in `$_POST`
-        if (empty($_POST['post_title'])) {
-            echo '<p style="color: red;">Error: Business name (post_title) is missing!</p>';
-            return;
-        }
-
         // Sanitize and update post fields
-        $updated_title = sanitize_text_field($_POST['post_title']); // Ensure post_title is sanitized
+        $updated_title = sanitize_text_field($_POST['post_title']);
         $updated_description = sanitize_textarea_field($_POST['business_description']);
         $updated_phone = sanitize_text_field($_POST['business_phone']);
         $updated_email = sanitize_email($_POST['business_email']);
         $updated_address = sanitize_text_field($_POST['business_address']);
         $updated_website = esc_url_raw($_POST['business_website']);
         $updated_address_privacy = sanitize_text_field($_POST['address_privacy']);
+        $updated_tags = isset($_POST['tags']) ? array_map('intval', $_POST['tags']) : array();
 
-        // Debugging: Output the sanitized title
-        // echo '<p>Updated Title: ' . esc_html($updated_title) . '</p>';
+        // Remove duplicates from tags array
+        $updated_tags = array_unique($updated_tags);
 
         // Update the post
         wp_update_post(array(
             'ID' => $listing_id,
-            'post_title' => $updated_title, // Save the sanitized title
+            'post_title' => $updated_title,
         ));
 
         // Update meta fields
@@ -265,6 +260,9 @@ function sb_handle_edit_form_submission() {
         update_post_meta($listing_id, 'business_address', $updated_address);
         update_post_meta($listing_id, 'business_website', $updated_website);
         update_post_meta($listing_id, 'address_privacy', $updated_address_privacy);
+
+        // Save tags
+        wp_set_post_terms($listing_id, $updated_tags, 'post_tag');
 
         echo '<p style="color: green;">Listing updated successfully.</p>';
     }
