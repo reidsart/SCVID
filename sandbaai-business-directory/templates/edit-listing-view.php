@@ -54,9 +54,9 @@ if ($query->have_posts()) {
         echo '<input type="text" id="listing_address_' . esc_attr($listing_id) . '" name="business_address" value="' . esc_attr($listing_address) . '" required>';
 
         // Address Privacy
-        echo '<label for="address_privacy_' . esc_attr($listing_id) . '">Hide Address?&nbsp&nbsp</label>';
-        echo '<input type="radio" name="address_privacy" value="1" ' . checked($address_privacy, 'yes', false) . '> Yes';
-        echo '<input type="radio" name="address_privacy" value="0" ' . checked($address_privacy, 'no', false) . '> No';
+        echo '<label for="address_privacy_' . esc_attr($listing_id) . '">Hide Address?&nbsp;&nbsp;</label>';
+        echo '<input type="radio" name="address_privacy" value="1" ' . checked($address_privacy, '1', false) . '> Yes';
+        echo '<input type="radio" name="address_privacy" value="0" ' . checked($address_privacy, '0', false) . '> No';
         echo '<br>';
 
         // Business Phone
@@ -72,16 +72,16 @@ if ($query->have_posts()) {
         echo '<textarea id="listing_description_' . esc_attr($listing_id) . '" name="business_description" required>' . esc_textarea($listing_description) . '</textarea>';
 
         // Business Website
-        echo '<label for="listing_website_' . esc_attr($listing_id) . '">Business Website:</label>';
-        echo '<input type="url" id="listing_website_' . esc_attr($listing_id) . '" name="business_website" value="' . esc_url($listing_website) . '">';
+        echo '<label for="business_website">Business Website:</label>';
+        echo '<input type="text" id="business_website" name="business_website" placeholder="example.com">';
 
         // WhatsApp Number
         echo '<label for="listing_whatsapp_' . esc_attr($listing_id) . '">Business WhatsApp Number:</label>';
         echo '<input type="text" id="listing_whatsapp_' . esc_attr($listing_id) . '" name="business_whatsapp" value="' . esc_attr($listing_whatsapp) . '">';
 
         // Facebook Page
-        echo '<label for="facebook_' . esc_attr($listing_id) . '">Business Facebook Page:</label>';
-        echo '<input type="url" id="facebook_' . esc_attr($listing_id) . '" name="facebook" value="' . esc_url($facebook) . '">';
+        echo '<label for="facebook">Facebook Page URL:</label>';
+        echo '<input type="text" id="facebook" name="facebook" placeholder="facebook.com/yourpage">';
 
         // Tags as Dropdowns
         $tags = get_tags(array('hide_empty' => false));
