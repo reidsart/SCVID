@@ -235,7 +235,8 @@ function sb_handle_edit_form_submission() {
         }
 
         // Sanitize and update post fields
-        $updated_title = sanitize_text_field($_POST['post_title']);
+        // Ensure that the business name (post_title) is retained
+        $updated_title = !empty($_POST['post_title']) ? sanitize_text_field($_POST['post_title']) : $listing->post_title;
         $updated_description = sanitize_textarea_field($_POST['business_description']);
         $updated_phone = sanitize_text_field($_POST['business_phone']);
         $updated_email = sanitize_email($_POST['business_email']);
