@@ -301,18 +301,51 @@ function sb_handle_edit_form_submission() {
         // Remove empty values from tags array
         $updated_tags = array_filter($updated_tags);
 
-        // Log sanitized data
-        error_log("Sanitized data: " . print_r([
-            'title' => $post_title,
-            'description' => $updated_description,
-            'phone' => $updated_phone,
-            'email' => $updated_email,
-            'address' => $updated_address,
-            'website' => $updated_website,
-            'whatsapp' => $updated_whatsapp,
-            'facebook' => $updated_facebook,
-            'tags' => $updated_tags,
-        ], true));
+        // Handle gallery updates
+        if (isset($_POST['remove_gallery']) || !empty($_FILES['gallery']['name'][0])) {
+            // Get the existing gallery meta
+            $existing_gallery = get_post_meta($listing_id, 'gallery', true);
+            if (!is_array($existing_gallery)) {
+                $existing_gallery = [];
+            }
+            error_log("Gallery meta for listing $listing_id: " . print_r($existing_gallery, true));
+
+            // Remove selected gallery photos
+            if (isset($_POST['remove_gallery']) && is_array($_POST['remove_gallery'])) {
+                foreach ($_POST['remove_gallery'] as $remove_index) {
+                    if (isset($existing_gallery[$remove_index])) {
+                        unset($existing_gallery[$remove_index]);
+                    }
+                }
+                // Re-index the array after removing items
+                $existing_gallery = array_values($existing_gallery);
+            }
+
+            // Handle new gallery uploads
+            if (!empty($_FILES['gallery']['name'][0])) {
+                foreach ($_FILES['gallery']['name'] as $key => $value) {
+                    if (!empty($value)) {
+                        $file = array(
+                            'name' => $_FILES['gallery']['name'][$key],
+                            'type' => $_FILES['gallery']['type'][$key],
+                            'tmp_name' => $_FILES['gallery']['tmp_name'][$key],
+                            'error' => $_FILES['gallery']['error'][$key],
+                            'size' => $_FILES['gallery']['size'][$key],
+                        );
+                        $uploaded_file = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
+                        if (!is_wp_error($uploaded_file)) {
+                            $existing_gallery[] = $uploaded_file;
+                        } else {
+                            echo '<p style="color: red;">Error uploading gallery photo: ' . $uploaded_file->get_error_message() . '</p>';
+                        }
+                    }
+                }
+            }
+
+            // Update the gallery meta field
+            update_post_meta($listing_id, 'gallery', $existing_gallery);
+            error_log("Updated gallery meta for listing $listing_id: " . print_r($existing_gallery, true));
+        }
 
         // Create a complete post data array with all post content
         $post_data = array(
@@ -332,7 +365,7 @@ function sb_handle_edit_form_submission() {
         }
 
         // Save meta fields explicitly
-        update_post_meta($listing_id, 'business_description', $updated_description); // Explicitly update the description in meta
+        update_post_meta($listing_id, 'business_description', $updated_description);
         update_post_meta($listing_id, 'business_phone', $updated_phone);
         update_post_meta($listing_id, 'business_email', $updated_email);
         update_post_meta($listing_id, 'business_address', $updated_address);
