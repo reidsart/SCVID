@@ -301,13 +301,24 @@ function sb_handle_edit_form_submission() {
             }
         }
 
-        // FIXED: Update the post with the title from the form
+// Create a complete post data array with all post content and meta
         $post_data = array(
             'ID' => $listing_id,
             'post_title' => $post_title,
             'post_content' => $updated_description,
+            'meta_input' => array(
+                'business_description' => $updated_description,
+                'business_phone' => $updated_phone,
+                'business_email' => $updated_email,
+                'business_address' => $updated_address,
+                'business_website' => $updated_website,
+                'address_privacy' => $updated_address_privacy,
+                'business_whatsapp' => $updated_whatsapp,
+                'facebook' => $updated_facebook
+            )
         );
-        
+
+        // Update the post
         $update_result = wp_update_post($post_data, true);
 
         // Log any errors or success from wp_update_post
@@ -317,40 +328,8 @@ function sb_handle_edit_form_submission() {
             error_log("Post updated successfully with ID: " . $update_result);
         }
 
-        // Check title immediately after update to verify
-        $check_post = get_post($listing_id);
-        error_log("Title immediately after wp_update_post: " . $check_post->post_title);
-
-        // Temporarily remove the Paystack hook before updating meta fields
-        if (has_action('save_post', 'paystack_save_post_meta')) {
-            $paystack_priority = has_filter('save_post', 'paystack_save_post_meta');
-            remove_action('save_post', 'paystack_save_post_meta', $paystack_priority);
-            $removed_paystack_hook = true;
-            error_log("Temporarily removed Paystack save_post_meta hook");
-        }
-
-        // Update meta fields
-        update_post_meta($listing_id, 'business_description', $updated_description);
-        update_post_meta($listing_id, 'business_phone', $updated_phone);
-        update_post_meta($listing_id, 'business_email', $updated_email);
-        update_post_meta($listing_id, 'business_address', $updated_address);
-        update_post_meta($listing_id, 'business_website', $updated_website);
-        update_post_meta($listing_id, 'address_privacy', $updated_address_privacy);
-        update_post_meta($listing_id, 'business_whatsapp', $updated_whatsapp);
-        update_post_meta($listing_id, 'facebook', $updated_facebook);
-
         // Save tags
         wp_set_post_terms($listing_id, $updated_tags, 'post_tag');
-
-        // Add the Paystack hook back if it was removed
-        if (isset($removed_paystack_hook) && $removed_paystack_hook && isset($paystack_priority)) {
-            add_action('save_post', 'paystack_save_post_meta', $paystack_priority, 2);
-            error_log("Re-added Paystack save_post_meta hook");
-        }
-
-        // Log the final title after all updates
-        $updated_listing = get_post($listing_id);
-        error_log("Title after update: " . $updated_listing->post_title);
 
         echo '<p style="color: green;">Listing updated successfully.</p>';
         
