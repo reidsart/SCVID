@@ -49,6 +49,7 @@ if ($query->have_posts()) {
         // Business Name
         echo '<label for="listing_title_' . esc_attr($listing_id) . '">Business Name:</label>';
         echo '<input type="text" id="listing_title_' . esc_attr($listing_id) . '" name="post_title" value="' . esc_attr($listing_title) . '" required>';
+
         // Business Address
         echo '<label for="listing_address_' . esc_attr($listing_id) . '">Business Address:</label>';
         echo '<input type="text" id="listing_address_' . esc_attr($listing_id) . '" name="business_address" value="' . esc_attr($listing_address) . '" required>';
@@ -57,6 +58,7 @@ if ($query->have_posts()) {
         echo '<label for="address_privacy_' . esc_attr($listing_id) . '">Hide Address?</label>';
         echo '<input type="radio" name="address_privacy" value="yes" ' . checked($address_privacy, 'yes', false) . '> Yes';
         echo '<input type="radio" name="address_privacy" value="no" ' . checked($address_privacy, 'no', false) . '> No';
+        echo '<br>';
 
         // Business Phone
         echo '<label for="listing_phone_' . esc_attr($listing_id) . '">Business Phone:</label>';
@@ -82,19 +84,29 @@ if ($query->have_posts()) {
         echo '<label for="facebook_' . esc_attr($listing_id) . '">Business Facebook Page:</label>';
         echo '<input type="url" id="facebook_' . esc_attr($listing_id) . '" name="facebook" value="' . esc_url($facebook) . '">';
 
-        // Tags
+        // Tags as Dropdowns
         $tags = get_tags(array('hide_empty' => false));
-        echo '<label for="tags_' . esc_attr($listing_id) . '">Select up to 2 Tags:</label>';
-        echo '<table id="tags-table" border="1" cellpadding="5" cellspacing="0">';
-        echo '<thead><tr><th>Select</th><th>Tag Name</th></tr></thead><tbody>';
+        $selected_tags = array_values($selected_tags); // Ensure selected tags are indexed numerically
+
+        // Tag 1 Dropdown
+        echo '<label for="tag_1">Tag 1:</label>';
+        echo '<select id="tag_1" name="tags[]" required>';
+        echo '<option value="">Select Tag 1</option>';
         foreach ($tags as $tag) {
-            $checked = in_array($tag->term_id, $selected_tags) ? 'checked' : '';
-            echo '<tr>';
-            echo '<td><input type="checkbox" name="tags[]" value="' . esc_attr($tag->term_id) . '" ' . $checked . '></td>';
-            echo '<td>' . esc_html($tag->name) . '</td>';
-            echo '</tr>';
+            $selected = (isset($selected_tags[0]) && $tag->term_id == $selected_tags[0]) ? 'selected' : '';
+            echo '<option value="' . esc_attr($tag->term_id) . '" ' . $selected . '>' . esc_html($tag->name) . '</option>';
         }
-        echo '</tbody></table>';
+        echo '</select>';
+
+        // Tag 2 Dropdown
+        echo '<label for="tag_2">Tag 2:</label>';
+        echo '<select id="tag_2" name="tags[]" required>';
+        echo '<option value="">Select Tag 2</option>';
+        foreach ($tags as $tag) {
+            $selected = (isset($selected_tags[1]) && $tag->term_id == $selected_tags[1]) ? 'selected' : '';
+            echo '<option value="' . esc_attr($tag->term_id) . '" ' . $selected . '>' . esc_html($tag->name) . '</option>';
+        }
+        echo '</select>';
 
         // Submit Button
         echo '<button type="submit" class="submit-button" name="update_listing" value="' . esc_attr($listing_id) . '">Update Listing</button>';
