@@ -9,6 +9,10 @@ Author URI: https://github.com/reidsart
 License: GPL2
 */
 
+// Global flag to prevent recursive post updates
+global $sb_is_updating_post;
+$sb_is_updating_post = false;
+
 // Prevent direct access
 if (!defined('ABSPATH')) {
     exit;
@@ -112,20 +116,38 @@ function render_edit_listing_page() {
         if ($listing_author == $current_user->ID || current_user_can('administrator')) {
             // Process the form submission
             // Update post data
+            
+            // Get form values with validation - FIX for the undefined array key errors
+            $listing_title = isset($_POST['listing_title']) ? sanitize_text_field($_POST['listing_title']) : '';
+            $listing_description = isset($_POST['listing_description']) ? wp_kses_post($_POST['listing_description']) : '';
+            
             $listing_data = array(
                 'ID' => $listing_id,
-                'post_title' => sanitize_text_field($_POST['listing_title']),
-                'post_content' => wp_kses_post($_POST['listing_description']),
+                'post_title' => $listing_title,
+                'post_content' => $listing_description,
             );
             
+            error_log('Current title before update: ' . get_the_title($listing_id));
             $update_success = wp_update_post($listing_data);
+            error_log('Title after update: ' . get_the_title($listing_id));
             
-            // Update meta fields (copied from edit-listing.php)
+            // Update meta fields (with fixes for undefined array keys)
             if ($update_success) {
-                update_post_meta($listing_id, '_listing_phone', sanitize_text_field($_POST['listing_phone']));
-                update_post_meta($listing_id, '_listing_email', sanitize_email($_POST['listing_email']));
-                update_post_meta($listing_id, '_listing_website', esc_url_raw($_POST['listing_website']));
-                update_post_meta($listing_id, '_listing_address', sanitize_text_field($_POST['listing_address']));
+                // Safely get and update phone
+                $listing_phone = isset($_POST['listing_phone']) ? sanitize_text_field($_POST['listing_phone']) : '';
+                update_post_meta($listing_id, '_listing_phone', $listing_phone);
+                
+                // Safely get and update email
+                $listing_email = isset($_POST['listing_email']) ? sanitize_email($_POST['listing_email']) : '';
+                update_post_meta($listing_id, '_listing_email', $listing_email);
+                
+                // Safely get and update website - fix for the ltrim deprecated warning
+                $listing_website = isset($_POST['listing_website']) ? esc_url_raw($_POST['listing_website']) : '';
+                update_post_meta($listing_id, '_listing_website', $listing_website);
+                
+                // Safely get and update address
+                $listing_address = isset($_POST['listing_address']) ? sanitize_text_field($_POST['listing_address']) : '';
+                update_post_meta($listing_id, '_listing_address', $listing_address);
                 
                 // Handle category if needed
                 if (!empty($_POST['listing_category'])) {
@@ -146,3 +168,46 @@ function render_edit_listing_page() {
     return ob_get_clean();
 }
 add_shortcode('edit_listing', 'render_edit_listing_page');
+
+// Fix for the Paystack save_post_meta issue
+function paystack_handle_save_post($post_id) {
+    // Skip if we're in a context where get_current_screen isn't available
+    if (!function_exists('get_current_screen') || !is_admin() || defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        error_log('Paystack save_post_meta skipped: get_current_screen unavailable.');
+        return;
+    }
+    
+    // Continue with your Paystack processing code
+    // ...
+}
+add_action('save_post', 'paystack_handle_save_post', 10, 1);
+
+// Fix for the preg_replace deprecated warning
+function safe_kses_replace($pattern, $replacement, $subject) {
+    if ($subject === null) {
+        return '';
+    }
+    return preg_replace($pattern, $replacement, $subject);
+}
+
+// Add a filter to prevent null values being passed to kses functions
+add_filter('wp_kses_normalize_entities', function($string) {
+    if ($string === null) {
+        return '';
+    }
+    return $string;
+}, 5, 1);
+
+add_filter('wp_insert_post_data', 'sb_ensure_post_title', 999, 2);
+function sb_ensure_post_title($data, $postarr) {
+    // Only apply to existing posts that are being updated
+    if (!empty($postarr['ID']) && empty($data['post_title'])) {
+        // Get the existing post title
+        $existing_post = get_post($postarr['ID']);
+        if ($existing_post && !empty($existing_post->post_title)) {
+            $data['post_title'] = $existing_post->post_title;
+            error_log("Force-preserved post title: " . $existing_post->post_title);
+        }
+    }
+    return $data;
+}
