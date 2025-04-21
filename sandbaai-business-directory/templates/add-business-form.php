@@ -32,13 +32,13 @@ function sb_render_add_business_form() {
 
         <!-- Optional Fields -->
         <label for="business_website">Business Website:</label>
-        <input type="url" id="business_website" name="business_website">
+        <input type="text" id="business_website" name="business_website" placeholder="example.com">
 
         <label for="business_whatsapp">Business WhatsApp Number:</label>
         <input type="text" id="business_whatsapp" name="business_whatsapp">
 
         <label for="facebook">Facebook Page URL:</label>
-        <input type="url" id="facebook" name="facebook">
+        <input type="text" id="facebook" name="facebook" placeholder="facebook.com/yourpage">
 
         <label for="logo">Business Logo (JPEG/PNG, max 500KB):</label>
         <input type="file" id="logo" name="logo" accept="image/jpeg, image/png">
