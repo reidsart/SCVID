@@ -13,8 +13,8 @@ function sb_render_add_business_form() {
         <input type="text" id="business_address" name="business_address" required>
 
         <label for="address_privacy">Hide Address? (yes/no):</label>
-        <input type="radio" id="address_privacy_yes" name="address_privacy" value="yes"> Yes
-        <input type="radio" id="address_privacy_no" name="address_privacy" value="no" checked> No
+        <input type="radio" id="address_privacy_yes" name="address_privacy" value="1"> Yes
+        <input type="radio" id="address_privacy_no" name="address_privacy" value="0" checked> No
 
         <label for="business_suburb">Business Suburb (default: Sandbaai):</label>
         <input type="text" id="business_suburb" name="business_suburb" value="Sandbaai">
