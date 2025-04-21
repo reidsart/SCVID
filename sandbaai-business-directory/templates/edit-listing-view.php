@@ -45,10 +45,13 @@ if ($query->have_posts()) {
         // Display the edit form for the listing
         echo '<form method="post" enctype="multipart/form-data">';
         echo '<input type="hidden" name="listing_id" value="' . esc_attr($listing_id) . '">';
+        
+        // IMPORTANT: Add a hidden field for the post title so it gets submitted with the form
+        echo '<input type="hidden" name="post_title" value="' . esc_attr($listing_title) . '">';
 
-        // Business Name
-//        echo '<label for="listing_title_' . esc_attr($listing_id) . '">Business Name:</label>';
-//        echo '<input type="text" id="listing_title_' . esc_attr($listing_id) . '" name="post_title" value="' . esc_attr($listing_title) . '" required>';
+        // Business Name (commented out - users can't edit it)
+        //echo '<label for="listing_title_' . esc_attr($listing_id) . '">Business Name:</label>';
+        //echo '<input type="text" id="listing_title_' . esc_attr($listing_id) . '" name="post_title" value="' . esc_attr($listing_title) . '" required>';
 
         // Business Address
         echo '<label for="listing_address_' . esc_attr($listing_id) . '">Business Address:</label>';
