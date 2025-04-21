@@ -55,7 +55,7 @@ if ($query->have_posts()) {
         echo '<input type="text" id="listing_address_' . esc_attr($listing_id) . '" name="business_address" value="' . esc_attr($listing_address) . '" required>';
 
         // Address Privacy
-        echo '<label for="address_privacy_' . esc_attr($listing_id) . '">Hide Address?</label>';
+        echo '<label for="address_privacy_' . esc_attr($listing_id) . '">Hide Address?&nbsp&nbsp</label>';
         echo '<input type="radio" name="address_privacy" value="yes" ' . checked($address_privacy, 'yes', false) . '> Yes';
         echo '<input type="radio" name="address_privacy" value="no" ' . checked($address_privacy, 'no', false) . '> No';
         echo '<br>';
@@ -106,12 +106,12 @@ if ($query->have_posts()) {
             $selected = (isset($selected_tags[1]) && $tag->term_id == $selected_tags[1]) ? 'selected' : '';
             echo '<option value="' . esc_attr($tag->term_id) . '" ' . $selected . '>' . esc_html($tag->name) . '</option>';
         }
-        echo '</select>';
+        echo '</select><br><br>';
 
         // Submit Button
         echo '<button type="submit" class="submit-button" name="update_listing" value="' . esc_attr($listing_id) . '">Update Listing</button>';
         echo '</form>';
-        echo '</div>';
+        echo '</div><br>';
     }
 
     echo '</div>';
