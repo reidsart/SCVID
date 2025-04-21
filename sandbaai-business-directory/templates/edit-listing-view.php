@@ -22,14 +22,13 @@ $args = array(
 $query = new WP_Query($args);
 
 if ($query->have_posts()) {
-    echo '<h2>Your Listings</h2>';
     echo '<div class="listings">';
 
     while ($query->have_posts()) {
         $query->the_post();
         $listing_id = get_the_ID();
-        $listing_title = get_the_title();
-        $listing_description = get_the_content();
+        $listing_title = get_the_title(); // Retrieve the post title
+        $listing_description = get_post_meta($listing_id, 'business_description', true);
         $listing_phone = get_post_meta($listing_id, 'business_phone', true);
         $listing_email = get_post_meta($listing_id, 'business_email', true);
         $listing_address = get_post_meta($listing_id, 'business_address', true);
@@ -50,7 +49,6 @@ if ($query->have_posts()) {
         // Business Name
         echo '<label for="listing_title_' . esc_attr($listing_id) . '">Business Name:</label>';
         echo '<input type="text" id="listing_title_' . esc_attr($listing_id) . '" name="post_title" value="' . esc_attr($listing_title) . '" required>';
-
         // Business Address
         echo '<label for="listing_address_' . esc_attr($listing_id) . '">Business Address:</label>';
         echo '<input type="text" id="listing_address_' . esc_attr($listing_id) . '" name="business_address" value="' . esc_attr($listing_address) . '" required>';
@@ -61,27 +59,27 @@ if ($query->have_posts()) {
         echo '<input type="radio" name="address_privacy" value="no" ' . checked($address_privacy, 'no', false) . '> No';
 
         // Business Phone
-        echo '<label for="listing_phone_' . esc_attr($listing_id) . '">Phone:</label>';
+        echo '<label for="listing_phone_' . esc_attr($listing_id) . '">Business Phone:</label>';
         echo '<input type="text" id="listing_phone_' . esc_attr($listing_id) . '" name="business_phone" value="' . esc_attr($listing_phone) . '" required>';
 
         // Business Email
-        echo '<label for="listing_email_' . esc_attr($listing_id) . '">Email:</label>';
+        echo '<label for="listing_email_' . esc_attr($listing_id) . '">Business Email:</label>';
         echo '<input type="email" id="listing_email_' . esc_attr($listing_id) . '" name="business_email" value="' . esc_attr($listing_email) . '" required>';
 
         // Business Description
-        echo '<label for="listing_description_' . esc_attr($listing_id) . '">Description:</label>';
+        echo '<label for="listing_description_' . esc_attr($listing_id) . '">Business Description:</label>';
         echo '<textarea id="listing_description_' . esc_attr($listing_id) . '" name="business_description" required>' . esc_textarea($listing_description) . '</textarea>';
 
         // Business Website
-        echo '<label for="listing_website_' . esc_attr($listing_id) . '">Website:</label>';
+        echo '<label for="listing_website_' . esc_attr($listing_id) . '">Business Website:</label>';
         echo '<input type="url" id="listing_website_' . esc_attr($listing_id) . '" name="business_website" value="' . esc_url($listing_website) . '">';
 
         // WhatsApp Number
-        echo '<label for="listing_whatsapp_' . esc_attr($listing_id) . '">WhatsApp Number:</label>';
+        echo '<label for="listing_whatsapp_' . esc_attr($listing_id) . '">Business WhatsApp Number:</label>';
         echo '<input type="text" id="listing_whatsapp_' . esc_attr($listing_id) . '" name="business_whatsapp" value="' . esc_attr($listing_whatsapp) . '">';
 
         // Facebook Page
-        echo '<label for="facebook_' . esc_attr($listing_id) . '">Facebook Page:</label>';
+        echo '<label for="facebook_' . esc_attr($listing_id) . '">Business Facebook Page:</label>';
         echo '<input type="url" id="facebook_' . esc_attr($listing_id) . '" name="facebook" value="' . esc_url($facebook) . '">';
 
         // Tags
