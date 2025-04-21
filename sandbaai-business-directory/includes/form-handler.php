@@ -224,6 +224,8 @@ add_action('init', 'sb_handle_edit_form_submission');
 function sb_handle_edit_form_submission() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_listing'])) {
         $listing_id = intval($_POST['update_listing']);
+        // debug
+        error_log("Submitted post_title: " . (isset($_POST['post_title']) ? $_POST['post_title'] : "NOT SET"));
 
         // Check if the current user is the author of the listing
         $current_user_id = get_current_user_id();
@@ -249,6 +251,41 @@ function sb_handle_edit_form_submission() {
 
         // Remove duplicates from tags array
         $updated_tags = array_unique($updated_tags);
+
+        // Handle file uploads for logo
+        if (!empty($_FILES['logo']['name'])) {
+            $uploaded_logo = sb_handle_file_upload($_FILES['logo'], 500 * 1024); // 500KB limit
+            if (!is_wp_error($uploaded_logo)) {
+                update_post_meta($listing_id, 'logo', $uploaded_logo);
+            } else {
+               echo '<p style="color: red;">Error uploading logo: ' . $uploaded_logo->get_error_message() . '</p>';
+           }
+        }
+
+// Handle file uploads for gallery
+if (!empty($_FILES['gallery']['name'][0])) {
+    $uploaded_gallery = array();
+    foreach ($_FILES['gallery']['name'] as $key => $value) {
+        if (!empty($value)) {
+            $file = array(
+                'name' => $_FILES['gallery']['name'][$key],
+                'type' => $_FILES['gallery']['type'][$key],
+                'tmp_name' => $_FILES['gallery']['tmp_name'][$key],
+                'error' => $_FILES['gallery']['error'][$key],
+                'size' => $_FILES['gallery']['size'][$key],
+            );
+            $uploaded_file = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
+            if (!is_wp_error($uploaded_file)) {
+                $uploaded_gallery[] = $uploaded_file;
+            } else {
+                echo '<p style="color: red;">Error uploading gallery photo: ' . $uploaded_file->get_error_message() . '</p>';
+            }
+        }
+    }
+    if (!empty($uploaded_gallery)) {
+        update_post_meta($listing_id, 'gallery', $uploaded_gallery);
+    }
+}
 
         // Update the post
         wp_update_post(array(
