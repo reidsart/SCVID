@@ -224,8 +224,6 @@ add_action('init', 'sb_handle_edit_form_submission');
 function sb_handle_edit_form_submission() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_listing'])) {
         $listing_id = intval($_POST['update_listing']);
-        // debug
-        error_log("Submitted post_title: " . (isset($_POST['post_title']) ? $_POST['post_title'] : "NOT SET"));
 
         // Check if the current user is the author of the listing
         $current_user_id = get_current_user_id();
@@ -236,9 +234,8 @@ function sb_handle_edit_form_submission() {
             return;
         }
 
-        // Sanitize and update post fields
-        // Ensure that the business name (post_title) is retained
-        $updated_title = !empty($_POST['post_title']) ? sanitize_text_field($_POST['post_title']) : $listing->post_title;
+        // Sanitize and update post fields (excluding the title)
+        // $updated_title = !empty($_POST['post_title']) ? sanitize_text_field($_POST['post_title']) : $listing->post_title;
         $updated_description = sanitize_textarea_field($_POST['business_description']);
         $updated_phone = sanitize_text_field($_POST['business_phone']);
         $updated_email = sanitize_email($_POST['business_email']);
@@ -262,10 +259,10 @@ function sb_handle_edit_form_submission() {
            }
         }
 
-// Handle file uploads for gallery
-if (!empty($_FILES['gallery']['name'][0])) {
-    $uploaded_gallery = array();
-    foreach ($_FILES['gallery']['name'] as $key => $value) {
+        // Handle file uploads for gallery
+        if (!empty($_FILES['gallery']['name'][0])) {
+            $uploaded_gallery = array();
+            foreach ($_FILES['gallery']['name'] as $key => $value) {
         if (!empty($value)) {
             $file = array(
                 'name' => $_FILES['gallery']['name'][$key],
@@ -288,9 +285,9 @@ if (!empty($_FILES['gallery']['name'][0])) {
 }
 
         // Update the post
+        // Do not update the post_title to ensure it remains unchanged
         wp_update_post(array(
             'ID' => $listing_id,
-            'post_title' => $updated_title,
         ));
 
         // Update meta fields
