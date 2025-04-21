@@ -201,6 +201,20 @@ function sb_handle_form_submission() {
             ),
         ));
 
+// Automatically add https:// to website or Facebook URL if missing
+function sb_sanitize_urls($post_data) {
+    // Ensure "https://" is added only if no protocol is present
+    if (!empty($post_data['business_website']) && !preg_match('/^https?:\\/\\//', $post_data['business_website'])) {
+        $post_data['business_website'] = 'https://' . ltrim($post_data['business_website'], '/');
+    }
+    if (!empty($post_data['facebook']) && !preg_match('/^https?:\\/\\//', $post_data['facebook'])) {
+        $post_data['facebook'] = 'https://' . ltrim($post_data['facebook'], '/');
+    }
+
+    return $post_data;
+}
+add_filter('pre_post_form_submission_data', 'sb_sanitize_urls'); // Ensure the hook matches your form's workflow
+
 // If the listing was created successfully
         if ($post_id) {
             echo '<p style="color: green;">Success: Your business listing has been submitted for review.</p>';
