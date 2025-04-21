@@ -1,58 +1,113 @@
 <?php
 // Check if user is logged in
 if (!is_user_logged_in()) {
-    echo '<p>You must be logged in to view your listings.</p>';
+    echo '<p>You must be logged in to view or edit a listing.</p>';
     echo '<a href="' . wp_login_url(get_permalink()) . '">Log in</a>';
     return;
 }
 
-// Check if the user is logged in for debugging
-if (is_user_logged_in()) {
-    $current_user_id = get_current_user_id();
-    echo '<p>Current User ID: ' . esc_html($current_user_id) . '</p>';
-} else {
-    echo '<p>No user is logged in.</p>';
-}
-
 // Get the current user
 $current_user = wp_get_current_user();
+$current_user_id = $current_user->ID;
 
-// Query all listings authored by the current user
+// Handle displaying all listings authored by the current user
 $args = array(
-    'post_type' => 'listing', // Ensure you use the correct post type
-    'post_status' => 'any', // Include all statuses (published, pending, etc.)
-    'author' => $current_user->ID, // Filter by the current user's ID
+    'post_type' => 'business_listing',
+    'post_status' => 'any', // Include all statuses
+    'author' => $current_user_id, // Filter by the current user's ID
     'orderby' => 'date',
     'order' => 'DESC',
 );
 
 $query = new WP_Query($args);
 
-if (!$query->have_posts()) {
-    echo '<p>You have not created any listings yet.</p>';
-    return;
-}
+if ($query->have_posts()) {
+    echo '<h2>Your Listings</h2>';
+    echo '<div class="listings">';
 
-// Display the listings
-echo '<div class="user-listings">';
-echo '<h2>Your Listings</h2>';
+    while ($query->have_posts()) {
+        $query->the_post();
+        $listing_id = get_the_ID();
+        $listing_title = get_the_title();
+        $listing_description = get_the_content();
+        $listing_phone = get_post_meta($listing_id, 'business_phone', true);
+        $listing_email = get_post_meta($listing_id, 'business_email', true);
+        $listing_address = get_post_meta($listing_id, 'business_address', true);
+        $listing_website = get_post_meta($listing_id, 'business_website', true);
+        $listing_whatsapp = get_post_meta($listing_id, 'business_whatsapp', true);
+        $facebook = get_post_meta($listing_id, 'facebook', true);
+        $address_privacy = get_post_meta($listing_id, 'address_privacy', true);
+        $tags = get_the_terms($listing_id, 'post_tag');
+        $selected_tags = !empty($tags) ? wp_list_pluck($tags, 'term_id') : array();
 
-while ($query->have_posts()) {
-    $query->the_post();
-    $listing_id = get_the_ID();
-    $listing_title = get_the_title();
-    $listing_description = get_the_excerpt(); // Short description
-    $edit_url = add_query_arg('listing_id', $listing_id, home_url('/edit-listing/'));
-    
-    echo '<div class="listing-item">';
-    echo '<h3>' . esc_html($listing_title) . '</h3>';
-    echo '<p>' . esc_html($listing_description) . '</p>';
-    echo '<a href="' . esc_url($edit_url) . '">Edit Listing</a>';
+        echo '<div class="listing">';
+        echo '<h3>' . esc_html($listing_title) . '</h3>';
+
+        // Display the edit form for the listing
+        echo '<form method="post" enctype="multipart/form-data">';
+        echo '<input type="hidden" name="listing_id" value="' . esc_attr($listing_id) . '">';
+
+        // Business Name
+        echo '<label for="listing_title_' . esc_attr($listing_id) . '">Business Name:</label>';
+        echo '<input type="text" id="listing_title_' . esc_attr($listing_id) . '" name="post_title" value="' . esc_attr($listing_title) . '" required>';
+
+        // Business Address
+        echo '<label for="listing_address_' . esc_attr($listing_id) . '">Business Address:</label>';
+        echo '<input type="text" id="listing_address_' . esc_attr($listing_id) . '" name="business_address" value="' . esc_attr($listing_address) . '" required>';
+
+        // Address Privacy
+        echo '<label for="address_privacy_' . esc_attr($listing_id) . '">Hide Address?</label>';
+        echo '<input type="radio" name="address_privacy" value="yes" ' . checked($address_privacy, 'yes', false) . '> Yes';
+        echo '<input type="radio" name="address_privacy" value="no" ' . checked($address_privacy, 'no', false) . '> No';
+
+        // Business Phone
+        echo '<label for="listing_phone_' . esc_attr($listing_id) . '">Phone:</label>';
+        echo '<input type="text" id="listing_phone_' . esc_attr($listing_id) . '" name="business_phone" value="' . esc_attr($listing_phone) . '" required>';
+
+        // Business Email
+        echo '<label for="listing_email_' . esc_attr($listing_id) . '">Email:</label>';
+        echo '<input type="email" id="listing_email_' . esc_attr($listing_id) . '" name="business_email" value="' . esc_attr($listing_email) . '" required>';
+
+        // Business Description
+        echo '<label for="listing_description_' . esc_attr($listing_id) . '">Description:</label>';
+        echo '<textarea id="listing_description_' . esc_attr($listing_id) . '" name="business_description" required>' . esc_textarea($listing_description) . '</textarea>';
+
+        // Business Website
+        echo '<label for="listing_website_' . esc_attr($listing_id) . '">Website:</label>';
+        echo '<input type="url" id="listing_website_' . esc_attr($listing_id) . '" name="business_website" value="' . esc_url($listing_website) . '">';
+
+        // WhatsApp Number
+        echo '<label for="listing_whatsapp_' . esc_attr($listing_id) . '">WhatsApp Number:</label>';
+        echo '<input type="text" id="listing_whatsapp_' . esc_attr($listing_id) . '" name="business_whatsapp" value="' . esc_attr($listing_whatsapp) . '">';
+
+        // Facebook Page
+        echo '<label for="facebook_' . esc_attr($listing_id) . '">Facebook Page:</label>';
+        echo '<input type="url" id="facebook_' . esc_attr($listing_id) . '" name="facebook" value="' . esc_url($facebook) . '">';
+
+        // Tags
+        $tags = get_tags(array('hide_empty' => false));
+        echo '<label for="tags_' . esc_attr($listing_id) . '">Select up to 2 Tags:</label>';
+        echo '<table id="tags-table" border="1" cellpadding="5" cellspacing="0">';
+        echo '<thead><tr><th>Select</th><th>Tag Name</th></tr></thead><tbody>';
+        foreach ($tags as $tag) {
+            $checked = in_array($tag->term_id, $selected_tags) ? 'checked' : '';
+            echo '<tr>';
+            echo '<td><input type="checkbox" name="tags[]" value="' . esc_attr($tag->term_id) . '" ' . $checked . '></td>';
+            echo '<td>' . esc_html($tag->name) . '</td>';
+            echo '</tr>';
+        }
+        echo '</tbody></table>';
+
+        // Submit Button
+        echo '<button type="submit" class="submit-button" name="update_listing" value="' . esc_attr($listing_id) . '">Update Listing</button>';
+        echo '</form>';
+        echo '</div>';
+    }
+
     echo '</div>';
+} else {
+    echo '<p>You have not created any listings yet.</p>';
 }
 
-echo '</div>';
-
-// Reset post data
 wp_reset_postdata();
 ?>
