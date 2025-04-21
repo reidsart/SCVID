@@ -55,8 +55,8 @@ if ($query->have_posts()) {
 
         // Address Privacy
         echo '<label for="address_privacy_' . esc_attr($listing_id) . '">Hide Address?&nbsp&nbsp</label>';
-        echo '<input type="radio" name="address_privacy" value="yes" ' . checked($address_privacy, 'yes', false) . '> Yes';
-        echo '<input type="radio" name="address_privacy" value="no" ' . checked($address_privacy, 'no', false) . '> No';
+        echo '<input type="radio" name="address_privacy" value="1" ' . checked($address_privacy, 'yes', false) . '> Yes';
+        echo '<input type="radio" name="address_privacy" value="0" ' . checked($address_privacy, 'no', false) . '> No';
         echo '<br>';
 
         // Business Phone
