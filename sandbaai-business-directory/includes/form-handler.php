@@ -219,12 +219,47 @@ function sb_handle_form_submission() {
 add_action('init', 'sb_handle_form_submission');
 
 // Edit business listings
-add_action('init', 'sb_handle_edit_form_submission');
+// Temporarily disable Paystack save_post_meta during frontend submissions
+add_action('init', function () {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_listing'])) {
+        global $wp_filter;
+
+        // Find the Paystack instance and remove the save_post_meta hook
+        $paystack_instance = null;
+
+        if (isset($wp_filter['save_post'])) {
+            foreach ($wp_filter['save_post']->callbacks as $priority => $callbacks) {
+                foreach ($callbacks as $callback_key => $callback_data) {
+                    if (
+                        is_array($callback_data['function']) &&
+                        is_object($callback_data['function'][0]) &&
+                        get_class($callback_data['function'][0]) === 'paystack\payment_forms\Forms_Update' &&
+                        $callback_data['function'][1] === 'save_post_meta'
+                    ) {
+                        $paystack_instance = $callback_data['function'][0];
+                        remove_action('save_post', [$paystack_instance, 'save_post_meta'], $priority);
+                        error_log('Paystack save_post_meta removed for frontend submission.');
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        // Call the form handler logic here
+        sb_handle_edit_form_submission();
+
+        // Do NOT re-enable the Paystack save_post_meta hook for frontend submissions
+        // It will only be added back by WordPress when needed in the backend.
+        if ($paystack_instance) {
+            error_log('Paystack save_post_meta was NOT re-added after frontend submission.');
+        }
+    }
+});
 
 // Function to handle editing listing updates
 function sb_handle_edit_form_submission() {
     global $sb_is_updating_post;
-    
+
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_listing'])) {
         // Set the flag to prevent recursive updates
         if ($sb_is_updating_post) {
@@ -232,8 +267,12 @@ function sb_handle_edit_form_submission() {
             return;
         }
         $sb_is_updating_post = true;
-        
-        $listing_id = intval($_POST['update_listing']);
+
+        // Use the correct field name for the listing ID
+        $listing_id = intval($_POST['listing_id']);
+
+        // Debug the submitted data
+        error_log("Submitted POST data: " . print_r($_POST, true));
 
         // Check if the current user is the author of the listing
         $current_user_id = get_current_user_id();
@@ -247,10 +286,6 @@ function sb_handle_edit_form_submission() {
 
         // Get the post title from the form input
         $post_title = isset($_POST['post_title']) ? sanitize_text_field($_POST['post_title']) : $listing->post_title;
-        
-        // Log the current title for debugging
-        error_log("Current title before update: " . $listing->post_title);
-        error_log("Title from form: " . $post_title);
 
         // Sanitize and update post fields
         $updated_description = sanitize_textarea_field($_POST['business_description']);
@@ -263,59 +298,27 @@ function sb_handle_edit_form_submission() {
         $updated_facebook = esc_url_raw($_POST['facebook']);
         $updated_tags = isset($_POST['tags']) ? array_map('intval', $_POST['tags']) : array();
 
-        // Remove duplicates from tags array
-        $updated_tags = array_unique($updated_tags);
+        // Remove empty values from tags array
+        $updated_tags = array_filter($updated_tags);
 
-        // Handle file uploads for logo
-        if (!empty($_FILES['logo']['name'])) {
-            $uploaded_logo = sb_handle_file_upload($_FILES['logo'], 500 * 1024); // 500KB limit
-            if (!is_wp_error($uploaded_logo)) {
-                update_post_meta($listing_id, 'logo', $uploaded_logo);
-            } else {
-                echo '<p style="color: red;">Error uploading logo: ' . $uploaded_logo->get_error_message() . '</p>';
-            }
-        }
+        // Log sanitized data
+        error_log("Sanitized data: " . print_r([
+            'title' => $post_title,
+            'description' => $updated_description,
+            'phone' => $updated_phone,
+            'email' => $updated_email,
+            'address' => $updated_address,
+            'website' => $updated_website,
+            'whatsapp' => $updated_whatsapp,
+            'facebook' => $updated_facebook,
+            'tags' => $updated_tags,
+        ], true));
 
-        // Handle file uploads for gallery
-        if (!empty($_FILES['gallery']['name'][0])) {
-            $uploaded_gallery = array();
-            foreach ($_FILES['gallery']['name'] as $key => $value) {
-                if (!empty($value)) {
-                    $file = array(
-                        'name' => $_FILES['gallery']['name'][$key],
-                        'type' => $_FILES['gallery']['type'][$key],
-                        'tmp_name' => $_FILES['gallery']['tmp_name'][$key],
-                        'error' => $_FILES['gallery']['error'][$key],
-                        'size' => $_FILES['gallery']['size'][$key],
-                    );
-                    $uploaded_file = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
-                    if (!is_wp_error($uploaded_file)) {
-                        $uploaded_gallery[] = $uploaded_file;
-                    } else {
-                        echo '<p style="color: red;">Error uploading gallery photo: ' . $uploaded_file->get_error_message() . '</p>';
-                    }
-                }
-            }
-            if (!empty($uploaded_gallery)) {
-                update_post_meta($listing_id, 'gallery', $uploaded_gallery);
-            }
-        }
-
-// Create a complete post data array with all post content and meta
+        // Create a complete post data array with all post content
         $post_data = array(
             'ID' => $listing_id,
             'post_title' => $post_title,
-            'post_content' => $updated_description,
-            'meta_input' => array(
-                'business_description' => $updated_description,
-                'business_phone' => $updated_phone,
-                'business_email' => $updated_email,
-                'business_address' => $updated_address,
-                'business_website' => $updated_website,
-                'address_privacy' => $updated_address_privacy,
-                'business_whatsapp' => $updated_whatsapp,
-                'facebook' => $updated_facebook
-            )
+            'post_content' => $updated_description
         );
 
         // Update the post
@@ -328,11 +331,24 @@ function sb_handle_edit_form_submission() {
             error_log("Post updated successfully with ID: " . $update_result);
         }
 
+        // Save meta fields explicitly
+        update_post_meta($listing_id, 'business_phone', $updated_phone);
+        update_post_meta($listing_id, 'business_email', $updated_email);
+        update_post_meta($listing_id, 'business_address', $updated_address);
+        update_post_meta($listing_id, 'business_website', $updated_website);
+        update_post_meta($listing_id, 'address_privacy', $updated_address_privacy);
+        update_post_meta($listing_id, 'business_whatsapp', $updated_whatsapp);
+        update_post_meta($listing_id, 'facebook', $updated_facebook);
+
+        // Log meta updates
+        error_log("Meta fields updated for listing ID: $listing_id");
+
         // Save tags
         wp_set_post_terms($listing_id, $updated_tags, 'post_tag');
+        error_log("Tags updated: " . implode(', ', $updated_tags));
 
         echo '<p style="color: green;">Listing updated successfully.</p>';
-        
+
         // Reset the flag at the end of the function
         $sb_is_updating_post = false;
     }
