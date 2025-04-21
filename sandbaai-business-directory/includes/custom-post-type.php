@@ -18,7 +18,7 @@ function sb_register_custom_post_type() {
         'public' => true,
         'has_archive' => true,
         'rewrite' => array('slug' => 'businesses'),
-        'supports' => array('title', 'editor', 'thumbnail'),
+        'supports' => array('title', 'editor', 'thumbnail', 'custom-fields', 'revisions'),
     ));
 
     // Register taxonomies for categories and tags
