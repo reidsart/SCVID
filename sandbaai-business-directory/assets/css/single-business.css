@@ -1,4 +1,17 @@
 /* General Styles */
+body.single-business-listing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* Center the content vertically */
+    padding: 20px;
+    min-height: 100vh;
+    box-sizing: border-box;
+    background-color: #f6f9fc;
+    /* Light background color for better contrast */
+}
+
 body.single-business-listing .business-details {
     max-width: 900px;
     margin: 20px auto;
@@ -6,24 +19,19 @@ body.single-business-listing .business-details {
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    /* Center the business card content */
-}
-
-/* Center the business card */
-body.single-business-listing {
+    text-align: left;
+    /* Left-align content */
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    padding: 20px;
-    min-height: 100vh;
-    box-sizing: border-box;
+    /* Center the business card on the page */
 }
 
+/* Business Header */
 body.single-business-listing .business-header {
-    text-align: center;
+    text-align: left;
     margin-bottom: 20px;
+    width: 100%;
 }
 
 body.single-business-listing .business-title {
@@ -32,10 +40,12 @@ body.single-business-listing .business-title {
     color: #333;
 }
 
+/* Business Content */
 body.single-business-listing .business-content {
     display: flex;
     gap: 20px;
     justify-content: center;
+    width: 100%;
 }
 
 body.single-business-listing .business-column {
@@ -57,101 +67,76 @@ body.single-business-listing .business-meta .business-item {
     font-size: 1rem;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
+    /* Space between icon and text */
 }
 
-/* Address and Suburb as Google Maps Link */
-body.single-business-listing .business-item.address-icon a {
-    color: #8683C6;
-    /* Pale violet color */
-    font-size: 1rem;
-    text-decoration: none;
+/* Align icons with the center of text */
+body.single-business-listing .business-meta .business-item::before {
     display: inline-block;
-    line-height: 1.2;
-    /* Reduced leading for visual grouping */
-    text-align: left;
-    /* Align with other content */
-    transition: color 0.3s ease;
-    padding-left: 10px;
-    /* Align with other contact info */
+    width: 20px;
+    height: 20px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    content: "";
+    align-self: center;
 }
 
-body.single-business-listing .business-item.address-icon a:hover {
-    color: #4F4A86;
-    /* Slightly darker violet on hover */
-}
-
-/* Icon Sizes */
 body.single-business-listing .business-item.address-icon::before {
-    content: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/address.png');
-    display: inline-block;
-    width: 6px;
-    /* Reduced size */
-    height: 6px;
-    /* Reduced size */
-    margin-right: 10px;
+    background-image: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/address.png');
 }
 
 body.single-business-listing .business-item.phone-icon::before {
-    content: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/phone.png');
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    margin-right: 10px;
+    background-image: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/phone.png');
 }
 
 body.single-business-listing .business-item.email-icon::before {
-    content: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/email.png');
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    margin-right: 10px;
+    background-image: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/email.png');
 }
 
 body.single-business-listing .business-item.whatsapp-icon::before {
-    content: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/whatsapp.png');
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    margin-right: 10px;
+    background-image: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/whatsapp.png');
 }
 
 body.single-business-listing .business-item.facebook-icon::before {
-    content: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/facebook.png');
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    margin-right: 10px;
+    background-image: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/facebook.png');
 }
 
-body.single-business-listing .business-website p::before {
-    content: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/website.png');
-    display: inline-block;
-    width: 6px;
-    /* Reduced size */
-    height: 6px;
-    /* Reduced size */
-    margin-right: 15px;
-    /* Increased spacing between icon and URL */
+body.single-business-listing .business-item.website-icon::before {
+    background-image: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/website.png');
+}
+
+/* Address and Suburb */
+body.single-business-listing .business-item.address-icon {
+    text-align: left;
+    line-height: 1.2;
+    /* Reduced spacing between address and suburb */
 }
 
 /* Website Link */
-body.single-business-listing .business-website p {
+body.single-business-listing .business-website {
     text-align: left;
-    /* Aligns the website link to the left */
+    /* Left-align the website URL */
+    margin-bottom: 20px;
+    /* Space between website and business description */
+    width: 100%;
+    border-bottom: 1px solid #ddd;
+    /* Horizontal divider */
+    padding-bottom: 10px;
+}
+
+body.single-business-listing .business-website p {
     color: #426DAE;
-    /* Custom color for website link */
+    /* Custom color for website links */
     font-size: 1.1rem;
     text-decoration: none;
     transition: color 0.3s ease;
-    padding-left: 10px;
-    /* Align with other contact info */
+    margin: 0;
 }
 
-/* Ensure visited links retain the original color */
 body.single-business-listing .business-website p a:visited {
     color: #426DAE;
-    /* Same color as the original link */
+    /* Ensure visited links retain the original color */
 }
 
 body.single-business-listing .business-website p a:hover {
@@ -162,6 +147,7 @@ body.single-business-listing .business-website p a:hover {
 /* Phone Link */
 body.single-business-listing .business-item.phone-icon a {
     color: #008ECF;
+    /* Custom color for phone links */
     text-decoration: none;
     transition: color 0.3s ease;
 }
@@ -173,6 +159,7 @@ body.single-business-listing .business-item.phone-icon a:hover {
 /* Email Link */
 body.single-business-listing .business-item.email-icon a {
     color: #2FA498;
+    /* Custom color for email links */
     text-decoration: none;
     transition: color 0.3s ease;
 }
@@ -184,6 +171,7 @@ body.single-business-listing .business-item.email-icon a:hover {
 /* WhatsApp Link */
 body.single-business-listing .business-item.whatsapp-icon a {
     color: #7EBF43;
+    /* Custom color for WhatsApp links */
     text-decoration: none;
     transition: color 0.3s ease;
 }
@@ -195,11 +183,12 @@ body.single-business-listing .business-item.whatsapp-icon a:hover {
 /* Facebook Link */
 body.single-business-listing .business-item.facebook-icon {
     margin-bottom: 10px;
-    /* Adds space between Facebook and Website */
+    /* Space between Facebook and website */
 }
 
 body.single-business-listing .business-item.facebook-icon a {
     color: #62B3E4;
+    /* Custom color for Facebook links */
     text-decoration: none;
     transition: color 0.3s ease;
 }
@@ -208,20 +197,12 @@ body.single-business-listing .business-item.facebook-icon a:hover {
     color: #3D7699;
 }
 
-/* Business Description */
-body.single-business-listing .business-description {
-    margin-top: 20px;
-    padding-top: 0;
-    /* Removed extra padding to eliminate duplicate divider */
-    border-top: 1px solid #ddd;
-    /* Ensure a single divider above description */
-    text-align: justify;
-}
-
-/* Photo Gallery with Lightbox */
+/* Gallery */
 body.single-business-listing .business-gallery {
     margin-top: 20px;
     text-align: center;
+    /* Center the gallery */
+    width: 100%;
 }
 
 body.single-business-listing .business-gallery a img {
@@ -237,42 +218,38 @@ body.single-business-listing .business-gallery a img:hover {
     transform: scale(1.1);
 }
 
-/* Lightbox overlay */
-body.single-business-listing .business-gallery a {
-    text-decoration: none;
+/* Business Description */
+body.single-business-listing .business-description {
+    margin-top: 20px;
+    text-align: left;
+    /* Align the description to the left */
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.6;
 }
 
-/* Business Buttons */
-body.single-business-listing .business-buttons {
-    margin-top: 30px;
+/* Edit Button */
+body.single-business-listing .edit-listing-button {
+    margin-top: 20px;
     text-align: center;
 }
 
-body.single-business-listing .business-buttons .button {
-    display: inline-block;
-    margin: 10px;
+body.single-business-listing .edit-listing-button .button {
+    background-color: #0073aa;
+    color: #fff;
     padding: 10px 20px;
-    background: #0073aa;
-    color: #fff;
-    text-decoration: none;
     border-radius: 5px;
-    transition: background 0.3s ease;
+    text-decoration: none;
 }
 
-body.single-business-listing .business-buttons .button:hover {
-    background: #0056a4;
+body.single-business-listing .edit-listing-button .button:hover {
+    background-color: #005177;
 }
 
-/* Footer Fix */
-footer {
-    margin-top: auto;
-    width: 100%;
-    text-align: center;
-    background: #333;
-    color: #fff;
-    padding: 10px 0;
-    position: relative;
-    clear: both;
+/* Footer Spacing */
+body.single-business-listing footer {
+    margin-top: 40px;
+    /* Increased space between the final button and the footer */
 }
 
 /* Responsive Styles */
