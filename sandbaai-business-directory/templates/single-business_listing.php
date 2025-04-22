@@ -44,7 +44,11 @@ get_header(); ?>
                     </div>
                     <div class="business-column business-meta">
                         <?php if ($address_privacy !== '1' && !empty($business_address)) : ?>
-                            <p class="business-item address-icon"><?php echo esc_html($business_address); ?>, <?php echo esc_html($business_suburb); ?></p>
+                            <p class="business-item address-icon">
+                                <?php echo esc_html($business_address); ?>
+                                <br>
+                                <?php echo esc_html($business_suburb); ?>
+                            </p>
                         <?php endif; ?>
 
                         <?php if (!empty($business_phone)) : ?>
@@ -53,10 +57,6 @@ get_header(); ?>
 
                         <?php if (!empty($business_email)) : ?>
                             <p class="business-item email-icon"><a href="mailto:<?php echo esc_attr($business_email); ?>"><?php echo esc_html($business_email); ?></a></p>
-                        <?php endif; ?>
-
-                        <?php if (!empty($business_website)) : ?>
-                            <p class="business-item website-icon"><a href="<?php echo esc_url($business_website); ?>" target="_blank"><?php echo esc_html($business_website); ?></a></p>
                         <?php endif; ?>
 
                         <?php if (!empty($business_whatsapp)) : ?>
@@ -69,35 +69,36 @@ get_header(); ?>
                         <?php if (!empty($facebook)) : ?>
                             <p class="business-item facebook-icon"><a href="<?php echo esc_url($facebook); ?>" target="_blank">Facebook</a></p>
                         <?php endif; ?>
+
+                        <?php if (!empty($business_website)) : ?>
+                            <p class="business-item website-icon"><a href="<?php echo esc_url($business_website); ?>" target="_blank"><?php echo esc_html($business_website); ?></a></p>
+                        <?php endif; ?>
                     </div>
                 </div>
-
-                <?php if (!empty($gallery)) : ?>
-                    <div class="business-gallery">
-                        <h2>Photo Gallery</h2>
-                        <?php foreach ($gallery as $image) : ?>
-                            <img src="<?php echo esc_url($image); ?>" alt="Gallery image">
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
 
                 <div class="business-description">
                     <p><?php echo esc_html($business_description); ?></p>
                 </div>
-
-                <?php if (!empty($tags)) : ?>
-                    <div class="business-tags">
-                        <p>Tags: <?php echo esc_html(implode(', ', $tags)); ?></p>
-                    </div>
-                <?php endif; ?>
-
-                <!-- Edit button for the author -->
-                <?php if ($current_user_id === $post_author_id) : ?>
-                    <div class="edit-listing-button">
-                        <a href="<?php echo get_edit_post_link(); ?>" class="button">Edit This Listing</a>
-                    </div>
-                <?php endif; ?>
             </div>
+
+            <?php if (!empty($gallery)) : ?>
+                <div class="business-gallery">
+                    <h2>Photo Gallery</h2>
+                    <div class="gallery-thumbnails">
+                        <?php foreach ($gallery as $image) : ?>
+                            <a href="<?php echo esc_url($image); ?>" data-lightbox="business-gallery">
+                                <img src="<?php echo esc_url($image); ?>" alt="Gallery image">
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($current_user_id === $post_author_id) : ?>
+                <div class="edit-listing-button">
+                    <a href="<?php echo get_edit_post_link(); ?>" class="button">Edit This Listing</a>
+                </div>
+            <?php endif; ?>
 
     <?php
         endwhile;
