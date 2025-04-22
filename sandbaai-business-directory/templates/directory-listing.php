@@ -2,24 +2,29 @@
 function sb_render_directory_listing() {
     ob_start();
 
-    // Display Tags Table
-    $tags = get_tags(array('orderby' => 'name', 'order' => 'ASC', 'hide_empty' => false));
+// Display Tags Table
+$tags = get_terms(array(
+    'taxonomy' => 'business_tag', // Use the custom taxonomy
+    'orderby' => 'name',
+    'order' => 'ASC',
+    'hide_empty' => false, // Include all tags, even if unused
+));
 
-    if (!empty($tags)) {
-        echo '<h2>Tags</h2>';
-        echo '<table class="tags-table">';
-        echo '<thead><tr><th>Tag Name</th></tr></thead>';
-        echo '<tbody>';
-        foreach ($tags as $tag) {
-            if ($tag->count > 0) { // Only show tags used 1 or more times
-                echo '<tr>';
-                echo '<td><a href="' . esc_url(get_tag_link($tag->term_id)) . '">' . esc_html($tag->name) . '</a></td>';
-                echo '</tr>';
-            }
+if (!empty($tags) && !is_wp_error($tags)) {
+    echo '<table class="tags-table">';
+    echo '<thead><tr><th>Tag Name</th></tr></thead>';
+    echo '<tbody>';
+    foreach ($tags as $tag) {
+        if ($tag->count > 0) { // Only show tags used 1 or more times
+            echo '<tr>';
+            // Display the tag name instead of the slug
+            echo '<td><a href="' . esc_url(get_term_link($tag->term_id, 'business_tag')) . '">' . esc_html($tag->name) . '</a></td>';
+            echo '</tr>';
         }
-        echo '</tbody>';
-        echo '</table>';
     }
+    echo '</tbody>';
+    echo '</table>';
+}
 
     // Query Sandbaai Businesses
     $sandbaai_query = new WP_Query(array(
