@@ -30,96 +30,79 @@ get_header(); ?>
             $post_author_id = get_the_author_meta('ID');
             ?>
 
-<!--business details-->
-<div class="business-details">
-    <div class="business-header">
-        <h1 class="business-title"><?php the_title(); ?></h1>
-    </div>
-
-    <div class="business-content">
-        <div class="business-column business-logo">
-            <?php if (!empty($logo)) : ?>
-                <img src="<?php echo esc_url($logo); ?>" alt="<?php the_title(); ?>">
-            <?php endif; ?>
-        </div>
-        <div class="business-column business-meta">
-            <?php if ($address_privacy !== '1' && !empty($business_address)) : ?>
-                <p class="business-item address-icon"><?php echo esc_html($business_address); ?>, <?php echo esc_html($business_suburb); ?></p>
-            <?php endif; ?>
-
-            <?php if (!empty($business_phone)) : ?>
-                <p class="business-item phone-icon"><a href="tel:<?php echo esc_html($business_phone); ?>"><?php echo esc_html($business_phone); ?></a></p>
-            <?php endif; ?>
-
-            <?php if (!empty($business_email)) : ?>
-                <p class="business-item email-icon"><a href="mailto:<?php echo esc_attr($business_email); ?>"><?php echo esc_html($business_email); ?></a></p>
-            <?php endif; ?>
-
-            <?php if (!empty($business_website)) : ?>
-                <div class="business-website">
-                    <p><a href="<?php echo esc_url($business_website); ?>" target="_blank"><?php echo esc_html($business_website); ?></a></p>
+            <!-- Business details -->
+            <div class="business-details">
+                <div class="business-header">
+                    <h1 class="business-title"><?php the_title(); ?></h1>
                 </div>
-            <?php endif; ?>
 
-            <?php if (!empty($business_whatsapp)) : ?>
-                <?php
-                $whatsapp_number = preg_replace('/^0/', '+27', esc_html($business_whatsapp));
-                ?>
-                <p class="business-item whatsapp-icon"><a href="https://wa.me/<?php echo $whatsapp_number; ?>" target="_blank"><?php echo esc_html($business_whatsapp); ?></a></p>
-            <?php endif; ?>
+                <div class="business-content">
+                    <div class="business-column business-logo">
+                        <?php if (!empty($logo)) : ?>
+                            <img src="<?php echo esc_url($logo); ?>" alt="<?php the_title(); ?>">
+                        <?php endif; ?>
+                    </div>
+                    <div class="business-column business-meta">
+                        <?php if ($address_privacy !== '1' && !empty($business_address)) : ?>
+                            <p class="business-item address-icon"><?php echo esc_html($business_address); ?>, <?php echo esc_html($business_suburb); ?></p>
+                        <?php endif; ?>
 
-            <?php if (!empty($facebook)) : ?>
-                <p class="business-item facebook-icon"><a href="<?php echo esc_url($facebook); ?>" target="_blank">Facebook</a></p>
-            <?php endif; ?>
-        </div>
-    </div>
+                        <?php if (!empty($business_phone)) : ?>
+                            <p class="business-item phone-icon"><a href="tel:<?php echo esc_html($business_phone); ?>"><?php echo esc_html($business_phone); ?></a></p>
+                        <?php endif; ?>
 
-    <div class="business-description">
-        <hr> <!-- Add a dividing line -->
-        <?php if (!empty($business_description)) : ?>
-            <p><?php echo esc_html($business_description); ?></p>
-        <?php endif; ?>
-    </div>
-</div>
+                        <?php if (!empty($business_email)) : ?>
+                            <p class="business-item email-icon"><a href="mailto:<?php echo esc_attr($business_email); ?>"><?php echo esc_html($business_email); ?></a></p>
+                        <?php endif; ?>
 
-<!-- photo gallery -->
+                        <?php if (!empty($business_website)) : ?>
+                            <p class="business-item website-icon"><a href="<?php echo esc_url($business_website); ?>" target="_blank"><?php echo esc_html($business_website); ?></a></p>
+                        <?php endif; ?>
 
-<?php if (!empty($gallery)) : ?>
-    <div class="business-gallery">
-        <h2>Photo Gallery</h2>
-        <?php foreach ($gallery as $photo_url) : ?>
-            <img src="<?php echo esc_url($photo_url); ?>" alt="Gallery Image">
-        <?php endforeach; ?>
-    </div>
-<?php endif; ?>
+                        <?php if (!empty($business_whatsapp)) : ?>
+                            <?php
+                            $whatsapp_number = preg_replace('/^0/', '+27', esc_html($business_whatsapp));
+                            ?>
+                            <p class="business-item whatsapp-icon"><a href="https://wa.me/<?php echo $whatsapp_number; ?>" target="_blank"><?php echo esc_html($business_whatsapp); ?></a></p>
+                        <?php endif; ?>
 
-<div class="business-buttons">
-    <?php if ($current_user_id === $post_author_id) : ?>
-        <a href="<?php echo esc_url(home_url('/edit-listing/?listing_id=' . get_the_ID())); ?>" class="button">Edit This Listing</a>
-    <?php endif; ?>
-    <a href="<?php echo esc_url(home_url('/directory')); ?>" class="button">Return To Main Directory</a>
-</div>
+                        <?php if (!empty($facebook)) : ?>
+                            <p class="business-item facebook-icon"><a href="<?php echo esc_url($facebook); ?>" target="_blank">Facebook</a></p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <?php if (!empty($gallery)) : ?>
+                    <div class="business-gallery">
+                        <h2>Photo Gallery</h2>
+                        <?php foreach ($gallery as $image) : ?>
+                            <img src="<?php echo esc_url($image); ?>" alt="Gallery image">
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+
+                <div class="business-description">
+                    <p><?php echo esc_html($business_description); ?></p>
+                </div>
 
                 <?php if (!empty($tags)) : ?>
-                    <p><strong>Tags:</strong> <?php echo esc_html($tags); ?></p>
+                    <div class="business-tags">
+                        <p>Tags: <?php echo esc_html(implode(', ', $tags)); ?></p>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Edit button for the author -->
+                <?php if ($current_user_id === $post_author_id) : ?>
+                    <div class="edit-listing-button">
+                        <a href="<?php echo get_edit_post_link(); ?>" class="button">Edit This Listing</a>
+                    </div>
                 <?php endif; ?>
             </div>
 
-            <!-- Add Edit Listing Button -->
-            <?php if ($current_user_id === $post_author_id) : ?>
-                <div class="edit-listing-button">
-                    <a href="<?php echo esc_url(home_url('/edit-listing/?listing_id=' . get_the_ID())); ?>" class="button" style="background-color: #0073aa; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;"
-                    >EDIT THIS LISTING</a>
-    
-                </div>
-            <?php endif; ?>
-
-        <?php endwhile;
-    else : ?>
-        <p>No business details found.</p>
-    <?php endif; ?>
-    <div class="edit-listing-button">
-    <a href="<?php echo esc_url(home_url('/business-directory/' . get_the_ID())); ?>" class="button" style="background-color: #0073aa; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-    Return To Main Directory</a></div>
+    <?php
+        endwhile;
+    endif;
+    ?>
 </div>
+
 <?php get_footer(); ?>
