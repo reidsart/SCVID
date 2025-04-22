@@ -8,7 +8,7 @@ body.single-business-listing {
     padding: 20px;
     min-height: 100vh;
     box-sizing: border-box;
-    background-color: #f6f9fc;
+    background-color: #cbe3fc;
     /* Light background color for better contrast */
 }
 
@@ -17,8 +17,8 @@ body.single-business-listing .business-details {
     margin: 20px auto;
     padding: 20px;
     background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, .2);
     text-align: left;
     /* Left-align content */
     display: flex;
@@ -29,7 +29,7 @@ body.single-business-listing .business-details {
 
 /* Business Header */
 body.single-business-listing .business-header {
-    text-align: left;
+    text-align: center;
     margin-bottom: 20px;
     width: 100%;
 }
@@ -54,7 +54,7 @@ body.single-business-listing .business-column {
 
 body.single-business-listing .business-logo img {
     max-width: 100%;
-    max-height: 200px;
+    max-height: 300px;
     object-fit: contain;
     border-radius: 8px;
     display: block;
@@ -98,7 +98,15 @@ body.single-business-listing .business-item.facebook-icon::before {
     background-image: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/facebook.png');
 }
 body.single-business-listing .business-item.website-icon::before {
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
     background-image: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/website.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    vertical-align: middle;
 }
 
 /* Address and Suburb */
@@ -214,9 +222,8 @@ body.single-business-listing .business-gallery a img:hover {
 
 /* Business Description */
 body.single-business-listing .business-description {
-    margin-top: 20px;
+    margin-top: 10px;
     text-align: left;
-    /* Align the description to the left */
     font-size: 1rem;
     color: #333;
     line-height: 1.6;
