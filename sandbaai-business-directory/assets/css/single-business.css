@@ -103,6 +103,7 @@ body.single-business-listing .business-item.website-icon::before {
 
 /* Address and Suburb */
 body.single-business-listing .business-item.address-icon {
+    color: #7e91c9;
     text-align: left;
     line-height: 1.2;
     /* Reduced spacing between address and suburb */
