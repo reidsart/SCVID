@@ -69,13 +69,13 @@ get_header(); ?>
                         <?php if (!empty($facebook)) : ?>
                             <p class="business-item facebook-icon"><a href="<?php echo esc_url($facebook); ?>" target="_blank">Facebook</a></p>
                         <?php endif; ?>
-
-                        <?php if (!empty($business_website)) : ?>
-                            <p class="business-item website-icon"><a href="<?php echo esc_url($business_website); ?>" target="_blank"><?php echo esc_html($business_website); ?></a></p>
-                        <?php endif; ?>
                     </div>
                 </div>
-
+        <?php if (!empty($business_website)) : ?>
+            <div class="business-website">
+                <p class="business-item website-icon"><a href="<?php echo esc_url($business_website); ?>" target="_blank"><?php echo esc_html($business_website); ?></a></p>
+            </div>
+        <?php endif; ?>
                 <div class="business-description">
                     <p><?php echo esc_html($business_description); ?></p>
                 </div>
