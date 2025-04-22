@@ -91,6 +91,15 @@ function sb_load_custom_template($template) {
 }
 add_filter('single_template', 'sb_load_custom_template');
 
+// Add a custom class to the body for single business listing pages.
+function sb_add_body_class($classes) {
+    if (is_singular('business_listing')) {
+        $classes[] = 'single-business-listing';
+    }
+    return $classes;
+}
+add_filter('body_class', 'sb_add_body_class');
+
 // Load edit listing page
 function render_edit_listing_page() {
     // Don't execute during any admin requests
@@ -211,3 +220,17 @@ function sb_ensure_post_title($data, $postarr) {
     }
     return $data;
 }
+
+// Enqueue styles for the Single Business Listing page.
+
+function enqueue_single_business_css() {
+    if (is_singular('business_listing')) {
+        wp_enqueue_style(
+            'single-business-css', 
+            plugin_dir_url(__FILE__) . 'assets/css/single-business.css', 
+            array('astra-theme-css'), // Ensure it loads after Astra's CSS
+            '1.0.0'
+        );
+    }
+}
+add_action('wp_enqueue_scripts', 'enqueue_single_business_css');
