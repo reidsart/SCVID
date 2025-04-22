@@ -234,3 +234,10 @@ function enqueue_single_business_css() {
     }
 }
 add_action('wp_enqueue_scripts', 'enqueue_single_business_css');
+
+// Enqueue lightbox javascript
+function enqueue_lightbox_scripts() {
+    wp_enqueue_style('lightbox-css', 'https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css');
+    wp_enqueue_script('lightbox-js', 'https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js', array('jquery'), null, true);
+}
+add_action('wp_enqueue_scripts', 'enqueue_lightbox_scripts');
