@@ -1,0 +1,124 @@
+/* Base Styles */
+body.single-business-listing .business-details {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+body.single-business-listing .business-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+body.single-business-listing .business-title {
+    font-size: 2rem;
+    margin: 0;
+    color: #333;
+}
+
+body.single-business-listing .business-content {
+    display: flex;
+    gap: 20px;
+}
+
+body.single-business-listing .business-column {
+    flex: 1;
+}
+
+body.single-business-listing .business-logo img {
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto;
+}
+
+body.single-business-listing .business-meta .business-item {
+    margin: 10px 0;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #555;
+}
+
+body.single-business-listing .business-meta .business-item a {
+    text-decoration: none;
+    color: #0078d4;
+    transition: color 0.3s ease;
+}
+
+body.single-business-listing .business-meta .business-item a:hover {
+    color: #0056a4;
+}
+
+/* Add custom icons */
+body.single-business-listing .business-item.address-icon::before {
+    content: url('path-to-your-icons/address-icon.svg');
+}
+
+body.single-business-listing .business-item.phone-icon::before {
+    content: url('path-to-your-icons/phone-icon.svg');
+}
+
+body.single-business-listing .business-item.email-icon::before {
+    content: url('path-to-your-icons/email-icon.svg');
+}
+
+body.single-business-listing .business-item.website-icon::before {
+    content: url('path-to-your-icons/website-icon.svg');
+}
+
+body.single-business-listing .business-item.whatsapp-icon::before {
+    content: url('path-to-your-icons/whatsapp-icon.svg');
+}
+
+body.single-business-listing .business-item.facebook-icon::before {
+    content: url('path-to-your-icons/facebook-icon.svg');
+}
+
+/* Business Description */
+body.single-business-listing .business-description {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+    text-align: justify;
+}
+
+/* Business Buttons */
+body.single-business-listing .business-buttons {
+    margin-top: 30px;
+    text-align: center;
+}
+
+body.single-business-listing .business-buttons .button {
+    display: inline-block;
+    margin: 10px;
+    padding: 10px 20px;
+    background: #0073aa;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+body.single-business-listing .business-buttons .button:hover {
+    background: #0056a4;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    body.single-business-listing .business-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    body.single-business-listing .business-buttons .button {
+        margin: 10px auto;
+    }
+}
