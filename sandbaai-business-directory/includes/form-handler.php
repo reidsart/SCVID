@@ -37,27 +37,28 @@ function sb_render_add_business_form() {
     ob_start(); // Start output buffering
     ?>
     <form method="post" enctype="multipart/form-data" action="">
-        <label for="business_name">Business Name:</label>
+        <label for="business_name">Business Name*:</label>
         <input type="text" id="business_name" name="business_name" required>
 
-        <label for="business_address">Business Address:</label>
+        <label for="business_address">Business Address*:</label>
         <input type="text" id="business_address" name="business_address" required>
 
-        <label for="address_privacy">Keep Address Private:</label>
-        <input type="checkbox" id="address_privacy" name="address_privacy" value="1">
-
-        <label for="business_suburb">Business Suburb:</label>
+        <label for="address_privacy">Hide Address?:</label>
+        <input type="radio" id="address_privacy_yes" name="address_privacy" value="1"> Yes
+        <input type="radio" id="address_privacy_no" name="address_privacy" value="0" checked> No
+<br>
+        <label for="business_suburb">Business Suburb*:</label>
         <input type="text" id="business_suburb" name="business_suburb" value="Sandbaai" required>
 
-        <label for="business_phone">Business Phone:</label>
+        <label for="business_phone">Business Phone*:</label>
         <input type="text" id="business_phone" name="business_phone" required>
 
-        <label for="business_email">Business Email:</label>
+        <label for="business_email">Business Email*:</label>
         <input type="email" id="business_email" name="business_email" required>
 
-        <label for="business_description">Business Description:</label>
+        <label for="business_description">Business Description*:</label>
         <textarea id="business_description" name="business_description" required></textarea>
-
+<hr>
         <label for="business_website">Business Website:</label>
         <input type="url" id="business_website" name="business_website">
 
@@ -68,7 +69,8 @@ function sb_render_add_business_form() {
         <input type="url" id="facebook" name="facebook">
 
         <!-- Dropdowns for Tags -->
-        <label for="tag_1">Tag 1:</label>
+        <div style="display: flex; align-items: center; gap: 10px;">
+        <div><label for="tag_1">Tag 1:</label>
         <select id="tag_1" name="tags[]" required>
             <option value="">Select Tag 1</option>
             <?php
@@ -79,9 +81,9 @@ function sb_render_add_business_form() {
                 }
             }
             ?>
-        </select>
+        </select></div>
 
-        <label for="tag_2">Tag 2:</label>
+        <div><label for="tag_2">Tag 2:</label>
         <select id="tag_2" name="tags[]" required>
             <option value="">Select Tag 2</option>
             <?php
@@ -91,23 +93,22 @@ function sb_render_add_business_form() {
                 }
             }
             ?>
-        </select>
-
-        <label for="suggestions">Suggestions or Feedback:</label>
-        <textarea id="suggestions" name="suggestions"></textarea>
+        </select></div>
+        </div><br>
 
         <label for="logo">Upload Business Logo:</label>
         <input type="file" id="logo" name="logo">
 
         <label for="gallery">Upload photos for your business:</label>
         <input type="file" id="gallery" name="gallery[]" multiple>
-
         <br>
+        <label for="suggestions">Suggestions or Feedback:</label>
+        <textarea id="suggestions" name="suggestions"></textarea>
 
         <input type="submit" name="sb_submit_business" value="Submit">
 
         <br>
-    </form>
+    </form><br>
     <?php
     return ob_get_clean(); // Return the buffered content
 }
