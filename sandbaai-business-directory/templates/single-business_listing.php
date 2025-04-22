@@ -96,7 +96,7 @@ get_header(); ?>
 
             <?php if ($current_user_id === $post_author_id) : ?>
                 <div class="edit-listing-button">
-                    <a href="<?php echo get_edit_post_link(); ?>" class="button">Edit This Listing</a>
+                    <a href="/edit-listing/" class="button">Edit This Listing</a>
                     <br>
                     <a href="/business-directory/">Return to Business Directory</a>
                 </div>
