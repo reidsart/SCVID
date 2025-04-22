@@ -115,6 +115,29 @@ function sb_render_add_business_form() {
 // Handle form submission for adding business
 function sb_handle_form_submission() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sb_submit_business'])) {
+        // Temporarily disable Paystack save_post_meta during frontend submissions
+global $wp_filter;
+
+// Find the Paystack instance and remove the save_post_meta hook
+$paystack_instance = null;
+
+if (isset($wp_filter['save_post'])) {
+    foreach ($wp_filter['save_post']->callbacks as $priority => $callbacks) {
+        foreach ($callbacks as $callback_key => $callback_data) {
+            if (
+                is_array($callback_data['function']) &&
+                is_object($callback_data['function'][0]) &&
+                get_class($callback_data['function'][0]) === 'paystack\payment_forms\Forms_Update' &&
+                $callback_data['function'][1] === 'save_post_meta'
+            ) {
+                $paystack_instance = $callback_data['function'][0];
+                remove_action('save_post', [$paystack_instance, 'save_post_meta'], $priority);
+                error_log('Paystack save_post_meta removed for frontend submission.');
+                break 2;
+            }
+        }
+    }
+}
         // Sanitize and validate input fields
         $business_name = sanitize_text_field($_POST['business_name']);
         $business_address = sanitize_text_field($_POST['business_address']);
