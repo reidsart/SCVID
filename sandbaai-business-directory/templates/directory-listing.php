@@ -12,7 +12,7 @@ $tags = get_terms(array(
 
 if (!empty($tags) && !is_wp_error($tags)) {
     echo '<table class="tags-table">';
-    echo '<thead><tr><th>Tag Name</th></tr></thead>';
+    echo '<thead><tr><th>Business Categories</th></tr></thead>';
     echo '<tbody>';
     foreach ($tags as $tag) {
         if ($tag->count > 0) { // Only show tags used 1 or more times
