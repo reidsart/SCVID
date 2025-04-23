@@ -56,7 +56,11 @@ get_header(); ?>
                         <?php endif; ?>
 
                         <?php if (!empty($business_email)) : ?>
-                            <p class="business-item email-icon"><a href="mailto:<?php echo esc_attr($business_email); ?>"><?php echo esc_html($business_email); ?></a></p>
+                          <p class="business-item email-icon">
+                              <a href="mailto:<?php echo esc_attr($business_email); ?>?subject=SCVID%20member%20query">
+                                   <?php echo esc_html($business_email); ?>
+                                </a>
+                            </p>
                         <?php endif; ?>
 
                         <?php if (!empty($business_whatsapp)) : ?>
