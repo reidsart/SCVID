@@ -16,8 +16,8 @@ function sb_render_add_business_form() {
         <input type="radio" id="address_privacy_yes" name="address_privacy" value="1"> Yes
         <input type="radio" id="address_privacy_no" name="address_privacy" value="0" checked> No
 
-        <label for="business_suburb">Business Suburb (default: Sandbaai):</label>
-        <input type="text" id="business_suburb" name="business_suburb" value="Sandbaai">
+        <br><label for="business_suburb">Business Suburb (default: Sandbaai):</label>
+        <input type="text" id="business_suburb" name="business_suburb" value="Sandbaai" required>
 
         <label for="business_phone">Business Phone (required):</label>
         <input type="text" id="business_phone" name="business_phone" required>
@@ -27,8 +27,6 @@ function sb_render_add_business_form() {
 
         <label for="business_description">Business Description (required):</label>
         <textarea id="business_description" name="business_description" required></textarea>
-
-        <hr>
 
         <!-- Optional Fields -->
         <label for="business_website">Business Website:</label>
@@ -72,7 +70,7 @@ function sb_render_add_business_form() {
         </table>
 
         <br>
-        <input type="hidden" id="category" name="category" value=""> <!-- Default empty -->
+        <input type="hidden" id="category" name="category" value="sb_business"> <!-- Default sb_business -->
         <br>
         <input type="submit" name="sb_submit_business" value="Submit Business">
     </form>
