@@ -73,7 +73,8 @@ if ($query->have_posts()) {
 
         // Business Website
         echo '<label for="business_website">Business Website:</label>';
-        echo '<input type="text" id="business_website" name="business_website" placeholder="example.com">';
+        echo '<input type="text" id="business_website" name="business_website" placeholder="example.com" value="' . esc_attr($listing_website) . '">';
+
 
         // WhatsApp Number
         echo '<label for="listing_whatsapp_' . esc_attr($listing_id) . '">Business WhatsApp Number:</label>';
@@ -81,7 +82,7 @@ if ($query->have_posts()) {
 
         // Facebook Page
         echo '<label for="facebook">Facebook Page URL:</label>';
-        echo '<input type="text" id="facebook" name="facebook" placeholder="facebook.com/yourpage">';
+        echo '<input type="text" id="facebook" name="facebook" placeholder="facebook.com/yourpage" value="' . esc_attr($facebook) . '">';
 
         // Tags as Dropdowns
         $tags = get_tags(array('hide_empty' => false));
