@@ -146,9 +146,9 @@ if (isset($wp_filter['save_post'])) {
         $business_phone = sanitize_text_field($_POST['business_phone']);
         $business_email = sanitize_email($_POST['business_email']);
         $business_description = sanitize_textarea_field($_POST['business_description']);
-        $business_website = !empty($_POST['business_website']) ? esc_url($_POST['business_website']) : '';
+        $business_website = sanitize_text_field($_POST['business_website'] ?? '');
         $business_whatsapp = sanitize_text_field($_POST['business_whatsapp']);
-        $facebook = !empty($_POST['facebook']) ? esc_url($_POST['facebook']) : '';
+        $facebook = sanitize_text_field($_POST['facebook'] ?? '');
         $tags = !empty($_POST['tags']) ? array_map('intval', $_POST['tags']) : array();
         $address_privacy = isset($_POST['address_privacy']) ? '1' : '0';
         $suggestions = sanitize_textarea_field($_POST['suggestions']);
@@ -196,45 +196,66 @@ if (isset($wp_filter['save_post'])) {
             return;
         }
 
-        // Determine category based on suburb
-        $category_slug = strtolower($business_suburb) === 'sandbaai' ? 'sb_business' : 'ob_business';
+// Determine category based on suburb
+$category_slug = strtolower($business_suburb) === 'sandbaai' ? 'sb_business' : 'ob_business';
 
-        // Create a new business listing post
-        $post_id = wp_insert_post(array(
-            'post_type' => 'business_listing',
-            'post_title' => $business_name,
-            'post_status' => 'pending', // Set to Pending Review
-            'post_author' => get_current_user_id(), // Explicitly set the post author
-            'tax_input' => array(
-                'business_category' => array($category_slug), // Assign category
-                'post_tag' => $tags, // Assign tags
-            ),
-            'meta_input' => array(
-                'business_address' => $business_address,
-                'business_suburb' => $business_suburb,
-                'business_phone' => $business_phone,
-                'business_email' => $business_email,
-                'business_description' => $business_description,
-                'business_website' => $business_website,
-                'business_whatsapp' => $business_whatsapp,
-                'facebook' => $facebook,
-                'logo' => $logo,
-                'gallery' => $gallery,
-                'address_privacy' => $address_privacy,
-                'suggestions' => $suggestions,
-            ),
-        ));
+// Create a new business listing post
+$post_id = wp_insert_post(array(
+    'post_type' => 'business_listing',
+    'post_title' => $business_name,
+    'post_status' => 'pending', // Set to Pending Review
+    'post_author' => get_current_user_id(), // Explicitly set the post author
+    'tax_input' => array(
+        'post_tag' => $tags, // Assign tags
+    ),
+    'meta_input' => array(
+        'business_address' => $business_address,
+        'business_suburb' => $business_suburb,
+        'business_phone' => $business_phone,
+        'business_email' => $business_email,
+        'business_description' => $business_description,
+        'business_website' => $business_website,
+        'business_whatsapp' => $business_whatsapp,
+        'facebook' => $facebook,
+        'logo' => $logo,
+        'gallery' => $gallery,
+        'address_privacy' => $address_privacy,
+        'suggestions' => $suggestions,
+    ),
+));
 
+// Debug: Log the post ID and category slug
+error_log("Post ID: $post_id, Category Slug: $category_slug");
+
+// Check if the post was created successfully
+if ($post_id && !is_wp_error($post_id)) {
+    // Ensure the category term exists
+    if (!term_exists($category_slug, 'business_category')) {
+        // Create the term if it doesn't exist
+        wp_insert_term(
+            $category_slug === 'sb_business' ? 'Sandbaai Businesses' : 'Overberg Businesses',
+            'business_category',
+            array('slug' => $category_slug)
+        );
+    }
+
+    // Assign the category taxonomy to the post
+    wp_set_post_terms($post_id, $category_slug, 'business_category');
+
+    // Debug: Log success
+    error_log("Successfully set category $category_slug for post $post_id");
+} else {
+    // Debug: Log error
+    error_log("Error creating post: " . print_r($post_id, true));
+}
 // Automatically add https:// to website or Facebook URL if missing
 function sb_sanitize_urls($post_data) {
-    // Ensure "https://" is added only if no protocol is present
-    if (!empty($post_data['business_website']) && !preg_match('/^https?:\\/\\//', $post_data['business_website'])) {
+    if (!empty($post_data['business_website']) && !preg_match('/^https?:\/\//', $post_data['business_website'])) {
         $post_data['business_website'] = 'https://' . ltrim($post_data['business_website'], '/');
     }
-    if (!empty($post_data['facebook']) && !preg_match('/^https?:\\/\\//', $post_data['facebook'])) {
+    if (!empty($post_data['facebook']) && !preg_match('/^https?:\/\//', $post_data['facebook'])) {
         $post_data['facebook'] = 'https://' . ltrim($post_data['facebook'], '/');
     }
-
     return $post_data;
 }
 // Hook the function to sanitize URLs during both "add" and "edit" form submissions
@@ -244,9 +265,9 @@ add_filter('pre_post_edit_form_submission_data', 'sb_sanitize_urls'); // For the
 // If the listing was created successfully
         if ($post_id) {
             echo '<p style="color: green;">Success: Your business listing has been submitted for review.</p>';
-            if ($listing_id) {
-// Redirect to the edit page with the new listing ID
-            $edit_page_url = home_url('/edit-listing/?listing_id=' . $listing_id);
+if ($post_id) {
+    // Redirect to the edit page with the new listing ID
+    $edit_page_url = home_url('/edit-listing/?listing_id=' . $post_id);
     wp_redirect($edit_page_url);
     exit;
 }
@@ -328,18 +349,20 @@ function sb_handle_edit_form_submission() {
         $post_title = isset($_POST['post_title']) ? sanitize_text_field($_POST['post_title']) : $listing->post_title;
 
         // Sanitize and update post fields
-        $updated_description = sanitize_textarea_field($_POST['business_description']);
-        $updated_phone = sanitize_text_field($_POST['business_phone']);
-        $updated_email = sanitize_email($_POST['business_email']);
-        $updated_address = sanitize_text_field($_POST['business_address']);
-        $updated_website = esc_url_raw($_POST['business_website']);
-        $updated_address_privacy = sanitize_text_field($_POST['address_privacy']);
-        $updated_whatsapp = sanitize_text_field($_POST['business_whatsapp']);
-        $updated_facebook = esc_url_raw($_POST['facebook']);
-        $updated_tags = isset($_POST['tags']) ? array_map('intval', $_POST['tags']) : array();
+        $updated_description = sanitize_textarea_field($_POST['business_description'] ?? '');
+        $updated_phone = sanitize_text_field($_POST['business_phone'] ?? '');
+        $updated_email = sanitize_email($_POST['business_email'] ?? '');
+        $updated_address = sanitize_text_field($_POST['business_address'] ?? '');
+        $updated_address_privacy = sanitize_text_field($_POST['address_privacy'] ?? '');
+        $updated_whatsapp = sanitize_text_field($_POST['business_whatsapp'] ?? '');
 
-        // Remove empty values from tags array
-        $updated_tags = array_filter($updated_tags);
+        // Change sanitization for business_website and facebook to accept plain text
+        $updated_website = sanitize_text_field($_POST['business_website'] ?? '');
+        $updated_facebook = sanitize_text_field($_POST['facebook'] ?? '');
+
+        // Sanitize and validate tags
+        $updated_tags = isset($_POST['tags']) ? array_map('intval', $_POST['tags']) : array();
+        $updated_tags = array_filter($updated_tags); // Remove any invalid or empty values
 
         // Handle gallery updates
         if (isset($_POST['remove_gallery']) || !empty($_FILES['gallery']['name'][0])) {
