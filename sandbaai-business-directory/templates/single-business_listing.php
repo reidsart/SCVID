@@ -71,13 +71,13 @@ get_header(); ?>
                         <?php endif; ?>
 
                         <?php if (!empty($facebook)) : ?>
-                            <p class="business-item facebook-icon"><a href="<?php echo esc_url($facebook); ?>" target="_blank">Facebook</a></p>
+                            <p class="business-item facebook-icon"><a href="<?php echo $facebook; ?>" target="_blank">Facebook</a></p>
                         <?php endif; ?>
                     </div>
                 </div>
         <?php if (!empty($business_website)) : ?>
             <div class="business-website">
-                <p class="business-item website-icon"><a href="<?php echo esc_url($business_website); ?>" target="_blank"><?php echo esc_html($business_website); ?></a></p>
+                <p class="business-item website-icon"><a href="<?php echo $business_website; ?>" target="_blank"><?php echo esc_html($business_website); ?></a></p>
             </div>
         <?php endif; ?>
                 <div class="business-description">
@@ -102,7 +102,6 @@ get_header(); ?>
                 <div class="edit-listing-button">
                     <a href="/edit-listing/" class="button">Edit This Listing</a>
                     <br>
-                    <a href="/business-directory/">Return to Business Directory</a>
                 </div>
             <?php endif; ?>
 
@@ -110,6 +109,6 @@ get_header(); ?>
         endwhile;
     endif;
     ?>
+    <center> <a href="/business-directory/">Return to Business Directory</a>
 </div>
-
 <?php get_footer(); ?>
