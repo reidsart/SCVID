@@ -237,7 +237,9 @@ function sb_sanitize_urls($post_data) {
 
     return $post_data;
 }
-add_filter('pre_post_form_submission_data', 'sb_sanitize_urls'); // Ensure the hook matches your form's workflow
+// Hook the function to sanitize URLs during both "add" and "edit" form submissions
+add_filter('pre_post_form_submission_data', 'sb_sanitize_urls'); // For the "add" functionality
+add_filter('pre_post_edit_form_submission_data', 'sb_sanitize_urls'); // For the "edit" functionality
 
 // If the listing was created successfully
         if ($post_id) {
