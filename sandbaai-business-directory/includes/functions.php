@@ -3,10 +3,12 @@
  * Utility functions for the Sandbaai Business Directory plugin.
  */
 
+/**
 // Sanitize input data
 function sanitize_input($data) {
     return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
 }
+*/
 
 // Add a message to the session
 function add_session_message($message, $type = 'info') {
@@ -29,5 +31,5 @@ function display_session_message() {
         unset($_SESSION['message']);
         unset($_SESSION['message_type']);
     }
-}
+} 
 ?>
