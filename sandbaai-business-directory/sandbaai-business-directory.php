@@ -5,7 +5,7 @@ Plugin URI: https://sandbaaicommunity.co.za
 Description: A WordPress plugin for managing a business directory focused on Sandbaai and Overberg businesses.
 Version: 1.0
 Author: reidsart
-Author URI: https://github.com/reidsart
+Author URI: https://reidsart.com
 License: GPL2
 */
 
@@ -246,3 +246,19 @@ function sb_enqueue_styles() {
     wp_enqueue_style('directory-styles', plugin_dir_url(__FILE__) . '/assets/css/directory.css');
 }
 add_action('wp_enqueue_scripts', 'sb_enqueue_styles');
+
+add_filter('template_include', function ($template) {
+    if (is_tax('business_tag')) {
+        $custom_template = SB_DIR_PATH . 'templates/taxonomy-business_tag.php';
+        if (file_exists($custom_template)) {
+            return $custom_template;
+        }
+
+        // Fallback to the generic taxonomy template
+        $generic_template = SB_DIR_PATH . 'templates/taxonomy.php';
+        if (file_exists($generic_template)) {
+            return $generic_template;
+        }
+    }
+    return $template;
+});
