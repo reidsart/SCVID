@@ -71,29 +71,30 @@ if ($query->have_posts()) {
         echo '<label for="listing_description_' . esc_attr($listing_id) . '">Business Description:</label>';
         echo '<textarea id="listing_description_' . esc_attr($listing_id) . '" name="business_description" required>' . esc_textarea($listing_description) . '</textarea>';
 
-        // Business Website
-        echo '<label for="business_website">Business Website:</label>';
-        echo '<input type="text" id="business_website" name="business_website" placeholder="example.com" value="' . esc_attr($listing_website) . '">';
+        // Business Website ?>
+        <label for="listing_website_<?php echo esc_attr($listing_id); ?>">Business Website:</label>
+        <input type="text" id="listing_website_<?php echo esc_attr($listing_id); ?>" name="business_website" value="<?php echo esc_attr($listing_website); ?>" placeholder="Enter your website (e.g., example.com)">
 
-
+        <?php // Facebook Page ?>
+        <label for="facebook_<?php echo esc_attr($listing_id); ?>">Business Facebook Page:</label>
+        <input type="text" id="facebook_<?php echo esc_attr($listing_id); ?>" name="facebook" value="<?php echo esc_attr($facebook); ?>" placeholder="Enter your Facebook page (e.g., facebook.com/yourpage)">
+        <?php
+        
         // WhatsApp Number
         echo '<label for="listing_whatsapp_' . esc_attr($listing_id) . '">Business WhatsApp Number:</label>';
         echo '<input type="text" id="listing_whatsapp_' . esc_attr($listing_id) . '" name="business_whatsapp" value="' . esc_attr($listing_whatsapp) . '">';
-
-        // Facebook Page
-        echo '<label for="facebook">Facebook Page URL:</label>';
-        echo '<input type="text" id="facebook" name="facebook" placeholder="facebook.com/yourpage" value="' . esc_attr($facebook) . '">';
 
         // Tags as Dropdowns
         $tags = get_tags(array('hide_empty' => false));
         $selected_tags = array_values($selected_tags); // Ensure selected tags are indexed numerically
 
+        echo '<div>Add up to 2 categories for your business   <i>**If your business category is not listed, <a href="mailto:admin@sandbaaicommunity.co.za subject="category suggestion">email us</a></i></div>';
+
         // Tag Dropdowns Container
         echo '<div style="display: flex; align-items: center; gap: 10px;">';
-
         // Tag 1 Dropdown
         echo '<div>';
-        echo '<label for="tag_1">Tag 1:</label>';
+        echo '<label for="tag_1">1st Category:</label>';
         echo '<select id="tag_1" name="tags[]" required>';
         echo '<option value="">Select Tag 1</option>';
         foreach ($tags as $tag) {
@@ -105,7 +106,7 @@ if ($query->have_posts()) {
 
         // Tag 2 Dropdown
         echo '<div>';
-        echo '<label for="tag_2">Tag 2:</label>';
+        echo '<label for="tag_2">2nd Category:</label>';
         echo '<select id="tag_2" name="tags[]">';
         echo '<option value="">Select Tag 2</option>';
         foreach ($tags as $tag) {
@@ -115,7 +116,7 @@ if ($query->have_posts()) {
         echo '</select>';
         echo '</div>';
 
-        echo '</div><br><br>';
+        echo '</div><br>';
 
         // Gallery and Logo Handling
         $gallery = get_post_meta($listing_id, 'gallery', true);
