@@ -82,22 +82,28 @@ body.single-business-listing .business-meta .business-item::before {
     content: "";
     align-self: center;
 }
+
 /* Define icons */
 body.single-business-listing .business-item.address-icon::before {
     background-image: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/address.png');
 }
+
 body.single-business-listing .business-item.phone-icon::before {
     background-image: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/phone.png');
 }
+
 body.single-business-listing .business-item.email-icon::before {
     background-image: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/email.png');
 }
+
 body.single-business-listing .business-item.whatsapp-icon::before {
     background-image: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/whatsapp.png');
 }
+
 body.single-business-listing .business-item.facebook-icon::before {
     background-image: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/facebook.png');
 }
+
 body.single-business-listing .business-item.website-icon::before {
     content: "";
     display: inline-block;
@@ -147,6 +153,7 @@ body.single-business-listing .business-website p a:visited {
 body.single-business-listing .business-website p a:hover {
     color: #22416D !important;
 }
+
 /* Phone Link */
 body.single-business-listing .business-item.phone-icon a {
     color: #008ECF;

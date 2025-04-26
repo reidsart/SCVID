@@ -1,67 +1,117 @@
-.directory-layout {
+/* General layout for the plugin */
+.sb-directory-layout {
     display: flex;
     flex-direction: row;
-}
-
-.sidebar-navigation {
-    width: 25%;
-    background-color: #e6f7ff;
-    /* Light blue background */
-    border: 2px solid #0056b3;
-    /* Dark blue border */
-    padding: 15px;
-    box-sizing: border-box;
-}
-
-.sidebar-navigation .search-bar {
-    margin-bottom: 20px;
-}
-
-.sidebar-navigation .search-bar input[type="text"] {
+    align-items: flex-start;
+    /* Align items at the top */
+    gap: 30px;
+    /* Space between sidebar and content */
+    margin-top: 20px;
     width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
+    /* Ensure the layout spans the full width of the container */
+}
+
+/* Sidebar styling */
+.sb-sidebar-container {
+    flex: 0 0 280px;
+    /* Fixed width for the sidebar */
+    max-width: 280px;
+    /* Ensure the sidebar doesn't grow too large */
+    background-color: #f9f9f9;
+    /* Light gray background */
+    border: 1px solid #ddd;
+    /* Light border */
+    padding: 20px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    /* Rounded corners */
+    color: #333;
+    /* Ensure text color is readable */
+}
+
+/* Search bar inside the sidebar */
+.sb-sidebar-container .sb-search-bar input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    font-size: 14px;
 }
 
-.sidebar-navigation .search-bar button {
-    display: block;
+.sb-sidebar-container .sb-search-bar button {
     width: 100%;
-    padding: 8px;
+    padding: 10px;
     background-color: #0056b3;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-weight: bold;
 }
 
-.sidebar-navigation .tags-section h3 {
-    margin-top: 0;
+.sb-sidebar-container .sb-search-bar button:hover {
+    background-color: #004494;
+    /* Darker blue on hover */
 }
 
-.sidebar-navigation .tags-section ul {
+/* Tags section in the sidebar */
+.sb-sidebar-container .sb-tags-section h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.sb-sidebar-container .sb-tags-section ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
 }
 
-.sidebar-navigation .tags-section ul li {
-    margin-bottom: 10px;
+.sb-sidebar-container .sb-tags-section ul li {
+    margin-bottom: 2px;
 }
 
-.sidebar-navigation .tags-section ul li a {
+.sb-sidebar-container .sb-tags-section ul li a {
+    display: block;
     color: #0056b3;
-    /* Dark blue for active tags */
+    /* Dark blue */
     text-decoration: none;
+    font-size: 14px;
 }
 
-.sidebar-navigation .tags-section ul li a:hover {
+.sb-sidebar-container .sb-tags-section ul li a:hover {
     text-decoration: underline;
 }
 
-.main-content {
-    width: 75%;
-    padding: 15px;
+/* Main content styling */
+.sb-main-content {
+    flex: 1;
+    /* Take up the remaining available space */
+    padding: 20px;
     box-sizing: border-box;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    /* Rounded corners */
+    min-height: 300px;
+    /* Ensure the content box has a minimum height */
+    color: #333;
+    /* Ensure text color is readable */
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    .sb-directory-layout {
+        flex-direction: column;
+        /* Stack sidebar and content vertically */
+    }
+
+    .sb-sidebar-container,
+    .sb-main-content {
+        width: 100%;
+        /* Full width for both sections */
+        margin-bottom: 20px;
+        /* Space between stacked sections */
+    }
 }

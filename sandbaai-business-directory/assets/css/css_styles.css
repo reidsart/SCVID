@@ -2,22 +2,3 @@
 .business-directory {
     font-family: Arial, sans-serif;
 }
-
-/* Styles for the edit listing button on single listing */
-.edit-listing-button {
-    margin-top: 20px;
-    text-align: center;
-}
-
-.edit-listing-button .button {
-    background-color: #0073aa;
-    color: #ffffff;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
-}
-
-.edit-listing-button .button:hover {
-    background-color: #005177;
-}
