@@ -17,16 +17,29 @@
     /* Fixed width for the sidebar */
     max-width: 280px;
     /* Ensure the sidebar doesn't grow too large */
-    background-color: #f9f9f9;
-    /* Light gray background */
-    border: 1px solid #ddd;
-    /* Light border */
+    background-color: #ffffff;
+    border: none;
+    /* Removed border */
     padding: 20px;
     box-sizing: border-box;
     border-radius: 8px;
     /* Rounded corners */
     color: #333;
     /* Ensure text color is readable */
+}
+
+/* Updated Specific Sidebar Styles */
+body .sb-sidebar-container.custom-sidebar-style {
+    background-color: #cbe3fc !important;
+    /* Light blue-violet */
+    border-radius: 10pt !important;
+    /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+    /* Drop shadow */
+    padding: 15px !important;
+    margin-bottom: 20px !important;
+    color: #333 !important;
+    /* Text color for better contrast */
 }
 
 /* Search bar inside the sidebar */
@@ -91,7 +104,8 @@
     padding: 20px;
     box-sizing: border-box;
     background-color: #ffffff;
-    border: 1px solid #ddd;
+    border: none;
+    /* Removed border */
     border-radius: 8px;
     /* Rounded corners */
     min-height: 300px;
@@ -114,4 +128,10 @@
         margin-bottom: 20px;
         /* Space between stacked sections */
     }
+}
+/* display taxonomy pages with forced white background */
+#content.site-content,
+.ast-container,
+.sb-directory-layout {
+    background-color: #FFFFFF !important;
 }
