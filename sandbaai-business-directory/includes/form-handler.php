@@ -103,10 +103,12 @@ function sb_render_add_business_form() {
         <label for="logo">Upload Business Logo:</label>
         <input type="file" id="logo" name="logo">
 
-        <label for="gallery">Upload photos for your business:   **<i>add more photos on the edit page once your business is approved</i></label>
+        <label for="gallery">Upload photos for your business:</label>
         <input type="file" id="gallery" name="gallery[]" multiple>
-        <br>
-        <label for="suggestions">Suggestions or Feedback:</label>
+    <br>
+        <label>**<i>add more photos on the edit page once your business is approved</i></label>
+        <br><br>
+        <label for="suggestions">Suggestions & Feedback:</label>
         <textarea id="suggestions" name="suggestions"></textarea>
 
         <input type="submit" name="sb_submit_business" value="Submit">

@@ -31,7 +31,7 @@ function sb_render_sidebar() {
 
     // Link to "All Listings"
     echo '<div class="sb-all-listings">';
-    echo '<a href="' . esc_url(home_url('/business-directory/')) . '">All listings</a>';
+    echo '<a href="' . esc_url(home_url('/business-directory/')) . '">All Listings</a>';
     echo '</div><hr>';
 
     // Tags Section
@@ -47,7 +47,7 @@ function sb_render_sidebar() {
     echo '<ul>';
     foreach ($tags as $tag) {
         if ($tag->count > 0) {
-            // Display as a clickable link if the tag is used
+            // Link to taxonomy archive page
             echo '<li><a href="' . esc_url(get_term_link($tag->term_id, 'business_tag')) . '">• ' . esc_html($tag->name) . '</a></li>';
         } else {
             // Display as grey non-clickable text if the tag is not used
