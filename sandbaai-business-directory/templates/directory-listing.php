@@ -1,46 +1,19 @@
 <?php
+require_once SB_DIR_PATH . 'includes/sidebar.php';
+
 function sb_render_directory_listing() {
     ob_start();
 
     // Begin Layout Wrapper
-    echo '<div class="directory-layout">';
+    echo '<div class="sb-directory-layout">';
 
     // Sidebar Navigation
-    echo '<div class="sidebar-navigation">';
-    
-    // Search Bar
-    echo '<div class="search-bar">';
-    echo '<form method="get" action="' . home_url('/') . '">';
-    echo '<input type="hidden" name="post_type" value="business_listing">';
-    echo '<input type="text" name="s" placeholder="Search Business Listings">';
-    echo '<button type="submit">Search</button>';
-    echo '</form>';
+    echo '<div class="sb-sidebar-container">';
+    sb_render_sidebar();
     echo '</div>';
-
-    // Tags Section
-    $tags = get_terms(array(
-        'taxonomy' => 'business_tag',
-        'orderby' => 'name',
-        'order' => 'ASC',
-        'hide_empty' => false,
-    ));
-
-    echo '<div class="tags-section">';
-    echo '<h3>Tags</h3>';
-    echo '<ul>';
-    foreach ($tags as $tag) {
-        if ($tag->count > 0) {
-            echo '<li><a href="' . esc_url(get_term_link($tag->term_id, 'business_tag')) . '">' . esc_html($tag->name) . '</a></li>';
-        } else {
-            echo '<li style="color: grey;">' . esc_html($tag->name) . '</li>';
-        }
-    }
-    echo '</ul>';
-    echo '</div>';
-    echo '</div>'; // End Sidebar Navigation
 
     // Main Content
-    echo '<div class="main-content">';
+    echo '<div class="sb-main-content">';
 
     // Query Sandbaai Businesses
     $sandbaai_query = new WP_Query(array(
@@ -79,4 +52,5 @@ function sb_render_directory_listing() {
 
     return ob_get_clean();
 }
+
 add_shortcode('sb_directory_listing', 'sb_render_directory_listing');
