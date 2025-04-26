@@ -206,7 +206,7 @@ if (isset($wp_filter['save_post'])) {
         }
 
 // Determine category based on suburb
-$category_slug = strtolower($business_suburb) === 'sandbaai' ? 'sb_business' : 'ob_business';
+$category_slug = strtolower($business_suburb) === 'Sandbaai' ? 'sb_business' : 'ob_business';
 
 // Create a new business listing post
 $post_id = wp_insert_post(array(
@@ -215,7 +215,7 @@ $post_id = wp_insert_post(array(
     'post_status' => 'pending', // Set to Pending Review
     'post_author' => get_current_user_id(), // Explicitly set the post author
     'tax_input' => array(
-        'post_tag' => $tags, // Assign tags
+        'business_tag' => $tags, // Assign tags to the correct custom taxonomy
     ),
     'meta_input' => array(
         'business_address' => $business_address,
@@ -233,9 +233,6 @@ $post_id = wp_insert_post(array(
     ),
 ));
 
-// Debug: Log the post ID and category slug
-error_log("Post ID: $post_id, Category Slug: $category_slug");
-
 // Check if the post was created successfully
 if ($post_id && !is_wp_error($post_id)) {
     // Ensure the category term exists
@@ -248,6 +245,13 @@ if ($post_id && !is_wp_error($post_id)) {
         );
     }
 
+    // Assign tags to the custom taxonomy `business_tag`
+    if (!empty($tags)) {
+        $result = wp_set_object_terms($post_id, $tags, 'business_tag', false); // Add tags to the post
+        if (is_wp_error($result)) {
+            error_log('Tag assignment error: ' . $result->get_error_message()); // Log any errors
+        }
+    }
     // Assign the category taxonomy to the post
     wp_set_post_terms($post_id, $category_slug, 'business_category');
 
@@ -450,7 +454,7 @@ function sb_handle_edit_form_submission() {
         error_log("Meta fields updated for listing ID: $listing_id");
 
         // Save tags
-        wp_set_post_terms($listing_id, $updated_tags, 'post_tag');
+        wp_set_post_terms($listing_id, $updated_tags, 'business_tag');
         error_log("Tags updated: " . implode(', ', $updated_tags));
 
         echo '<p style="color: green;">Listing updated successfully.</p>';
