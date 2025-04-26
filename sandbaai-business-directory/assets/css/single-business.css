@@ -8,8 +8,7 @@ body.single-business-listing {
     padding: 20px;
     min-height: 100vh;
     box-sizing: border-box;
-    background-color: #cbe3fc;
-    /* Light background color for better contrast */
+    background-color: #ffffff;;
 }
 
 body.single-business-listing .business-details {

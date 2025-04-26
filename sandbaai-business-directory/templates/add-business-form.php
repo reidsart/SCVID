@@ -45,7 +45,7 @@ function sb_render_add_business_form() {
         <label for="gallery">Photo Gallery (up to 5, max 2MB each):</label>
         <input type="file" id="gallery" name="gallery[]" accept="image/jpeg, image/png" multiple>
 
-        <label for="tags">Select up to 2 Tags:</label>
+        <label for="tags">Select up to 2 categories that fit your business:</label>
         <table id="tags-table" border="1" cellpadding="5" cellspacing="0">
             <thead>
                 <tr>

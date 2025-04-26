@@ -32,4 +32,27 @@ function display_session_message() {
         unset($_SESSION['message_type']);
     }
 } 
+/**
+ * Modify the search query to include business descriptions.
+ */
+function sb_extend_business_search($query) {
+    if (!is_admin() && $query->is_main_query() && $query->is_search() && $query->get('post_type') === 'business_listing') {
+        // Include meta query for business_description
+        $meta_query = array(
+            array(
+                'key'     => 'business_description',
+                'value'   => $query->get('s'),
+                'compare' => 'LIKE',
+            ),
+        );
+
+        // Set the meta query
+        $query->set('meta_query', $meta_query);
+
+        // Ensure it also searches post titles and content
+        $query->set('s', $query->get('s'));
+    }
+}
+add_action('pre_get_posts', 'sb_extend_business_search');
+
 ?>

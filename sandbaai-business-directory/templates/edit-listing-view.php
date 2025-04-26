@@ -36,6 +36,7 @@ if ($query->have_posts()) {
         $listing_whatsapp = get_post_meta($listing_id, 'business_whatsapp', true);
         $facebook = get_post_meta($listing_id, 'facebook', true);
         $address_privacy = get_post_meta($listing_id, 'address_privacy', true);
+        $suggestions = get_post_meta($listing_id, 'suggestions', true); // Retrieve suggestions field
         $tags = get_the_terms($listing_id, 'post_tag');
         $selected_tags = !empty($tags) ? wp_list_pluck($tags, 'term_id') : array();
 
@@ -88,7 +89,7 @@ if ($query->have_posts()) {
         $tags = get_tags(array('hide_empty' => false));
         $selected_tags = array_values($selected_tags); // Ensure selected tags are indexed numerically
 
-        echo '<div>Add up to 2 categories for your business   <i>**If your business category is not listed, <a href="mailto:admin@sandbaaicommunity.co.za subject="category suggestion">email us</a></i></div>';
+        echo '<div>Add up to 2 categories for your business <i>**If your business category is not listed, <a href="mailto:admin@sandbaaicommunity.co.za subject="category suggestion">email us</a></i></div>';
 
         // Tag Dropdowns Container
         echo '<div style="display: flex; align-items: center; gap: 10px;">';
@@ -122,9 +123,6 @@ if ($query->have_posts()) {
         $gallery = get_post_meta($listing_id, 'gallery', true);
         $logo = get_post_meta($listing_id, 'logo', true);
 
-        // Debug: Log the gallery meta
-        error_log('Gallery meta for listing ' . $listing_id . ': ' . print_r($gallery, true));
-
         // Display Logo
         if (!empty($logo)) {
             echo '<div>';
@@ -153,6 +151,10 @@ if ($query->have_posts()) {
 
         echo '<label for="logo">Upload New Logo:</label>';
         echo '<input type="file" id="logo" name="logo"><br>';
+
+        // Suggestions and Feedback
+        echo '<label for="listing_suggestions_' . esc_attr($listing_id) . '">Suggestions & Feedback:</label>';
+        echo '<textarea id="listing_suggestions_' . esc_attr($listing_id) . '" name="suggestions">' . esc_textarea($suggestions) . '</textarea>';
 
         // Submit button
         echo '<input type="submit" name="update_listing" value="Update Listing">';

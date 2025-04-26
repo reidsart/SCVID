@@ -19,10 +19,16 @@ get_header();
         <?php
         if (have_posts()) {
             echo '<h2>' . single_term_title('', false) . '</h2>';
-            echo '<ul class="business-listing">';
+            echo '<ul class="business-listing" style="list-style-type: none;">';
             while (have_posts()) {
                 the_post();
-                echo '<li><a href="' . get_permalink() . '">' . get_the_title() . '</a></li>';
+                $logo = get_post_meta(get_the_ID(), 'logo', true); // Fetch logo meta
+                echo '<li>';
+                if (!empty($logo)) {
+                    echo '<img src="' . esc_url($logo) . '" alt="Logo" style="width: 20px; height: 20px; margin-right: 10px; vertical-align: middle;">';
+                }
+                echo '<a href="' . get_permalink() . '">' . get_the_title() . '</a>';
+                echo '</li>';
             }
             echo '</ul>';
         } else {

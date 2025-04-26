@@ -45,8 +45,8 @@ function sb_render_add_business_form() {
 
         <label for="address_privacy">Hide Address?:</label>
         <input type="radio" id="address_privacy_yes" name="address_privacy" value="1"> Yes
-        <input type="radio" id="address_privacy_no" name="address_privacy" value="0" checked> No
-<br>
+        <input type="radio" id="address_privacy_no" name="address_privacy" value="0" checked> No<br>
+
         <label for="business_suburb">Business Suburb*:</label>
         <input type="text" id="business_suburb" name="business_suburb" value="Sandbaai" required>
 
@@ -58,8 +58,9 @@ function sb_render_add_business_form() {
 
         <label for="business_description">Business Description*:</label>
         <textarea id="business_description" name="business_description" required></textarea>
-<hr>
-        <label for="business_website">Business Website:</label>
+
+        <hr>
+        <label for="business_website">Business Website: (optional)</label>
         <input type="text" id="business_website" name="business_website">
 
         <label for="business_whatsapp">WhatsApp Number:</label>
@@ -68,52 +69,54 @@ function sb_render_add_business_form() {
         <label for="facebook">Business Facebook Page:</label>
         <input type="text" id="facebook" name="facebook">
 
-        <label for="tags">Add up to 2 categories for your business   <i>**If your business category is not listed, <a href="mailto:admin@sandbaaicommunity.co.za subject="category suggestion">email us</a></i></label>
-        <!-- Dropdowns for Tags -->
+        <label for="tags">Add up to 2 categories for your business:</label>
         <div style="display: flex; align-items: center; gap: 10px;">
-        <div><label for="tag_1">1st Category:</label>
-        <select id="tag_1" name="tags[]" required>
-            <option value="">Select 1st Category</option>
-            <?php
-            $tags = get_tags(array('hide_empty' => false)); // Fetch all tags
-            if ($tags) {
-                foreach ($tags as $tag) {
-                    echo '<option value="' . esc_attr($tag->term_id) . '">' . esc_html($tag->name) . '</option>';
-                }
-            }
-            ?>
-        </select></div>
+            <div>
+                <label for="tag_1">1st Category:</label>
+                <select id="tag_1" name="tags[]" required>
+                    <option value="">Select 1st Category</option>
+                    <?php
+                    $tags = get_tags(array('hide_empty' => false)); // Fetch all tags
+                    if ($tags) {
+                        foreach ($tags as $tag) {
+                            echo '<option value="' . esc_attr($tag->term_id) . '">' . esc_html($tag->name) . '</option>';
+                        }
+                    }
+                    ?>
+                </select>
+            </div>
 
-        <div><label for="tag_2">2nd Category:</label>
-        <select id="tag_2" name="tags[]">
-            <option value="">Select 2nd Category</option>
-            <?php
-            if ($tags) { // Reuse the fetched tags
-                foreach ($tags as $tag) {
-                    echo '<option value="' . esc_attr($tag->term_id) . '">' . esc_html($tag->name) . '</option>';
-                }
-            }
-            ?>
-        </select></div>
-        <div style=font-size: 10px;>
-        
-        </div>
+            <div>
+                <label for="tag_2">2nd Category:</label>
+                <select id="tag_2" name="tags[]">
+                    <option value="">Select 2nd Category</option>
+                    <?php
+                    if ($tags) { // Reuse the fetched tags
+                        foreach ($tags as $tag) {
+                            echo '<option value="' . esc_attr($tag->term_id) . '">' . esc_html($tag->name) . '</option>';
+                        }
+                    }
+                    ?>
+                </select>
+            </div>
         </div><br>
 
         <label for="logo">Upload Business Logo:</label>
         <input type="file" id="logo" name="logo">
 
         <label for="gallery">Upload photos for your business:</label>
-        <input type="file" id="gallery" name="gallery[]" multiple>
-    <br>
-        <label>**<i>add more photos on the edit page once your business is approved</i></label>
-        <br><br>
+        <input type="file" id="gallery" name="gallery[]" multiple><br>
+
+        <label>**<i>add more photos on the edit page once your business is approved</i></label><br><br>
+
         <label for="suggestions">Suggestions & Feedback:</label>
         <textarea id="suggestions" name="suggestions"></textarea>
 
-        <input type="submit" name="sb_submit_business" value="Submit">
-
-        <br>
+        <!-- Submit and Cancel Buttons -->
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="submit" name="sb_submit_business" value="Submit" style="width: 150px;">
+            <button type="button" onclick="window.location.href='<?php echo esc_url(home_url('/business-directory/')); ?>';" style="width: 150px;">Cancel</button>
+        </div>
     </form><br>
     <?php
     return ob_get_clean(); // Return the buffered content

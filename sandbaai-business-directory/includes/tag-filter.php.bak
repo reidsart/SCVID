@@ -1,0 +1,565 @@
+<?php
+/**
+ * Add Tag Filter functionality to Sandbaai Business Directory
+ */
+
+// Add shortcode for tag filter functionality
+function sbbd_tag_filter_shortcode() {
+    ob_start();
+    ?>
+    <div class="sbbd-tag-filter-container">
+        <h3>Filter Businesses by Category</h3>
+        <div class="sbbd-tag-filters">
+            <!-- Food & Drink -->
+            <div class="sbbd-filter-category">
+                <div class="sbbd-category-header">
+                    <h4>Food & Drink</h4>
+                    <span class="sbbd-toggle-icon">+</span>
+                </div>
+                <div class="sbbd-category-tags">
+                    <label><input type="checkbox" name="tag" value="restaurants"> Restaurants</label>
+                    <label><input type="checkbox" name="tag" value="cafes-coffee-shops"> Cafés & Coffee Shops</label>
+                    <label><input type="checkbox" name="tag" value="bakeries"> Bakeries</label>
+                    <label><input type="checkbox" name="tag" value="takeaways-fast-food"> Takeaways & Fast Food</label>
+                    <label><input type="checkbox" name="tag" value="bars-pubs"> Bars & Pubs</label>
+                    <label><input type="checkbox" name="tag" value="catering-services"> Catering Services</label>
+                </div>
+            </div>
+            
+            <!-- Retail -->
+            <div class="sbbd-filter-category">
+                <div class="sbbd-category-header" onclick="toggleCategory(this)">
+                    <h4>Retail</h4>
+                    <span class="sbbd-toggle-icon">+</span>
+                </div>
+                <div class="sbbd-category-tags">
+                    <label><input type="checkbox" name="tag" value="bookstores"> Bookstores</label>
+                    <label><input type="checkbox" name="tag" value="clothing"> Clothing</label>
+                    <label><input type="checkbox" name="tag" value="convenience-stores"> Convenience Stores</label>
+                    <label><input type="checkbox" name="tag" value="gift-shops"> Gift Shops</label>
+                    <label><input type="checkbox" name="tag" value="hardware-stores"> Hardware Stores</label>
+                    <label><input type="checkbox" name="tag" value="health-food"> Health Food</label>
+                    <label><input type="checkbox" name="tag" value="home-goods-decor"> Home Goods & Decor</label>
+                </div>
+            </div>
+            
+            <!-- Services -->
+            <div class="sbbd-filter-category">
+                <div class="sbbd-category-header" onclick="toggleCategory(this)">
+                    <h4>Services</h4>
+                    <span class="sbbd-toggle-icon">+</span>
+                </div>
+                <div class="sbbd-category-tags">
+                    <label><input type="checkbox" name="tag" value="barbershops"> Barbershops</label>
+                    <label><input type="checkbox" name="tag" value="beauty-spas"> Beauty Spas</label>
+                    <label><input type="checkbox" name="tag" value="car-wash-detailing"> Car Wash & Detailing</label>
+                    <label><input type="checkbox" name="tag" value="dry-cleaners-tailors"> Dry Cleaners & Tailors</label>
+                    <label><input type="checkbox" name="tag" value="garden-services"> Garden Services</label>
+                    <label><input type="checkbox" name="tag" value="hair-salons"> Hair Salons</label>
+                    <label><input type="checkbox" name="tag" value="mechanics-auto-repair"> Mechanics & Auto Repair</label>
+                    <label><input type="checkbox" name="tag" value="nail-salons"> Nail Salons</label>
+                    <label><input type="checkbox" name="tag" value="print-copy-shops"> Print & Copy Shops</label>
+                </div>
+            </div>
+            
+            <!-- Professional Services -->
+            <div class="sbbd-filter-category">
+                <div class="sbbd-category-header" onclick="toggleCategory(this)">
+                    <h4>Professional Services</h4>
+                    <span class="sbbd-toggle-icon">+</span>
+                </div>
+                <div class="sbbd-category-tags">
+                    <label><input type="checkbox" name="tag" value="accountants"> Accountants</label>
+                    <label><input type="checkbox" name="tag" value="architects-designers"> Architects & Designers</label>
+                    <label><input type="checkbox" name="tag" value="dentists"> Dentists</label>
+                    <label><input type="checkbox" name="tag" value="insurance"> Insurance</label>
+                    <label><input type="checkbox" name="tag" value="financial-advisors"> Financial Advisors</label>
+                    <label><input type="checkbox" name="tag" value="law-firms"> Law Firms</label>
+                    <label><input type="checkbox" name="tag" value="medical-care"> Medical Care</label>
+                    <label><input type="checkbox" name="tag" value="real-estate-agencies"> Real Estate Agencies</label>
+                    <label><input type="checkbox" name="tag" value="veterinarians-pet-clinics"> Veterinarians & Pet Clinics</label>
+                </div>
+            </div>
+            
+            <!-- Health & Wellness -->
+            <div class="sbbd-filter-category">
+                <div class="sbbd-category-header" onclick="toggleCategory(this)">
+                    <h4>Health & Wellness</h4>
+                    <span class="sbbd-toggle-icon">+</span>
+                </div>
+                <div class="sbbd-category-tags">
+                    <label><input type="checkbox" name="tag" value="chiropractors"> Chiropractors</label>
+                    <label><input type="checkbox" name="tag" value="counseling-therapy"> Counseling & Therapy Services</label>
+                    <label><input type="checkbox" name="tag" value="gyms-fitness"> Gyms & Fitness Studios</label>
+                    <label><input type="checkbox" name="tag" value="massage-therapy"> Massage Therapy</label>
+                    <label><input type="checkbox" name="tag" value="pharmacies"> Pharmacies</label>
+                    <label><input type="checkbox" name="tag" value="yoga-pilates"> Yoga & Pilates Studios</label>
+                </div>
+            </div>
+            
+            <!-- Education & Childcare -->
+            <div class="sbbd-filter-category">
+                <div class="sbbd-category-header" onclick="toggleCategory(this)">
+                    <h4>Education & Childcare</h4>
+                    <span class="sbbd-toggle-icon">+</span>
+                </div>
+                <div class="sbbd-category-tags">
+                    <label><input type="checkbox" name="tag" value="after-school"> After-school Programs</label>
+                    <label><input type="checkbox" name="tag" value="art-music-schools"> Art & Music Schools</label>
+                    <label><input type="checkbox" name="tag" value="driving-schools"> Driving Schools</label>
+                    <label><input type="checkbox" name="tag" value="play-areas"> Play Areas</label>
+                    <label><input type="checkbox" name="tag" value="preschools-daycares"> Preschools & Daycares</label>
+                    <label><input type="checkbox" name="tag" value="swimming-lessons"> Swimming Lessons</label>
+                    <label><input type="checkbox" name="tag" value="tutoring-centres"> Tutoring Centres</label>
+                </div>
+            </div>
+            
+            <!-- Creative & Handmade -->
+            <div class="sbbd-filter-category">
+                <div class="sbbd-category-header" onclick="toggleCategory(this)">
+                    <h4>Creative & Handmade</h4>
+                    <span class="sbbd-toggle-icon">+</span>
+                </div>
+                <div class="sbbd-category-tags">
+                    <label><input type="checkbox" name="tag" value="craft-makers"> Craft Makers</label>
+                    <label><input type="checkbox" name="tag" value="graphic-designers"> Graphic Designers</label>
+                    <label><input type="checkbox" name="tag" value="home-bakers"> Home Bakers & Treat Makers</label>
+                    <label><input type="checkbox" name="tag" value="musicians-teachers"> Musicians & Music Teachers</label>
+                    <label><input type="checkbox" name="tag" value="photographers"> Photographers</label>
+                    <label><input type="checkbox" name="tag" value="visual-artists"> Visual Artists</label>
+                </div>
+            </div>
+            
+            <!-- Home-Based Services -->
+            <div class="sbbd-filter-category">
+                <div class="sbbd-category-header" onclick="toggleCategory(this)">
+                    <h4>Home-Based Services</h4>
+                    <span class="sbbd-toggle-icon">+</span>
+                </div>
+                <div class="sbbd-category-tags">
+                    <label><input type="checkbox" name="tag" value="bookkeepers"> Bookkeepers</label>
+                    <label><input type="checkbox" name="tag" value="copywriters-editors"> Copywriters & Editors</label>
+                    <label><input type="checkbox" name="tag" value="home-catering"> Home-Based Catering</label>
+                    <label><input type="checkbox" name="tag" value="interior-decorators"> Interior Decorators</label>
+                    <label><input type="checkbox" name="tag" value="social-media-managers"> Social Media Managers</label>
+                    <label><input type="checkbox" name="tag" value="translators"> Translators</label>
+                    <label><input type="checkbox" name="tag" value="virtual-assistants"> Virtual Assistants</label>
+                    <label><input type="checkbox" name="tag" value="web-designers"> Web Designers & Developers</label>
+                </div>
+            </div>
+            
+            <!-- Personal Care -->
+            <div class="sbbd-filter-category">
+                <div class="sbbd-category-header" onclick="toggleCategory(this)">
+                    <h4>Personal Care</h4>
+                    <span class="sbbd-toggle-icon">+</span>
+                </div>
+                <div class="sbbd-category-tags">
+                    <label><input type="checkbox" name="tag" value="hairdressers"> Hairdressers</label>
+                    <label><input type="checkbox" name="tag" value="makeup-artists"> Makeup Artists</label>
+                    <label><input type="checkbox" name="tag" value="massage-therapists"> Massage Therapists</label>
+                    <label><input type="checkbox" name="tag" value="nail-technicians"> Nail Technicians</label>
+                </div>
+            </div>
+            
+            <!-- Trades & Home Services -->
+            <div class="sbbd-filter-category">
+                <div class="sbbd-category-header" onclick="toggleCategory(this)">
+                    <h4>Trades & Home Services</h4>
+                    <span class="sbbd-toggle-icon">+</span>
+                </div>
+                <div class="sbbd-category-tags">
+                    <label><input type="checkbox" name="tag" value="cleaning-services"> Cleaning Services</label>
+                    <label><input type="checkbox" name="tag" value="construction"> Construction</label>
+                    <label><input type="checkbox" name="tag" value="gardeners-landscapers"> Gardeners & Landscapers</label>
+                    <label><input type="checkbox" name="tag" value="handymen"> Handymen/Women</label>
+                    <label><input type="checkbox" name="tag" value="pet-groomers"> Pet Groomers & Pet Sitters</label>
+                    <label><input type="checkbox" name="tag" value="pool-maintenance"> Pool Maintenance</label>
+                    <label><input type="checkbox" name="tag" value="renovations-repairs"> Renovations & Repairs</label>
+                </div>
+            </div>
+            
+            <!-- Tech & Consulting -->
+            <div class="sbbd-filter-category">
+                <div class="sbbd-category-header" onclick="toggleCategory(this)">
+                    <h4>Tech & Consulting</h4>
+                    <span class="sbbd-toggle-icon">+</span>
+                </div>
+                <div class="sbbd-category-tags">
+                    <label><input type="checkbox" name="tag" value="business-consultants"> Business Consultants</label>
+                    <label><input type="checkbox" name="tag" value="it-support"> IT Support</label>
+                    <label><input type="checkbox" name="tag" value="life-coaches"> Life Coaches</label>
+                    <label><input type="checkbox" name="tag" value="marketing-consultants"> Marketing Consultants</label>
+                    <label><input type="checkbox" name="tag" value="software-developers"> Software Developers</label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sbbd-filter-actions">
+            <button id="sbbd-apply-filters" class="button">Apply Filters</button>
+            <button id="sbbd-clear-filters" class="button">Clear All</button>
+        </div>
+        
+        <div id="sbbd-filtered-results">
+            <!-- Results will be loaded here -->
+        </div>
+    </div>
+    <script>
+    (function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up category toggling
+            const categoryHeaders = document.querySelectorAll('.sbbd-category-header');
+            
+            categoryHeaders.forEach(function(header) {
+                header.addEventListener('click', function() {
+                    const category = this.parentElement;
+                    if (category.classList.contains('sbbd-active')) {
+                        category.classList.remove('sbbd-active');
+                    } else {
+                        category.classList.add('sbbd-active');
+                    }
+                });
+            });
+            
+            // Apply filters button click handler
+            document.getElementById('sbbd-apply-filters').addEventListener('click', function() {
+                const selectedTags = [];
+                const checkboxes = document.querySelectorAll('.sbbd-category-tags input[type="checkbox"]:checked');
+                
+                checkboxes.forEach(function(checkbox) {
+                    selectedTags.push(checkbox.value);
+                });
+                
+                if (selectedTags.length > 0) {
+                    filterBusinesses(selectedTags);
+                } else {
+                    alert('Please select at least one tag to filter businesses.');
+                }
+            });
+            
+            // Clear all filters button click handler
+            document.getElementById('sbbd-clear-filters').addEventListener('click', function() {
+                const checkboxes = document.querySelectorAll('.sbbd-category-tags input[type="checkbox"]:checked');
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.checked = false;
+                });
+                
+                document.getElementById('sbbd-filtered-results').innerHTML = '';
+            });
+        });
+        
+        function filterBusinesses(tags) {
+            const resultsContainer = document.getElementById('sbbd-filtered-results');
+            resultsContainer.innerHTML = '<div class="sbbd-loading">Loading results...</div>';
+            
+            // Create AJAX request to fetch filtered businesses
+            const data = new FormData();
+            data.append('action', 'sbbd_filter_businesses');
+            
+            tags.forEach(function(tag) {
+                data.append('tags[]', tag);
+            });
+            
+            fetch(sbbd_ajax_object.ajax_url, {
+                method: 'POST',
+                body: data
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    resultsContainer.innerHTML = data.data;
+                } else {
+                    resultsContainer.innerHTML = '<p>No businesses found matching your selected filters.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resultsContainer.innerHTML = '<p>Error loading results. Please try again.</p>';
+            });
+        }
+    })();
+    </script>
+    <?php
+    return ob_get_clean();
+}
+?>
+    <style>
+        .sbbd-tag-filter-container {
+            max-width: 100%;
+            margin-bottom: 30px;
+        }
+        
+        .sbbd-filter-category {
+            margin-bottom: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+        }
+        
+        .sbbd-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #f5f5f5;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        
+        .sbbd-category-header h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .sbbd-toggle-icon {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .sbbd-category-tags {
+            display: none;
+            padding: 10px 15px;
+            background-color: #fff;
+        }
+        
+        .sbbd-category-tags label {
+            display: block;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        .sbbd-filter-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .sbbd-active .sbbd-category-tags {
+            display: block;
+        }
+        
+        .sbbd-active .sbbd-toggle-icon {
+            transform: rotate(45deg);
+        }
+        
+        #sbbd-filtered-results {
+            margin-top: 30px;
+        }
+    </style>
+    
+    <script>
+        function toggleCategory(element) {
+            const category = element.parentElement;
+            if (category.classList.contains('sbbd-active')) {
+                category.classList.remove('sbbd-active');
+            } else {
+                category.classList.add('sbbd-active');
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Apply filters button click handler
+            document.getElementById('sbbd-apply-filters').addEventListener('click', function() {
+                const selectedTags = [];
+                const checkboxes = document.querySelectorAll('.sbbd-category-tags input[type="checkbox"]:checked');
+                
+                checkboxes.forEach(function(checkbox) {
+                    selectedTags.push(checkbox.value);
+                });
+                
+                if (selectedTags.length > 0) {
+                    filterBusinesses(selectedTags);
+                } else {
+                    alert('Please select at least one tag to filter businesses.');
+                }
+            });
+            
+            // Clear all filters button click handler
+            document.getElementById('sbbd-clear-filters').addEventListener('click', function() {
+                const checkboxes = document.querySelectorAll('.sbbd-category-tags input[type="checkbox"]:checked');
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.checked = false;
+                });
+                
+                document.getElementById('sbbd-filtered-results').innerHTML = '';
+            });
+        });
+        
+        function filterBusinesses(tags) {
+            const resultsContainer = document.getElementById('sbbd-filtered-results');
+            resultsContainer.innerHTML = '<div class="sbbd-loading">Loading results...</div>';
+            
+            // Create AJAX request to fetch filtered businesses
+            const data = {
+                'action': 'sbbd_filter_businesses',
+                'tags': tags
+            };
+            
+            fetch(sbbd_ajax_object.ajax_url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    resultsContainer.innerHTML = data.data;
+                } else {
+                    resultsContainer.innerHTML = '<p>No businesses found matching your selected filters.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resultsContainer.innerHTML = '<p>Error loading results. Please try again.</p>';
+            });
+        }
+    </script>
+    <?php
+    return ob_get_clean();
+
+add_shortcode('sbbd_tag_filter', 'sbbd_tag_filter_shortcode');
+
+// Handle AJAX request for filtering businesses
+function sbbd_filter_businesses_ajax() {
+    // Check for nonce for security (you should add this)
+    
+    $tags = isset($_POST['tags']) ? $_POST['tags'] : array();
+    
+    if (empty($tags)) {
+        wp_send_json_error('No tags provided');
+        return;
+    }
+    
+    // Build tax query based on selected tags
+    $tax_query = array('relation' => 'OR');
+    
+    foreach ($tags as $tag) {
+        $tax_query[] = array(
+            'taxonomy' => 'business_tag',
+            'field'    => 'slug',
+            'terms'    => $tag,
+        );
+    }
+    
+    // Query arguments for businesses
+    $args = array(
+        'post_type'      => 'business',
+        'posts_per_page' => -1,
+        'tax_query'      => $tax_query,
+    );
+    
+    $businesses = new WP_Query($args);
+    
+    ob_start();
+    
+    if ($businesses->have_posts()) {
+        echo '<h3>Filtered Results (' . $businesses->found_posts . ')</h3>';
+        echo '<div class="sbbd-businesses-grid">';
+        
+        while ($businesses->have_posts()) {
+            $businesses->the_post();
+            
+            $business_id = get_the_ID();
+            $business_address = get_post_meta($business_id, '_sbbd_address', true);
+            $business_phone = get_post_meta($business_id, '_sbbd_phone', true);
+            $business_email = get_post_meta($business_id, '_sbbd_email', true);
+            $business_website = get_post_meta($business_id, '_sbbd_website', true);
+            $business_description = get_post_meta($business_id, '_sbbd_description', true);
+            
+            echo '<div class="sbbd-business-card">';
+            
+            if (has_post_thumbnail()) {
+                echo '<div class="sbbd-business-image">' . get_the_post_thumbnail($business_id, 'medium') . '</div>';
+            }
+            
+            echo '<div class="sbbd-business-info">';
+            echo '<h4><a href="' . get_permalink() . '">' . get_the_title() . '</a></h4>';
+            
+            if (!empty($business_description)) {
+                echo '<div class="sbbd-business-description">' . wp_trim_words($business_description, 20) . '</div>';
+            }
+            
+            echo '<div class="sbbd-business-meta">';
+            
+            if (!empty($business_address)) {
+                echo '<p><strong>Address:</strong> ' . esc_html($business_address) . '</p>';
+            }
+            
+            if (!empty($business_phone)) {
+                echo '<p><strong>Phone:</strong> <a href="tel:' . esc_attr($business_phone) . '">' . esc_html($business_phone) . '</a></p>';
+            }
+            
+            if (!empty($business_email)) {
+                echo '<p><strong>Email:</strong> <a href="mailto:' . esc_attr($business_email) . '">' . esc_html($business_email) . '</a></p>';
+            }
+            
+            if (!empty($business_website)) {
+                echo '<p><strong>Website:</strong> <a href="' . esc_url($business_website) . '" target="_blank">' . esc_html($business_website) . '</a></p>';
+            }
+            
+            echo '</div>'; // .sbbd-business-meta
+            
+            // Get and display business tags
+            $business_tags = get_the_terms($business_id, 'business_tag');
+            if ($business_tags && !is_wp_error($business_tags)) {
+                echo '<div class="sbbd-business-tags">';
+                foreach ($business_tags as $tag) {
+                    echo '<span class="sbbd-tag">' . esc_html($tag->name) . '</span>';
+                }
+                echo '</div>';
+            }
+            
+            echo '</div>'; // .sbbd-business-info
+            echo '</div>'; // .sbbd-business-card
+        }
+        
+        echo '</div>'; // .sbbd-businesses-grid
+        
+        wp_reset_postdata();
+    } else {
+        echo '<p>No businesses found matching your selected filters.</p>';
+    }
+    
+    $output = ob_get_clean();
+    wp_send_json_success($output);
+}
+add_action('wp_ajax_sbbd_filter_businesses', 'sbbd_filter_businesses_ajax');
+add_action('wp_ajax_nopriv_sbbd_filter_businesses', 'sbbd_filter_businesses_ajax');
+
+// Add necessary scripts
+function sbbd_enqueue_filter_scripts() {
+    wp_enqueue_script('jquery');
+    
+    wp_localize_script('jquery', 'sbbd_ajax_object', array(
+        'ajax_url' => admin_url('admin-ajax.php')
+    ));
+}
+add_action('wp_enqueue_scripts', 'sbbd_enqueue_filter_scripts');
+
+// Register business_tag taxonomy if not already registered
+function sbbd_register_taxonomies() {
+    if (!taxonomy_exists('business_tag')) {
+        $args = array(
+            'hierarchical'      => false,
+            'labels'            => array(
+                'name'              => 'Business Tags',
+                'singular_name'     => 'Business Tag',
+                'search_items'      => 'Search Business Tags',
+                'all_items'         => 'All Business Tags',
+                'edit_item'         => 'Edit Business Tag',
+                'update_item'       => 'Update Business Tag',
+                'add_new_item'      => 'Add New Business Tag',
+                'new_item_name'     => 'New Business Tag Name',
+                'menu_name'         => 'Business Tags',
+            ),
+            'show_ui'           => true,
+            'show_admin_column' => true,
+            'query_var'         => true,
+            'rewrite'           => array('slug' => 'business-tag'),
+        );
+        register_taxonomy('business_tag', array('business'), $args);
+    }
+}
+add_action('init', 'sbbd_register_taxonomies');

@@ -34,10 +34,14 @@ function sb_render_directory_listing() {
     // Display Sandbaai Businesses
     if ($sandbaai_query->have_posts()) {
         echo '<h2>Sandbaai Businesses</h2>';
-        echo '<ul class="business-listing">';
+        echo '<ul class="business-listing" style="list-style-type: none;">';
         while ($sandbaai_query->have_posts()) {
             $sandbaai_query->the_post();
+            $logo = get_post_meta(get_the_ID(), 'logo', true); // Fetch logo meta
             echo '<li>';
+            if (!empty($logo)) {
+                echo '<img src="' . esc_url($logo) . '" alt="Logo" style="width: 20px; height: 20px; margin-right: 10px; vertical-align: middle;">';
+            }
             echo '<a href="' . esc_url(get_permalink()) . '">' . esc_html(get_the_title()) . '</a>';
             echo '</li>';
         }

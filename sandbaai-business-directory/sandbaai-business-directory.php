@@ -28,6 +28,13 @@ require_once SB_DIR_PATH . 'includes/form-handler.php';
 require_once SB_DIR_PATH . 'includes/directory-handler.php';
 require_once plugin_dir_path(__FILE__) . 'includes/database.php';
 
+// Include the process-comment.php file
+require_once SB_DIR_PATH . 'includes/process-comment.php';
+
+// Hook the function into WordPress
+add_action('admin_post_process_comment', 'sb_process_comment_submission');  // For logged-in users
+add_action('admin_post_nopriv_process_comment', 'sb_process_comment_submission');  // For non-logged-in users
+
 // Enqueue assets
 function sb_enqueue_assets() {
     wp_enqueue_style('sb-styles', SB_DIR_URL . 'assets/css/css_styles.css', array(), '1.0');
@@ -262,3 +269,27 @@ add_filter('template_include', function ($template) {
     }
     return $template;
 });
+
+//smooth scrolling for mobile devices
+function sb_enqueue_scripts() {
+    wp_enqueue_script(
+        'sb-smooth-scroll', 
+        plugin_dir_url(__FILE__) . 'assets/js/scroll.js', 
+        array(), 
+        '1.3', // Increment version to clear browser cache
+        true // Load script in the footer
+    );
+}
+add_action('wp_enqueue_scripts', 'sb_enqueue_scripts');
+
+//smooth scrolling for both adding and editing forms
+function sb_enqueue_smooth_scroll() {
+    wp_enqueue_script(
+        'sb-smooth-scroll',
+        plugin_dir_url(__FILE__) . 'assets/js/smooth-scroll.js',
+        array(),
+        '1.0',
+        true // Load the script in the footer
+    );
+}
+add_action('wp_enqueue_scripts', 'sb_enqueue_smooth_scroll');
