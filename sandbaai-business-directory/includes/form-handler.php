@@ -37,7 +37,7 @@ function sb_render_add_business_form() {
     ob_start(); // Start output buffering
     ?>
     <form method="post" enctype="multipart/form-data" action="">
-        <label for="business_name">Business Name*:</label>
+        <label for="business_name">Business Name* (cannot be changed later):</label>
         <input type="text" id="business_name" name="business_name" required>
 
         <label for="business_address">Business Address*:</label>
@@ -60,19 +60,20 @@ function sb_render_add_business_form() {
         <textarea id="business_description" name="business_description" required></textarea>
 <hr>
         <label for="business_website">Business Website:</label>
-        <input type="url" id="business_website" name="business_website">
+        <input type="text" id="business_website" name="business_website">
 
         <label for="business_whatsapp">WhatsApp Number:</label>
         <input type="text" id="business_whatsapp" name="business_whatsapp">
 
         <label for="facebook">Business Facebook Page:</label>
-        <input type="url" id="facebook" name="facebook">
+        <input type="text" id="facebook" name="facebook">
 
+        <label for="tags">Add up to 2 categories for your business   <i>**If your business category is not listed, <a href="mailto:admin@sandbaaicommunity.co.za subject="category suggestion">email us</a></i></label>
         <!-- Dropdowns for Tags -->
         <div style="display: flex; align-items: center; gap: 10px;">
-        <div><label for="tag_1">Tag 1:</label>
+        <div><label for="tag_1">1st Category:</label>
         <select id="tag_1" name="tags[]" required>
-            <option value="">Select Tag 1</option>
+            <option value="">Select 1st Category</option>
             <?php
             $tags = get_tags(array('hide_empty' => false)); // Fetch all tags
             if ($tags) {
@@ -83,9 +84,9 @@ function sb_render_add_business_form() {
             ?>
         </select></div>
 
-        <div><label for="tag_2">Tag 2:</label>
-        <select id="tag_2" name="tags[]" required>
-            <option value="">Select Tag 2</option>
+        <div><label for="tag_2">2nd Category:</label>
+        <select id="tag_2" name="tags[]">
+            <option value="">Select 2nd Category</option>
             <?php
             if ($tags) { // Reuse the fetched tags
                 foreach ($tags as $tag) {
@@ -94,12 +95,15 @@ function sb_render_add_business_form() {
             }
             ?>
         </select></div>
+        <div style=font-size: 10px;>
+        
+        </div>
         </div><br>
 
         <label for="logo">Upload Business Logo:</label>
         <input type="file" id="logo" name="logo">
 
-        <label for="gallery">Upload photos for your business:</label>
+        <label for="gallery">Upload photos for your business:   **<i>add more photos on the edit page once your business is approved</i></label>
         <input type="file" id="gallery" name="gallery[]" multiple>
         <br>
         <label for="suggestions">Suggestions or Feedback:</label>
@@ -250,6 +254,7 @@ if ($post_id && !is_wp_error($post_id)) {
 }
 // Automatically add https:// to website or Facebook URL if missing
 function sb_sanitize_urls($post_data) {
+    // Automatically prepend "https://" to URLs missing a valid prefix
     if (!empty($post_data['business_website']) && !preg_match('/^https?:\/\//', $post_data['business_website'])) {
         $post_data['business_website'] = 'https://' . ltrim($post_data['business_website'], '/');
     }
@@ -258,9 +263,10 @@ function sb_sanitize_urls($post_data) {
     }
     return $post_data;
 }
-// Hook the function to sanitize URLs during both "add" and "edit" form submissions
-add_filter('pre_post_form_submission_data', 'sb_sanitize_urls'); // For the "add" functionality
-add_filter('pre_post_edit_form_submission_data', 'sb_sanitize_urls'); // For the "edit" functionality
+
+// Hook the function to sanitize URLs during both add and edit form submissions
+add_filter('pre_post_form_submission_data', 'sb_sanitize_urls');
+add_filter('pre_post_edit_form_submission_data', 'sb_sanitize_urls');
 
 // If the listing was created successfully
         if ($post_id) {
@@ -355,8 +361,6 @@ function sb_handle_edit_form_submission() {
         $updated_address = sanitize_text_field($_POST['business_address'] ?? '');
         $updated_address_privacy = sanitize_text_field($_POST['address_privacy'] ?? '');
         $updated_whatsapp = sanitize_text_field($_POST['business_whatsapp'] ?? '');
-
-        // Change sanitization for business_website and facebook to accept plain text
         $updated_website = sanitize_text_field($_POST['business_website'] ?? '');
         $updated_facebook = sanitize_text_field($_POST['facebook'] ?? '');
 
