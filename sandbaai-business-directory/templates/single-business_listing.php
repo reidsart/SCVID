@@ -1,6 +1,6 @@
 <?php
 /**
- * Template for displaying a single Business Listing
+ * Template for displaying a single Business Listing with comments
  */
 
 get_header(); ?>
@@ -29,7 +29,13 @@ get_header(); ?>
             $current_user_id = get_current_user_id();
             $post_author_id = get_the_author_meta('ID');
             ?>
-
+ <?php if ($current_user_id === $post_author_id) : ?>
+                <div class="edit-listing-button">
+                    <a href="/edit-listing/" class="button">Edit Your Business Listing</a>
+                    <br>
+                </div>
+            <?php endif; ?>
+            
             <!-- Business details -->
             <div class="business-details">
                 <div class="business-header">
@@ -56,9 +62,9 @@ get_header(); ?>
                         <?php endif; ?>
 
                         <?php if (!empty($business_email)) : ?>
-                          <p class="business-item email-icon">
-                              <a href="mailto:<?php echo esc_attr($business_email); ?>?subject=SCVID%20member%20query">
-                                   <?php echo esc_html($business_email); ?>
+                            <p class="business-item email-icon">
+                                <a href="mailto:<?php echo esc_attr($business_email); ?>?subject=SCVID%20member%20query">
+                                    <?php echo esc_html($business_email); ?>
                                 </a>
                             </p>
                         <?php endif; ?>
@@ -75,11 +81,13 @@ get_header(); ?>
                         <?php endif; ?>
                     </div>
                 </div>
-        <?php if (!empty($business_website)) : ?>
-            <div class="business-website">
-                <p class="business-item website-icon"><a href="<?php echo $business_website; ?>" target="_blank"><?php echo esc_html($business_website); ?></a></p>
-            </div>
-        <?php endif; ?>
+
+                <?php if (!empty($business_website)) : ?>
+                    <div class="business-website">
+                        <p class="business-item website-icon"><a href="<?php echo $business_website; ?>" target="_blank"><?php echo esc_html($business_website); ?></a></p>
+                    </div>
+                <?php endif; ?>
+
                 <div class="business-description">
                     <p><?php echo esc_html($business_description); ?></p>
                 </div>
@@ -98,12 +106,51 @@ get_header(); ?>
                 </div>
             <?php endif; ?>
 
-            <?php if ($current_user_id === $post_author_id) : ?>
-                <div class="edit-listing-button">
-                    <a href="/edit-listing/" class="button">Edit This Listing</a>
-                    <br>
+            <!-- Success Message -->
+            <?php if (isset($_GET['review_submitted']) && $_GET['review_submitted'] === 'pending') : ?>
+                <div class="notice notice-success">
+                    <p>Your review has been submitted and is pending approval.</p>
                 </div>
             <?php endif; ?>
+
+            <!-- Comments Section -->
+            <div class="comments-section">
+                <h2>Reviews</h2>
+
+                <?php
+                // Fetch and display comments
+                $comments = get_comments(array(
+                    'post_id' => get_the_ID(),
+                    'status' => 'approve',
+                    'orderby' => 'comment_date',
+                    'order' => 'DESC',
+                ));
+
+                if (!empty($comments)) {
+                    echo '<div class="comments-box">';
+                    foreach ($comments as $comment) {
+                        $comment_author = get_userdata($comment->user_id);
+                        $comment_author_name = $comment_author->first_name ? $comment_author->first_name : $comment_author->display_name;
+                        $comment_content = $comment->comment_content;
+
+                        echo '<div class="comment">';
+                        echo '<p><strong>' . esc_html($comment_author_name) . ':</strong> ' . esc_html($comment_content) . '</p>';
+                        echo '</div>';
+                    }
+                    echo '</div>';
+                } else {
+                    echo '<p>No reviews yet. Be the first to leave a review!</p>';
+                }
+                ?>
+
+                <!-- Comment Form -->
+                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                    <input type="hidden" name="action" value="process_comment">
+                    <input type="hidden" name="post_id" value="<?php echo esc_attr(get_the_ID()); ?>">
+                    <textarea name="comment_content" placeholder="Write your review here..." required></textarea><br>
+                    <button type="submit" name="submit_comment">Submit Review</button>
+                </form>
+            </div>
 
     <?php
         endwhile;
