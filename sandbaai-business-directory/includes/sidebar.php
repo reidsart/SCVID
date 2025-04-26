@@ -20,14 +20,6 @@ function sb_render_sidebar() {
 
     echo '<div class="sb-sidebar-navigation">';
 
-    // Search Bar
-    echo '<div class="sb-search-bar">';
-    echo '<form method="get" action="' . home_url('/') . '">';
-    echo '<input type="hidden" name="post_type" value="business_listing">';
-    echo '<input type="text" name="s" placeholder="Search Business Listings">';
-    echo '<button type="submit">Search</button>';
-    echo '</form>';
-    echo '</div>';
 
     // Link to "All Listings"
     echo '<div class="sb-all-listings">';
@@ -55,6 +47,15 @@ function sb_render_sidebar() {
         }
     }
     echo '</ul>';
+    echo '</div>';
+    
+    // Search Bar
+    echo '<div class="sb-search-bar">';
+    echo '<form method="get" action="' . home_url('/') . '">';
+    echo '<input type="hidden" name="post_type" value="business_listing">';
+    echo '<input type="text" name="s" placeholder="Search Business Listings">';
+    echo '<button type="submit">Search</button>';
+    echo '</form>';
     echo '</div>';
 
     // Link to "Add Your Business"
