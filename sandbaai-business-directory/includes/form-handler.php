@@ -246,12 +246,18 @@ if ($post_id && !is_wp_error($post_id)) {
     }
 
     // Assign tags to the custom taxonomy `business_tag`
-    if (!empty($tags)) {
-        $result = wp_set_object_terms($post_id, $tags, 'business_tag', false); // Add tags to the post
-        if (is_wp_error($result)) {
-            error_log('Tag assignment error: ' . $result->get_error_message()); // Log any errors
-        }
+if (!empty($tags)) {
+    error_log('Tags being assigned: ' . implode(', ', $tags));
+    $result = wp_set_object_terms($post_id, $tags, 'business_tag', false); // Add tags to the post
+    if (is_wp_error($result)) {
+        error_log('Tag assignment error: ' . $result->get_error_message()); // Log any errors
+    } else {
+        error_log('Tags successfully assigned to post ' . $post_id);
     }
+} else {
+    error_log('No tags were submitted for post ' . $post_id);
+}
+
     // Assign the category taxonomy to the post
     wp_set_post_terms($post_id, $category_slug, 'business_category');
 
