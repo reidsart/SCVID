@@ -19,15 +19,22 @@ get_header();
         <?php
         if (have_posts()) {
             echo '<h2>' . single_term_title('', false) . '</h2>';
-            echo '<ul class="business-listing" style="list-style-type: none;">';
+            echo '<ul class="taxonomy-business-listing" style="list-style-type: none;">'; // Updated class name
             while (have_posts()) {
                 the_post();
                 $logo = get_post_meta(get_the_ID(), 'logo', true); // Fetch logo meta
-                echo '<li>';
+                $description = get_post_meta(get_the_ID(), 'business_description', true); // Fetch custom description meta field
+
+                echo '<li class="taxonomy-business-item">'; // Updated class name
                 if (!empty($logo)) {
-                    echo '<img src="' . esc_url($logo) . '" alt="Logo" style="width: 20px; height: 20px; margin-right: 10px; vertical-align: middle;">';
+                    echo '<div class="taxonomy-business-logo"><img src="' . esc_url($logo) . '" alt="Logo"></div>';
                 }
-                echo '<a href="' . get_permalink() . '">' . get_the_title() . '</a>';
+                echo '<div class="taxonomy-business-details">';
+                echo '<h3 class="taxonomy-business-title"><a href="' . get_permalink() . '">' . get_the_title() . '</a></h3>';
+                if (!empty($description)) {
+                    echo '<p class="taxonomy-business-description">' . wp_trim_words(esc_html($description), 20, ' <a href="' . get_permalink() . '" class="read-more">Read More</a>') . '</p>';
+                }
+                echo '</div>';
                 echo '</li>';
             }
             echo '</ul>';

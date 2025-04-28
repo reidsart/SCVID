@@ -33,8 +33,12 @@ function sb_render_taxonomy_with_sidebar($content) {
         echo '<ul class="business-listing">';
         while (have_posts()) {
             the_post();
-            echo '<li>';
-            echo '<a href="' . esc_url(get_permalink()) . '">' . esc_html(get_the_title()) . '</a>';
+            echo '<li class="business-item">';
+            echo '<h3><a href="' . esc_url(get_permalink()) . '">' . esc_html(get_the_title()) . '</a></h3>';
+            $description = get_the_excerpt();
+            if (!empty($description)) {
+                echo '<p class="business-description">' . esc_html(wp_trim_words($description, 20, '...')) . '</p>';
+            }
             echo '</li>';
         }
         echo '</ul>';

@@ -4,6 +4,13 @@ require_once SB_DIR_PATH . 'includes/sidebar.php';
 function sb_render_directory_listing() {
     ob_start();
 
+    // Check for success message
+    if (isset($_GET['submission']) && $_GET['submission'] === 'pending') {
+        echo '<div class="notice notice-success" style="background-color: #d4edda; padding: 10px; border: 1px solid #c3e6cb; border-radius: 5px; color: #155724; margin-bottom: 20px;">';
+        echo '<p>Your business listing has been submitted and is pending review.</p>';
+        echo '</div>';
+    }
+
     // Begin Layout Wrapper
     echo '<div class="sb-directory-layout">';
 
@@ -38,9 +45,12 @@ function sb_render_directory_listing() {
         while ($sandbaai_query->have_posts()) {
             $sandbaai_query->the_post();
             $logo = get_post_meta(get_the_ID(), 'logo', true); // Fetch logo meta
+            $default_logo = SB_DIR_URL . 'assets/icons/generic-business-icon.png'; // Default logo path
             echo '<li>';
             if (!empty($logo)) {
                 echo '<img src="' . esc_url($logo) . '" alt="Logo" style="width: 20px; height: 20px; margin-right: 10px; vertical-align: middle;">';
+            } else {
+                echo '<img src="' . esc_url($default_logo) . '" alt="Generic Business Icon" style="width: 20px; height: 20px; margin-right: 10px; vertical-align: middle;">';
             }
             echo '<a href="' . esc_url(get_permalink()) . '">' . esc_html(get_the_title()) . '</a>';
             echo '</li>';

@@ -40,66 +40,34 @@ function sb_render_add_business_form() {
         <label for="business_name">Business Name* (cannot be changed later):</label>
         <input type="text" id="business_name" name="business_name" required>
 
-        <label for="business_address">Business Address*:</label>
+        <label for="business_address">Business Address (required):</label>
         <input type="text" id="business_address" name="business_address" required>
 
         <label for="address_privacy">Hide Address?:</label>
         <input type="radio" id="address_privacy_yes" name="address_privacy" value="1"> Yes
         <input type="radio" id="address_privacy_no" name="address_privacy" value="0" checked> No<br>
 
-        <label for="business_suburb">Business Suburb*:</label>
+        <label for="business_suburb">Business Suburb (required):</label>
         <input type="text" id="business_suburb" name="business_suburb" value="Sandbaai" required>
 
-        <label for="business_phone">Business Phone*:</label>
+        <label for="business_phone">Business Phone (required):</label>
         <input type="text" id="business_phone" name="business_phone" required>
 
-        <label for="business_email">Business Email*:</label>
+        <label for="business_email">Business Email (required):</label>
         <input type="email" id="business_email" name="business_email" required>
 
-        <label for="business_description">Business Description*:</label>
+        <label for="business_description">Business Description (required):</label>
         <textarea id="business_description" name="business_description" required></textarea>
 
         <hr>
         <label for="business_website">Business Website: (optional)</label>
         <input type="text" id="business_website" name="business_website">
 
-        <label for="business_whatsapp">WhatsApp Number:</label>
+        <label for="business_whatsapp">WhatsApp Number: (optional)</label>
         <input type="text" id="business_whatsapp" name="business_whatsapp">
 
-        <label for="facebook">Business Facebook Page:</label>
+        <label for="facebook">Business Facebook Page: (optional)</label>
         <input type="text" id="facebook" name="facebook">
-
-        <label for="tags">Add up to 2 categories for your business:</label>
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <div>
-                <label for="tag_1">1st Category:</label>
-                <select id="tag_1" name="tags[]" required>
-                    <option value="">Select 1st Category</option>
-                    <?php
-                    $tags = get_tags(array('hide_empty' => false)); // Fetch all tags
-                    if ($tags) {
-                        foreach ($tags as $tag) {
-                            echo '<option value="' . esc_attr($tag->term_id) . '">' . esc_html($tag->name) . '</option>';
-                        }
-                    }
-                    ?>
-                </select>
-            </div>
-
-            <div>
-                <label for="tag_2">2nd Category:</label>
-                <select id="tag_2" name="tags[]">
-                    <option value="">Select 2nd Category</option>
-                    <?php
-                    if ($tags) { // Reuse the fetched tags
-                        foreach ($tags as $tag) {
-                            echo '<option value="' . esc_attr($tag->term_id) . '">' . esc_html($tag->name) . '</option>';
-                        }
-                    }
-                    ?>
-                </select>
-            </div>
-        </div><br>
 
         <label for="logo">Upload Business Logo:</label>
         <input type="file" id="logo" name="logo">
@@ -108,10 +76,31 @@ function sb_render_add_business_form() {
         <input type="file" id="gallery" name="gallery[]" multiple><br>
 
         <label>**<i>add more photos on the edit page once your business is approved</i></label><br><br>
+<?php
+// Display the tag selection dropdowns
+echo '<label for="business_tag_1">Select Tag 1: (required to list your business)</label>';
+echo '<select name="business_tag_1" id="business_tag_1" required>';
+echo '<option value="" disabled selected>Select the first tag</option>';
+$tags = get_terms(array(
+    'taxonomy' => 'business_tag',
+    'hide_empty' => false,
+));
+foreach ($tags as $tag) {
+    echo '<option value="' . esc_attr($tag->term_id) . '">' . esc_html($tag->name) . '</option>';
+}
+echo '</select>';
 
+echo '<label for="business_tag_2">Select Tag 2: (optional)</label>';
+echo '<select name="business_tag_2" id="business_tag_2">';
+echo '<option value="" disabled selected>Select the second tag (optional)</option>';
+foreach ($tags as $tag) {
+    echo '<option value="' . esc_attr($tag->term_id) . '">' . esc_html($tag->name) . '</option>';
+}
+echo '</select>';
+?>
         <label for="suggestions">Suggestions & Feedback:</label>
         <textarea id="suggestions" name="suggestions"></textarea>
-
+<?php echo '<script src="' . esc_url(plugin_dir_url(__FILE__) . 'js/tag-restriction.js') . '"></script>'; ?>
         <!-- Submit and Cancel Buttons -->
         <div style="display: flex; gap: 10px; align-items: center;">
             <input type="submit" name="sb_submit_business" value="Submit" style="width: 150px;">
@@ -125,29 +114,28 @@ function sb_render_add_business_form() {
 // Handle form submission for adding business
 function sb_handle_form_submission() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sb_submit_business'])) {
-        // Temporarily disable Paystack save_post_meta during frontend submissions
-global $wp_filter;
+        global $wp_filter;
 
-// Find the Paystack instance and remove the save_post_meta hook
-$paystack_instance = null;
-
-if (isset($wp_filter['save_post'])) {
-    foreach ($wp_filter['save_post']->callbacks as $priority => $callbacks) {
-        foreach ($callbacks as $callback_key => $callback_data) {
-            if (
-                is_array($callback_data['function']) &&
-                is_object($callback_data['function'][0]) &&
-                get_class($callback_data['function'][0]) === 'paystack\payment_forms\Forms_Update' &&
-                $callback_data['function'][1] === 'save_post_meta'
-            ) {
-                $paystack_instance = $callback_data['function'][0];
-                remove_action('save_post', [$paystack_instance, 'save_post_meta'], $priority);
-                error_log('Paystack save_post_meta removed for frontend submission.');
-                break 2;
+        // Remove Paystack's save_post_meta hook temporarily
+        $paystack_instance = null;
+        if (isset($wp_filter['save_post'])) {
+            foreach ($wp_filter['save_post']->callbacks as $priority => $callbacks) {
+                foreach ($callbacks as $callback_key => $callback_data) {
+                    if (
+                        is_array($callback_data['function']) &&
+                        is_object($callback_data['function'][0]) &&
+                        get_class($callback_data['function'][0]) === 'paystack\payment_forms\Forms_Update' &&
+                        $callback_data['function'][1] === 'save_post_meta'
+                    ) {
+                        $paystack_instance = $callback_data['function'][0];
+                        remove_action('save_post', [$paystack_instance, 'save_post_meta'], $priority);
+                        error_log('Paystack save_post_meta removed for frontend submission.');
+                        break 2;
+                    }
+                }
             }
         }
-    }
-}
+
         // Sanitize and validate input fields
         $business_name = sanitize_text_field($_POST['business_name']);
         $business_address = sanitize_text_field($_POST['business_address']);
@@ -158,144 +146,90 @@ if (isset($wp_filter['save_post'])) {
         $business_website = sanitize_text_field($_POST['business_website'] ?? '');
         $business_whatsapp = sanitize_text_field($_POST['business_whatsapp']);
         $facebook = sanitize_text_field($_POST['facebook'] ?? '');
-        $tags = !empty($_POST['tags']) ? array_map('intval', $_POST['tags']) : array();
         $address_privacy = isset($_POST['address_privacy']) ? '1' : '0';
         $suggestions = sanitize_textarea_field($_POST['suggestions']);
 
-        // Process logo upload
-        $logo = '';
-        if (!empty($_FILES['logo']['name'])) {
-            $logo = sb_handle_file_upload($_FILES['logo'], 500 * 1024); // 500KB limit
-            if (is_wp_error($logo)) {
-                echo '<p style="color: red;">Logo Upload Error: ' . $logo->get_error_message() . '</p>';
-                return;
-            }
-        }
-
-        // Process gallery uploads
-        $gallery = array();
-        if (!empty($_FILES['gallery']['name'][0])) {
-            foreach ($_FILES['gallery']['name'] as $key => $value) {
-                $file = array(
-                    'name' => $_FILES['gallery']['name'][$key],
-                    'type' => $_FILES['gallery']['type'][$key],
-                    'tmp_name' => $_FILES['gallery']['tmp_name'][$key],
-                    'error' => $_FILES['gallery']['error'][$key],
-                    'size' => $_FILES['gallery']['size'][$key],
-                );
-
-                $upload = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
-                if (is_wp_error($upload)) {
-                    echo '<p style="color: red;">Gallery Upload Error: ' . $upload->get_error_message() . '</p>';
-                    return;
-                }
-
-                $gallery[] = $upload;
-            }
-        }
-
         // Validate required fields
         if (empty($business_name) || empty($business_address) || empty($business_phone) || empty($business_email) || empty($business_description)) {
-            echo '<p style="color: red;">Error: Please fill in all required fields.</p>';
+            add_session_message('Error: Please fill in all required fields.', 'error');
             return;
         }
 
         if (!is_email($business_email)) {
-            echo '<p style="color: red;">Error: Invalid email format.</p>';
+            add_session_message('Error: Invalid email format.', 'error');
             return;
         }
 
-// Determine category based on suburb
-$category_slug = strtolower($business_suburb) === 'Sandbaai' ? 'sb_business' : 'ob_business';
-
-// Create a new business listing post
-$post_id = wp_insert_post(array(
-    'post_type' => 'business_listing',
-    'post_title' => $business_name,
-    'post_status' => 'pending', // Set to Pending Review
-    'post_author' => get_current_user_id(), // Explicitly set the post author
-    'tax_input' => array(
-        'business_tag' => $tags, // Assign tags to the correct custom taxonomy
-    ),
-    'meta_input' => array(
-        'business_address' => $business_address,
-        'business_suburb' => $business_suburb,
-        'business_phone' => $business_phone,
-        'business_email' => $business_email,
-        'business_description' => $business_description,
-        'business_website' => $business_website,
-        'business_whatsapp' => $business_whatsapp,
-        'facebook' => $facebook,
-        'logo' => $logo,
-        'gallery' => $gallery,
-        'address_privacy' => $address_privacy,
-        'suggestions' => $suggestions,
-    ),
-));
-
-// Check if the post was created successfully
-if ($post_id && !is_wp_error($post_id)) {
-    // Ensure the category term exists
-    if (!term_exists($category_slug, 'business_category')) {
-        // Create the term if it doesn't exist
-        wp_insert_term(
-            $category_slug === 'sb_business' ? 'Sandbaai Businesses' : 'Overberg Businesses',
-            'business_category',
-            array('slug' => $category_slug)
-        );
-    }
-
-    // Assign tags to the custom taxonomy `business_tag`
-if (!empty($tags)) {
-    error_log('Tags being assigned: ' . implode(', ', $tags));
-    $result = wp_set_object_terms($post_id, $tags, 'business_tag', false); // Add tags to the post
-    if (is_wp_error($result)) {
-        error_log('Tag assignment error: ' . $result->get_error_message()); // Log any errors
-    } else {
-        error_log('Tags successfully assigned to post ' . $post_id);
-    }
-} else {
-    error_log('No tags were submitted for post ' . $post_id);
+// Save tags to the listing
+if (!empty($selected_tags)) {
+    wp_set_object_terms($post_id, $selected_tags, 'business_tag');
+    error_log('Business tags saved: ' . implode(', ', $selected_tags)); // Debugging
 }
 
-    // Assign the category taxonomy to the post
-    wp_set_post_terms($post_id, $category_slug, 'business_category');
+        // Determine category based on suburb
+        $category_slug = strtolower($business_suburb) === 'sandbaai' ? 'sb_business' : 'ob_business';
 
-    // Debug: Log success
-    error_log("Successfully set category $category_slug for post $post_id");
-} else {
-    // Debug: Log error
-    error_log("Error creating post: " . print_r($post_id, true));
-}
-// Automatically add https:// to website or Facebook URL if missing
-function sb_sanitize_urls($post_data) {
-    // Automatically prepend "https://" to URLs missing a valid prefix
-    if (!empty($post_data['business_website']) && !preg_match('/^https?:\/\//', $post_data['business_website'])) {
-        $post_data['business_website'] = 'https://' . ltrim($post_data['business_website'], '/');
-    }
-    if (!empty($post_data['facebook']) && !preg_match('/^https?:\/\//', $post_data['facebook'])) {
-        $post_data['facebook'] = 'https://' . ltrim($post_data['facebook'], '/');
-    }
-    return $post_data;
-}
-
-// Hook the function to sanitize URLs during both add and edit form submissions
-add_filter('pre_post_form_submission_data', 'sb_sanitize_urls');
-add_filter('pre_post_edit_form_submission_data', 'sb_sanitize_urls');
-
-// If the listing was created successfully
-        if ($post_id) {
-            echo '<p style="color: green;">Success: Your business listing has been submitted for review.</p>';
-if ($post_id) {
-    // Redirect to the edit page with the new listing ID
-    $edit_page_url = home_url('/edit-listing/?listing_id=' . $post_id);
-    wp_redirect($edit_page_url);
-    exit;
-}
-        } else {
-// If the listing was not created successfully
-            echo '<p style="color: red;">Error: Unable to save your business listing. Please try again later.</p>';
+        // Ensure the category term exists
+        if (!term_exists($category_slug, 'business_category')) {
+            wp_insert_term(
+                $category_slug === 'sb_business' ? 'Sandbaai Businesses' : 'Overberg Businesses',
+                'business_category',
+                array('slug' => $category_slug)
+            );
         }
+
+        // Create a new business listing post
+        $post_id = wp_insert_post(array(
+            'post_type' => 'business_listing',
+            'post_title' => $business_name,
+            'post_status' => 'pending', // Set to Pending Review
+            'post_author' => get_current_user_id(),
+            'meta_input' => array(
+                'business_address' => $business_address,
+                'business_suburb' => $business_suburb,
+                'business_phone' => $business_phone,
+                'business_email' => $business_email,
+                'business_description' => $business_description,
+                'business_website' => $business_website,
+                'business_whatsapp' => $business_whatsapp,
+                'facebook' => $facebook,
+                'address_privacy' => $address_privacy,
+                'suggestions' => $suggestions,
+            ),
+        ));
+// Debug: Log post creation
+if (!$post_id || is_wp_error($post_id)) {
+    error_log("Error creating post: " . print_r($post_id, true));
+    add_session_message('Error: Unable to save your business listing. Please try again later.', 'error');
+    return;
+} else {
+    error_log("Post created successfully with ID: $post_id");
+}
+
+// Process selected tags from two dropdowns
+$selected_tags = array();
+
+if (!empty($_POST['business_tag_1'])) {
+    $selected_tags[] = intval($_POST['business_tag_1']);
+}
+if (!empty($_POST['business_tag_2'])) { // Only add the second tag if it is explicitly selected
+    $selected_tags[] = intval($_POST['business_tag_2']);
+}
+
+// Ensure no more than 2 tags are selected
+if (count($selected_tags) > 2) {
+    error_log('Error: More than 2 tags were selected.');
+    add_session_message('Error: You can only select up to 2 tags.', 'error');
+    return;
+}
+
+// Save the tags to the listing
+wp_set_object_terms($post_id, $selected_tags, 'business_tag');
+error_log('Tags saved for post ID ' . $post_id . ': ' . implode(', ', $selected_tags));
+
+// Redirect to the main directory page with a success message
+wp_redirect(home_url('/business-directory/?submission=pending'));
+exit; // Prevent further execution
     }
 }
 add_action('init', 'sb_handle_form_submission');
@@ -339,6 +273,7 @@ add_action('init', function () {
 });
 
 // Function to handle editing listing updates
+// Function to handle editing listing updates
 function sb_handle_edit_form_submission() {
     global $sb_is_updating_post;
 
@@ -378,10 +313,6 @@ function sb_handle_edit_form_submission() {
         $updated_whatsapp = sanitize_text_field($_POST['business_whatsapp'] ?? '');
         $updated_website = sanitize_text_field($_POST['business_website'] ?? '');
         $updated_facebook = sanitize_text_field($_POST['facebook'] ?? '');
-
-        // Sanitize and validate tags
-        $updated_tags = isset($_POST['tags']) ? array_map('intval', $_POST['tags']) : array();
-        $updated_tags = array_filter($updated_tags); // Remove any invalid or empty values
 
         // Handle gallery updates
         if (isset($_POST['remove_gallery']) || !empty($_FILES['gallery']['name'][0])) {
@@ -459,11 +390,18 @@ function sb_handle_edit_form_submission() {
         // Log meta updates
         error_log("Meta fields updated for listing ID: $listing_id");
 
-        // Save tags
-        wp_set_post_terms($listing_id, $updated_tags, 'business_tag');
-        error_log("Tags updated: " . implode(', ', $updated_tags));
-
         echo '<p style="color: green;">Listing updated successfully.</p>';
+
+        // Redirect to the single listing page for the updated listing
+        $listing_permalink = get_permalink($listing_id);
+
+        if (!is_wp_error($listing_permalink)) {
+            wp_redirect($listing_permalink); // Redirect to the single listing page
+            exit; // Stop further execution
+        } else {
+            // Handle error in getting permalink
+            wp_die("Error: Unable to retrieve the permalink for the updated listing.");
+        }
 
         // Reset the flag at the end of the function
         $sb_is_updating_post = false;

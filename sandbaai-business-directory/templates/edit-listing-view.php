@@ -32,27 +32,28 @@ if ($query->have_posts()) {
         $listing_phone = get_post_meta($listing_id, 'business_phone', true);
         $listing_email = get_post_meta($listing_id, 'business_email', true);
         $listing_address = get_post_meta($listing_id, 'business_address', true);
+        $listing_suburb = get_post_meta($listing_id, 'business_suburb', true); // Retrieve the suburb
         $listing_website = get_post_meta($listing_id, 'business_website', true);
         $listing_whatsapp = get_post_meta($listing_id, 'business_whatsapp', true);
         $facebook = get_post_meta($listing_id, 'facebook', true);
         $address_privacy = get_post_meta($listing_id, 'address_privacy', true);
         $suggestions = get_post_meta($listing_id, 'suggestions', true); // Retrieve suggestions field
-        $tags = get_the_terms($listing_id, 'post_tag');
-        $selected_tags = !empty($tags) ? wp_list_pluck($tags, 'term_id') : array();
-
+echo '</div>';
         echo '<div class="listing">';
         echo '<h3>' . esc_html($listing_title) . '</h3>';
 
         // Display the edit form for the listing
         echo '<form method="post" enctype="multipart/form-data">';
         echo '<input type="hidden" name="listing_id" value="' . esc_attr($listing_id) . '">';
-
-        // IMPORTANT: Add a hidden field for the post title so it gets submitted with the form
         echo '<input type="hidden" name="post_title" value="' . esc_attr($listing_title) . '">';
 
         // Business Address
         echo '<label for="listing_address_' . esc_attr($listing_id) . '">Business Address:</label>';
         echo '<input type="text" id="listing_address_' . esc_attr($listing_id) . '" name="business_address" value="' . esc_attr($listing_address) . '" required>';
+
+        // Suburb Field
+        echo '<label for="listing_suburb_' . esc_attr($listing_id) . '">Business Suburb:</label>';
+        echo '<input type="text" id="listing_suburb_' . esc_attr($listing_id) . '" name="business_suburb" value="' . esc_attr($listing_suburb) . '" required>';
 
         // Address Privacy
         echo '<label for="address_privacy_' . esc_attr($listing_id) . '">Hide Address?&nbsp;&nbsp;</label>';
@@ -68,56 +69,21 @@ if ($query->have_posts()) {
         echo '<label for="listing_email_' . esc_attr($listing_id) . '">Business Email:</label>';
         echo '<input type="email" id="listing_email_' . esc_attr($listing_id) . '" name="business_email" value="' . esc_attr($listing_email) . '" required>';
 
-        // Business Description
+         // Business Description
         echo '<label for="listing_description_' . esc_attr($listing_id) . '">Business Description:</label>';
         echo '<textarea id="listing_description_' . esc_attr($listing_id) . '" name="business_description" required>' . esc_textarea($listing_description) . '</textarea>';
 
-        // Business Website ?>
-        <label for="listing_website_<?php echo esc_attr($listing_id); ?>">Business Website:</label>
-        <input type="text" id="listing_website_<?php echo esc_attr($listing_id); ?>" name="business_website" value="<?php echo esc_attr($listing_website); ?>" placeholder="Enter your website (e.g., example.com)">
+        // Business Website
+        echo '<label for="listing_website_' . esc_attr($listing_id) . '">Business Website:</label>';
+        echo '<input type="text" id="listing_website_' . esc_attr($listing_id) . '" name="business_website" value="' . esc_attr($listing_website) . '" placeholder="Enter your website (e.g., https://example.com)">';
 
-        <?php // Facebook Page ?>
-        <label for="facebook_<?php echo esc_attr($listing_id); ?>">Business Facebook Page:</label>
-        <input type="text" id="facebook_<?php echo esc_attr($listing_id); ?>" name="facebook" value="<?php echo esc_attr($facebook); ?>" placeholder="Enter your Facebook page (e.g., facebook.com/yourpage)">
-        <?php
+        // Facebook Page
+        echo '<label for="facebook_' . esc_attr($listing_id) . '">Business Facebook Page:</label>';
+        echo '<input type="text" id="facebook_' . esc_attr($listing_id) . '" name="facebook" value="' . esc_attr($facebook) . '" placeholder="Enter your Facebook page (e.g., facebook.com/yourpage)">';
         
         // WhatsApp Number
         echo '<label for="listing_whatsapp_' . esc_attr($listing_id) . '">Business WhatsApp Number:</label>';
         echo '<input type="text" id="listing_whatsapp_' . esc_attr($listing_id) . '" name="business_whatsapp" value="' . esc_attr($listing_whatsapp) . '">';
-
-        // Tags as Dropdowns
-        $tags = get_tags(array('hide_empty' => false));
-        $selected_tags = array_values($selected_tags); // Ensure selected tags are indexed numerically
-
-        echo '<div>Add up to 2 categories for your business <i>**If your business category is not listed, <a href="mailto:admin@sandbaaicommunity.co.za subject="category suggestion">email us</a></i></div>';
-
-        // Tag Dropdowns Container
-        echo '<div style="display: flex; align-items: center; gap: 10px;">';
-        // Tag 1 Dropdown
-        echo '<div>';
-        echo '<label for="tag_1">1st Category:</label>';
-        echo '<select id="tag_1" name="tags[]" required>';
-        echo '<option value="">Select Tag 1</option>';
-        foreach ($tags as $tag) {
-            $selected = (isset($selected_tags[0]) && $tag->term_id == $selected_tags[0]) ? 'selected' : '';
-            echo '<option value="' . esc_attr($tag->term_id) . '" ' . $selected . '>' . esc_html($tag->name) . '</option>';
-        }
-        echo '</select>';
-        echo '</div>';
-
-        // Tag 2 Dropdown
-        echo '<div>';
-        echo '<label for="tag_2">2nd Category:</label>';
-        echo '<select id="tag_2" name="tags[]">';
-        echo '<option value="">Select Tag 2</option>';
-        foreach ($tags as $tag) {
-            $selected = (isset($selected_tags[1]) && $tag->term_id == $selected_tags[1]) ? 'selected' : '';
-            echo '<option value="' . esc_attr($tag->term_id) . '" ' . $selected . '>' . esc_html($tag->name) . '</option>';
-        }
-        echo '</select>';
-        echo '</div>';
-
-        echo '</div><br>';
 
         // Gallery and Logo Handling
         $gallery = get_post_meta($listing_id, 'gallery', true);
@@ -146,20 +112,62 @@ if ($query->have_posts()) {
         }
 
         // File upload for new photos
-        echo '<label for="gallery">Upload New Photos:</label>';
+        echo '<label for="gallery">Upload New Photos: </label>';
         echo '<input type="file" id="gallery" name="gallery[]" multiple><br>';
 
-        echo '<label for="logo">Upload New Logo:</label>';
+        echo '<label for="logo">Upload New Logo: </label>';
         echo '<input type="file" id="logo" name="logo"><br>';
+
+// Retrieve all available tags
+$tags = get_terms(array(
+    'taxonomy' => 'business_tag',
+    'hide_empty' => false,
+));
+
+// Get the selected tags for the listing
+$selected_tags = wp_list_pluck(get_the_terms($listing_id, 'business_tag'), 'term_id');
+$selected_tag_1 = isset($selected_tags[0]) ? $selected_tags[0] : '';
+$selected_tag_2 = isset($selected_tags[1]) ? $selected_tags[1] : '';
+
+// Dropdown for the first tag
+echo '<label for="business_tag_1">Select Tag 1:</label>';
+echo '<select name="business_tag_1" id="business_tag_1" required>';
+echo '<option value="" disabled>Select the first tag</option>';
+foreach ($tags as $tag) {
+    $selected = $tag->term_id == $selected_tag_1 ? 'selected' : '';
+    echo '<option value="' . esc_attr($tag->term_id) . '" ' . $selected . '>' . esc_html($tag->name) . '</option>';
+}
+echo '</select>';
+
+// Dropdown for the second tag
+echo '<label for="business_tag_2">Select Tag 2:</label>';
+echo '<select name="business_tag_2" id="business_tag_2">';
+echo '<option value="" selected>Select the second tag (optional)</option>'; // Default blank option
+foreach ($tags as $tag) {
+    $selected = $tag->term_id == $selected_tag_2 ? 'selected' : '';
+    echo '<option value="' . esc_attr($tag->term_id) . '" ' . $selected . '>' . esc_html($tag->name) . '</option>';
+}
+echo '</select>';
 
         // Suggestions and Feedback
         echo '<label for="listing_suggestions_' . esc_attr($listing_id) . '">Suggestions & Feedback:</label>';
         echo '<textarea id="listing_suggestions_' . esc_attr($listing_id) . '" name="suggestions">' . esc_textarea($suggestions) . '</textarea>';
 
-        // Submit button
-        echo '<input type="submit" name="update_listing" value="Update Listing">';
-        echo '</form>';
-        echo '</div><br>';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_listing'])) {
+    // Process form submission here (update meta fields, descriptions, etc.)
+    
+    // Perform necessary updates (e.g., wp_update_post, update_post_meta, etc.)
+
+    // Redirect to the main directory with a success message
+    wp_redirect(home_url('/business-directory/?success=1'));
+    exit;
+}
+
+        // Submit and Cancel Buttons
+        echo '<div style="display: flex; gap: 10px; align-items: center; margin-top: 15px;">';
+        echo '<input type="submit" name="update_listing" value="Update Listing" style="width: 150px;">';
+        echo '<button type="button" onclick="window.location.href=\'' . esc_url(home_url('/business-directory/')) . '\';" style="width: 150px;">Cancel</button>';
+        echo '</div>';
     }
 
     echo '</div>';

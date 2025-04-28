@@ -28,18 +28,29 @@
     /* Ensure text color is readable */
 }
 
-/* Updated Specific Sidebar Styles */
-body .sb-sidebar-container.custom-sidebar-style {
-    background-color: #cbe3fc !important;
-    /* Light blue-violet */
-    border-radius: 10pt !important;
-    /* Rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
-    /* Drop shadow */
-    padding: 15px !important;
-    margin-bottom: 20px !important;
-    color: #333 !important;
-    /* Text color for better contrast */
+/* Sidebar container with background image */
+.sb-sidebar-container.custom-sidebar-style {
+    background: url('../photos/sidebar.jpg') no-repeat center center fixed;
+    background-size: cover;
+    /* Ensure the image covers the entire container */
+    color: #ffffff;
+    /* Make text white for better readability */
+}
+
+/* Sidebar links */
+.sb-sidebar-container.custom-sidebar-style a {
+    color: #ffffff;
+    /* White links */
+    text-decoration: none;
+    /* Remove underline */
+}
+
+/* Sidebar links on hover */
+.sb-sidebar-container.custom-sidebar-style a:hover {
+    color: #ffa500;
+    /* Light orange hover effect */
+    text-decoration: underline;
+    /* Optional: Add underline for hover */
 }
 
 /* Search bar inside the sidebar */
@@ -73,6 +84,8 @@ body .sb-sidebar-container.custom-sidebar-style {
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 8px;
+    color: #ffffff;
+    /* Make "Categories" heading white */
 }
 
 .sb-sidebar-container .sb-tags-section ul {
@@ -87,14 +100,21 @@ body .sb-sidebar-container.custom-sidebar-style {
 
 .sb-sidebar-container .sb-tags-section ul li a {
     display: block;
-    color: #0056b3;
-    /* Dark blue */
+    color: #ffffff;
+    /* Active tag links are white */
     text-decoration: none;
     font-size: 14px;
 }
 
 .sb-sidebar-container .sb-tags-section ul li a:hover {
     text-decoration: underline;
+}
+
+/* Inactive tags (not links) */
+.sb-sidebar-container .sb-tags-section ul li {
+    color: grey;
+    /* Grey for inactive tags */
+    font-size: 12px;
 }
 
 /* Main content styling */
@@ -130,9 +150,93 @@ body .sb-sidebar-container.custom-sidebar-style {
     }
 }
 
-/* display taxonomy pages with forced white background */
+/* Add hover styles for Join and Login links */
+.sb-sidebar-container .sb-add-business a {
+    color: #0056b3;
+    /* Default dark blue color */
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.sb-sidebar-container .sb-add-business a:hover {
+    color: #FFA500 !important;
+    /* Light orange hover color with !important */
+    text-decoration: underline !important;
+    /* Ensure underline is applied on hover */
+}
+
+/* Display taxonomy pages with forced white background */
 #content.site-content,
 .ast-container,
 .sb-directory-layout {
     background-color: #FFFFFF !important;
 }
+
+/* Taxonomy business listing container */
+.taxonomy-business-listing {
+    margin: 0;
+    padding: 0;
+}
+
+.taxonomy-business-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #a8d5e3;
+    /* Light turquoise border */
+    border-radius: 5px;
+    background-color: #ffffff;
+    /* Ensure white background for contrast */
+}
+
+.taxonomy-business-logo img {
+    width: 80px;
+    /* Adjusted width */
+    height: auto;
+    margin-right: 15px;
+    border-radius: 4px;
+    /* Optional rounded corners for logos */
+    object-fit: contain;
+    /* Ensure the logo maintains its aspect ratio */
+}
+
+.taxonomy-business-details {
+    flex: 1;
+    /* Allow business details to take up remaining space */
+}
+
+.taxonomy-business-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0 0 5px 0;
+}
+
+.taxonomy-business-title a {
+    color: #0056b3;
+    text-decoration: none;
+}
+
+.taxonomy-business-title a:hover {
+    text-decoration: underline;
+    color: #ffa500;
+    /* Light orange hover effect */
+}
+
+.taxonomy-business-description {
+    font-size: 14px;
+    color: #333;
+    margin: 0;
+}
+
+.taxonomy-business-description .read-more {
+    font-weight: bold;
+    color: #0056b3;
+    text-decoration: none;
+}
+
+.taxonomy-business-description .read-more:hover {
+    text-decoration: underline;
+    color: #ffa500;
+}}

@@ -38,13 +38,6 @@ function sb_render_add_business_form() {
         <label for="facebook">Facebook Page URL (optional):</label>
         <input type="text" id="facebook" name="facebook" placeholder="Enter your Facebook page (e.g., facebook.com/yourpage)">
 
-
-        <label for="logo">Business Logo (JPEG/PNG, max 500KB):</label>
-        <input type="file" id="logo" name="logo" accept="image/jpeg, image/png">
-
-        <label for="gallery">Photo Gallery (up to 5, max 2MB each):</label>
-        <input type="file" id="gallery" name="gallery[]" accept="image/jpeg, image/png" multiple>
-
         <label for="tags">Select up to 2 categories that fit your business:</label>
         <table id="tags-table" border="1" cellpadding="5" cellspacing="0">
             <thead>
@@ -55,7 +48,7 @@ function sb_render_add_business_form() {
             </thead>
             <tbody>
                 <?php
-                $tags = get_tags(); // Fetch WordPress post tags
+                $tags = get_terms(array('taxonomy' => 'business_tag', 'hide_empty' => false));
                 if ($tags) {
                     foreach ($tags as $tag) {
                         echo '<tr>';
@@ -86,31 +79,9 @@ function sb_render_add_business_form() {
                 checkbox.checked = false;
             }
         }
-
-        // JavaScript to check Suburb field and set category
-        document.getElementById('business_suburb').addEventListener('change', function () {
-            const categoryInput = document.getElementById('category');
-            if (this.value.toLowerCase() === 'sandbaai') {
-                categoryInput.value = 'sb_business';
-            } else {
-                categoryInput.value = '';
-            }
-        });
     </script>
     <?php
     return ob_get_clean();
 }
-
-// Automatically add https:// to website or Facebook URL if missing
-function sb_sanitize_urls($post_data) {
-    if (!empty($post_data['business_website']) && !preg_match('/^https?:\/\//', $post_data['business_website'])) {
-        $post_data['business_website'] = 'https://' . $post_data['business_website'];
-    }
-    if (!empty($post_data['facebook']) && !preg_match('/^https?:\/\//', $post_data['facebook'])) {
-        $post_data['facebook'] = 'https://' . $post_data['facebook'];
-    }
-    return $post_data;
-}
-add_filter('pre_post_form_submission_data', 'sb_sanitize_urls'); // Ensure the hook matches your form's workflow
 
 add_shortcode('sb_add_business_form', 'sb_render_add_business_form');

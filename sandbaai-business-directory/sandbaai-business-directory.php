@@ -27,9 +27,8 @@ require_once SB_DIR_PATH . 'includes/custom-post-type.php';
 require_once SB_DIR_PATH . 'includes/form-handler.php';
 require_once SB_DIR_PATH . 'includes/directory-handler.php';
 require_once plugin_dir_path(__FILE__) . 'includes/database.php';
-
-// Include the process-comment.php file
 require_once SB_DIR_PATH . 'includes/process-comment.php';
+require_once plugin_dir_path(__FILE__) . 'includes/functions.php';
 
 // Hook the function into WordPress
 add_action('admin_post_process_comment', 'sb_process_comment_submission');  // For logged-in users

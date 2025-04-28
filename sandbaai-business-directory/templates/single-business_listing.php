@@ -156,6 +156,20 @@ get_header(); ?>
         endwhile;
     endif;
     ?>
-    <center> <a href="/business-directory/">Return to Business Directory</a>
+    <div style="text-align: center; margin-top: 20px;">
+        <form action="/business-directory/" method="get" style="display: inline-block;">
+            <button type="submit" style="
+                background-color: #0056b3; 
+                color: white; 
+                border: none; 
+                padding: 10px 20px; 
+                border-radius: 4px; 
+                font-weight: bold; 
+                cursor: pointer; 
+                text-transform: uppercase;">
+                Back To Directory
+            </button>
+        </form>
+    </div>
 </div>
 <?php get_footer(); ?>
