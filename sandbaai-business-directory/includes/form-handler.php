@@ -206,12 +206,13 @@ if (!empty($selected_tags)) {
 // Debug: Log post creation
 if (!$post_id || is_wp_error($post_id)) {
     error_log("Error creating post: " . print_r($post_id, true));
-    add_session_message('Error: Unable to save your business listing. Please try again later.', 'error');
+    add_session_message('Error: Unable to save your business listing. Please contact us.', 'error');
     return;
 } else {
-    error_log("Post created successfully with ID: $post_id");
+    // Assign the category to the post
+    wp_set_object_terms($post_id, $category_slug, 'business_category');
+    error_log("Category '$category_slug' assigned to post ID $post_id");
 }
-
 // Process selected tags from two dropdowns
 $selected_tags = array();
 
