@@ -21,14 +21,15 @@ function sb_handle_file_upload($file, $max_size) {
 
     $upload = wp_handle_upload($file, array('test_form' => false));
     error_log("Upload result inside sb_handle_file_upload: " . print_r($upload, true));
-    //debugging
-    $upload_dir = wp_upload_dir();
-    error_log("Expected upload path: " . $upload_dir['basedir'] . '/' . basename($uploaded_logo));
 
     if (isset($upload['error'])) {
         error_log("Upload error: " . $upload['error']);
         return new WP_Error('upload_error', $upload['error']);
     }
+
+    // Debugging: Log the full upload path
+    $upload_dir = wp_upload_dir();
+    error_log("Expected upload path: " . $upload_dir['basedir'] . '/' . basename($upload['url']));
 
     return $upload['url'];
 }
@@ -298,6 +299,15 @@ add_action('init', function () {
 
 // Function to handle editing listing updates
 function sb_handle_edit_form_submission() {
+    $listing_id = intval($_POST['listing_id'] ?? 0);
+
+// Debugging: Log the listing ID
+if ($listing_id > 0) {
+    error_log("Listing ID retrieved: " . $listing_id);
+} else {
+    error_log("Error: Listing ID could not be retrieved.");
+    return; // Prevent further execution if no valid listing ID is found
+}
     global $sb_is_updating_post;
 //debugging
 if (!empty($_FILES['logo']['name'])) {
@@ -312,10 +322,15 @@ if (!empty($_FILES['logo']['name'])) {
     } else {
         error_log("Uploaded logo URL: " . $uploaded_logo);
 
-        if (update_post_meta($listing_id, 'logo', $uploaded_logo)) {
-            error_log("Logo meta updated successfully for listing ID: " . $listing_id);
+        // Check if listing ID is valid before updating meta
+        if ($listing_id > 0) {
+            if (update_post_meta($listing_id, 'logo', $uploaded_logo)) {
+                error_log("Logo meta updated successfully for listing ID: " . $listing_id);
+            } else {
+                error_log("Failed to update logo meta for listing ID: " . $listing_id);
+            }
         } else {
-            error_log("Failed to update logo meta for listing ID: " . $listing_id);
+            error_log("Error: Cannot update logo meta due to invalid listing ID.");
         }
     }
 }
@@ -395,12 +410,17 @@ if (!empty($_FILES['logo']['name'])) {
 
 // Handle logo removal
 if (!empty($_POST['remove_logo']) && intval($_POST['remove_logo']) === 1) {
-    error_log("Attempting to remove logo for listing ID: " . $listing_id); // Debug log
-    $result = delete_post_meta($listing_id, 'logo'); // Remove logo meta
-    if ($result) {
-        error_log("Logo removed successfully for listing ID: " . $listing_id);
+    error_log("Attempting to remove logo for listing ID: " . $listing_id);
+
+    if ($listing_id > 0) {
+        $result = delete_post_meta($listing_id, 'logo'); // Remove logo meta
+        if ($result) {
+            error_log("Logo removed successfully for listing ID: " . $listing_id);
+        } else {
+            error_log("Failed to remove logo for listing ID: " . $listing_id);
+        }
     } else {
-        error_log("Failed to remove logo for listing ID: " . $listing_id);
+        error_log("Error: Cannot remove logo due to invalid listing ID.");
     }
 }
 
@@ -491,18 +511,32 @@ if (update_post_meta($listing_id, 'logo', $uploaded_logo)) {
             error_log("Post updated successfully with ID: " . $update_result);
         }
 
-        // Save meta fields explicitly
-        update_post_meta($listing_id, 'business_description', $updated_description);
-        update_post_meta($listing_id, 'business_phone', $updated_phone);
-        update_post_meta($listing_id, 'business_email', $updated_email);
-        update_post_meta($listing_id, 'business_address', $updated_address);
-        update_post_meta($listing_id, 'business_website', $updated_website);
-        update_post_meta($listing_id, 'address_privacy', $updated_address_privacy);
-        update_post_meta($listing_id, 'business_whatsapp', $updated_whatsapp);
-        update_post_meta($listing_id, 'facebook', $updated_facebook);
+// Save meta fields explicitly
+update_post_meta($listing_id, 'business_description', $updated_description);
+error_log("Updated business_description for listing ID: $listing_id");
 
-        // Log meta updates
-        error_log("Meta fields updated for listing ID: $listing_id");
+update_post_meta($listing_id, 'business_phone', $updated_phone);
+error_log("Updated business_phone for listing ID: $listing_id");
+
+update_post_meta($listing_id, 'business_email', $updated_email);
+error_log("Updated business_email for listing ID: $listing_id");
+
+update_post_meta($listing_id, 'business_address', $updated_address);
+error_log("Updated business_address for listing ID: $listing_id");
+
+update_post_meta($listing_id, 'business_website', $updated_website);
+error_log("Updated business_website for listing ID: $listing_id");
+
+update_post_meta($listing_id, 'address_privacy', $updated_address_privacy);
+error_log("Updated address_privacy for listing ID: $listing_id");
+
+update_post_meta($listing_id, 'business_whatsapp', $updated_whatsapp);
+error_log("Updated business_whatsapp for listing ID: $listing_id");
+
+update_post_meta($listing_id, 'facebook', $updated_facebook);
+error_log("Updated facebook for listing ID: $listing_id");
+
+error_log("Meta fields updated for listing ID: $listing_id");
 
         echo '<p style="color: green;">Listing updated successfully.</p>';
 
