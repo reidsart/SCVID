@@ -26,6 +26,12 @@ function sb_handle_file_upload($file, $max_size) {
     return $upload['url']; // Return the file URL on success
 }
 
+// Function to sanitize business phone number
+function sb_sanitize_phone_number($phone) {
+    // Remove parentheses, hyphens, and spaces
+    return preg_replace('/[\(\)\-\s]/', '', $phone);
+}
+
 // Register the add business form shortcode
 function sb_register_add_business_form_shortcode() {
     add_shortcode('sb_add_business_form', 'sb_render_add_business_form');
@@ -140,7 +146,7 @@ function sb_handle_form_submission() {
         $business_name = sanitize_text_field($_POST['business_name']);
         $business_address = sanitize_text_field($_POST['business_address']);
         $business_suburb = sanitize_text_field($_POST['business_suburb']);
-        $business_phone = sanitize_text_field($_POST['business_phone']);
+        $business_phone = sb_sanitize_phone_number(sanitize_text_field($_POST['business_phone']));
         $business_email = sanitize_email($_POST['business_email']);
         $business_description = sanitize_textarea_field($_POST['business_description']);
         $business_website = sanitize_text_field($_POST['business_website'] ?? '');
@@ -306,7 +312,7 @@ function sb_handle_edit_form_submission() {
 
         // Sanitize and update post fields
         $updated_description = sanitize_textarea_field($_POST['business_description'] ?? '');
-        $updated_phone = sanitize_text_field($_POST['business_phone'] ?? '');
+        $updated_phone = sb_sanitize_phone_number(sanitize_text_field($_POST['business_phone'] ?? ''));
         $updated_email = sanitize_email($_POST['business_email'] ?? '');
         $updated_address = sanitize_text_field($_POST['business_address'] ?? '');
         $updated_address_privacy = sanitize_text_field($_POST['address_privacy'] ?? '');
