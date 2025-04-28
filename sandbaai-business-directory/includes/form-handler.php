@@ -1,8 +1,7 @@
 <?php
 // Function to handle file uploads
 function sb_handle_file_upload($file, $max_size) {
-    // Log the file data
-    error_log("File data: " . print_r($file, true));
+    error_log("File data received in sb_handle_file_upload: " . print_r($file, true));
 
     if ($file['error'] !== UPLOAD_ERR_OK) {
         error_log("File upload error: " . $file['error']);
@@ -21,12 +20,16 @@ function sb_handle_file_upload($file, $max_size) {
     }
 
     $upload = wp_handle_upload($file, array('test_form' => false));
+    error_log("Upload result inside sb_handle_file_upload: " . print_r($upload, true));
+    //debugging
+    $upload_dir = wp_upload_dir();
+    error_log("Expected upload path: " . $upload_dir['basedir'] . '/' . basename($uploaded_logo));
+
     if (isset($upload['error'])) {
         error_log("Upload error: " . $upload['error']);
         return new WP_Error('upload_error', $upload['error']);
     }
 
-    error_log("File uploaded successfully: " . $upload['url']);
     return $upload['url'];
 }
 
@@ -124,6 +127,16 @@ echo '</select>';
 // Handle form submission for adding business
 function sb_handle_form_submission() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sb_submit_business'])) {
+        // Debugging: Log the POST data and uploaded files
+        error_log("Submitted POST data: " . print_r($_POST, true));
+        error_log("Uploaded FILES data: " . print_r($_FILES, true));
+
+        // Debugging: Log the remove_logo checkbox value
+        if (isset($_POST['remove_logo'])) {
+            error_log("Remove logo value: " . print_r($_POST['remove_logo'], true));
+        } else {
+            error_log("Remove logo checkbox not set.");
+        }
         global $wp_filter;
 
         // Remove Paystack's save_post_meta hook temporarily
@@ -287,10 +300,24 @@ add_action('init', function () {
 function sb_handle_edit_form_submission() {
     global $sb_is_updating_post;
 //debugging
-if (!empty($_FILES['logo'])) {
-    error_log("Logo file data: " . print_r($_FILES['logo'], true));
-} else {
-    error_log("No logo file uploaded.");
+if (!empty($_FILES['logo']['name'])) {
+    $file = $_FILES['logo'];
+
+    error_log("Logo file data: " . print_r($file, true));
+
+    $uploaded_logo = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
+
+    if (is_wp_error($uploaded_logo)) {
+        error_log("Logo upload error: " . $uploaded_logo->get_error_message());
+    } else {
+        error_log("Uploaded logo URL: " . $uploaded_logo);
+
+        if (update_post_meta($listing_id, 'logo', $uploaded_logo)) {
+            error_log("Logo meta updated successfully for listing ID: " . $listing_id);
+        } else {
+            error_log("Failed to update logo meta for listing ID: " . $listing_id);
+        }
+    }
 }
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_listing'])) {
         // Set the flag to prevent recursive updates
@@ -335,7 +362,7 @@ if (!empty($_FILES['logo'])) {
              if (!is_array($existing_gallery)) {
                  $existing_gallery = [];
              }
- // Handle logo upload
+// Handle logo upload
 if (!empty($_FILES['logo']['name'])) {
     $file = [
         'name' => $_FILES['logo']['name'],
@@ -345,15 +372,25 @@ if (!empty($_FILES['logo']['name'])) {
         'size' => $_FILES['logo']['size'],
     ];
 
-    // Use the sb_handle_file_upload function
+    // Debugging: Log file data
+    error_log("Logo file data: " . print_r($file, true));
+
+    // Call the upload function
     $uploaded_logo = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
 
-    if (!is_wp_error($uploaded_logo)) {
-        update_post_meta($listing_id, 'logo', $uploaded_logo);
-        error_log("Logo URL saved: " . $uploaded_logo);
+    // Debugging: Log upload result
+    if (is_wp_error($uploaded_logo)) {
+        error_log("Logo upload error: " . $uploaded_logo->get_error_message());
     } else {
-        error_log("Error saving logo URL: " . $uploaded_logo->get_error_message());
-}
+        error_log("Uploaded logo URL: " . $uploaded_logo);
+    }
+
+    // Update the meta field
+    if (!is_wp_error($uploaded_logo) && update_post_meta($listing_id, 'logo', $uploaded_logo)) {
+        error_log("Logo meta updated successfully for listing ID: " . $listing_id);
+    } else {
+        error_log("Failed to update logo meta for listing ID: " . $listing_id);
+    }
 }
 
 // Handle logo removal
@@ -364,6 +401,36 @@ if (!empty($_POST['remove_logo']) && intval($_POST['remove_logo']) === 1) {
         error_log("Logo removed successfully for listing ID: " . $listing_id);
     } else {
         error_log("Failed to remove logo for listing ID: " . $listing_id);
+    }
+}
+
+// Handle logo upload
+if (!empty($_FILES['logo']['name'])) {
+    $file = [
+        'name' => $_FILES['logo']['name'],
+        'type' => $_FILES['logo']['type'],
+        'tmp_name' => $_FILES['logo']['tmp_name'],
+        'error' => $_FILES['logo']['error'],
+        'size' => $_FILES['logo']['size'],
+    ];
+
+    // Debugging: Log file data
+    error_log("Logo file data: " . print_r($file, true));
+error_log("Upload result: " . print_r($upload, true));
+    $uploaded_logo = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
+
+    // Debugging: Log upload result
+    if (is_wp_error($uploaded_logo)) {
+        error_log("Logo upload error: " . $uploaded_logo->get_error_message());
+    } else {
+        error_log("Uploaded logo URL: " . $uploaded_logo);
+    }
+
+    // Update the meta field
+    if (!is_wp_error($uploaded_logo) && update_post_meta($listing_id, 'logo', $uploaded_logo)) {
+        error_log("Logo meta updated successfully for listing ID: " . $listing_id);
+    } else {
+        error_log("Failed to update logo meta for listing ID: " . $listing_id);
     }
 }
              // Remove selected gallery photos
@@ -399,6 +466,12 @@ if (!empty($_POST['remove_logo']) && intval($_POST['remove_logo']) === 1) {
  
              // Update gallery meta
              update_post_meta($listing_id, 'gallery', $existing_gallery);
+             // Debug after update_post_meta
+if (update_post_meta($listing_id, 'logo', $uploaded_logo)) {
+    error_log("Logo meta updated successfully for listing ID: " . $listing_id);
+} else {
+    error_log("Failed to update logo meta for listing ID: " . $listing_id);
+}
          }
 
         // Create a complete post data array with all post content
