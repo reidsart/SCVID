@@ -85,39 +85,46 @@ echo '</div>';
         echo '<label for="listing_whatsapp_' . esc_attr($listing_id) . '">Business WhatsApp Number:</label>';
         echo '<input type="text" id="listing_whatsapp_' . esc_attr($listing_id) . '" name="business_whatsapp" value="' . esc_attr($listing_whatsapp) . '">';
 
-        // Gallery and Logo Handling
-        $gallery = get_post_meta($listing_id, 'gallery', true);
-        $logo = get_post_meta($listing_id, 'logo', true);
-
-        // Display Logo
-        if (!empty($logo)) {
-            echo '<div>';
-            echo '<label>Current Logo:</label><br>';
-            echo '<img src="' . esc_url($logo) . '" alt="Logo" style="max-width: 150px;"><br>';
-            echo '<input type="checkbox" name="remove_logo" value="1"> Remove Logo';
-            echo '</div>';
-        }
-
-        // Display Gallery
-        if (!empty($gallery) && is_array($gallery)) {
-            echo '<div>';
-            echo '<label>Current Gallery:</label><br>';
-            foreach ($gallery as $key => $photo_url) {
-                echo '<div style="margin-bottom: 10px;">';
-                echo '<img src="' . esc_url($photo_url) . '" alt="Gallery Photo" style="max-width: 150px;"><br>';
-                echo '<input type="checkbox" name="remove_gallery[]" value="' . esc_attr($key) . '"> Remove Photo';
+         // Logo Handling
+         $logo = get_post_meta($listing_id, 'logo', true);
+         echo '<div class="logo-section">';
+         echo '<label for="logo">Upload New Logo:</label>';
+         if (!empty($logo)) {
+             echo '<div>';
+             echo '<img src="' . esc_url($logo) . '" alt="Logo" style="max-width: 150px;"><br>';
+             echo '<input type="checkbox" name="remove_logo" value="1"> Remove Logo';
+             echo '</div>';
+         }
+         echo '<input type="file" id="logo" name="logo"><br>';
+         echo '</div>';
+ 
+         // Gallery Handling
+         $gallery = get_post_meta($listing_id, 'gallery', true);
+         echo '<div class="gallery-section">';
+         echo '<label for="gallery">Upload New Photos (Max: 5):</label>';
+         if (!empty($gallery) && is_array($gallery)) {
+             echo '<div style="display: flex; flex-wrap: wrap; gap: 10px;">';
+             foreach ($gallery as $key => $photo_url) {
+                echo '<div style="display: inline-block; text-align: center;">';
+                echo '<img src="' . esc_url($photo_url) . '" alt="Gallery Photo" style="max-width: 100px;"><br>';
+                echo '<input type="checkbox" name="remove_gallery[]" value="' . esc_attr($key) . '"> Remove';
                 echo '</div>';
-            }
-            echo '</div>';
-        }
+             }
+             echo '</div>';
+         }
+        echo '<input type="file" id="gallery" name="gallery[]" multiple accept="image/*" onchange="validateGalleryUpload(this, 5)"><br>';
+        echo '</div>';
 
-        // File upload for new photos
-        echo '<label for="gallery">Upload New Photos: </label>';
-        echo '<input type="file" id="gallery" name="gallery[]" multiple><br>';
-
-        echo '<label for="logo">Upload New Logo: </label>';
-        echo '<input type="file" id="logo" name="logo"><br>';
-
+        // Add JavaScript for validation
+        echo '<script>
+             function validateGalleryUpload(input, maxFiles) {
+                 if (input.files.length > maxFiles) {
+                     alert("You can only upload up to " + maxFiles + " photos.");
+                     input.value = ""; // Clear the input
+               }
+             }
+     </script>';
+     
 // Retrieve all available tags
 $tags = get_terms(array(
     'taxonomy' => 'business_tag',
