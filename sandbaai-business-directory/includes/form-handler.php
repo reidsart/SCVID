@@ -357,8 +357,14 @@ if (!empty($_FILES['logo']['name'])) {
 }
 
 // Handle logo removal
-if (!empty($_POST['remove_logo'])) {
-    delete_post_meta($listing_id, 'logo'); // Remove logo meta
+if (!empty($_POST['remove_logo']) && intval($_POST['remove_logo']) === 1) {
+    error_log("Attempting to remove logo for listing ID: " . $listing_id); // Debug log
+    $result = delete_post_meta($listing_id, 'logo'); // Remove logo meta
+    if ($result) {
+        error_log("Logo removed successfully for listing ID: " . $listing_id);
+    } else {
+        error_log("Failed to remove logo for listing ID: " . $listing_id);
+    }
 }
              // Remove selected gallery photos
              if (!empty($_POST['remove_gallery'])) {
