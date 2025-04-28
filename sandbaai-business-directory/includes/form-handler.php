@@ -321,51 +321,47 @@ function sb_handle_edit_form_submission() {
         $updated_website = sanitize_text_field($_POST['business_website'] ?? '');
         $updated_facebook = sanitize_text_field($_POST['facebook'] ?? '');
 
-        // Handle gallery updates
-        if (isset($_POST['remove_gallery']) || !empty($_FILES['gallery']['name'][0])) {
-            // Get the existing gallery meta
-            $existing_gallery = get_post_meta($listing_id, 'gallery', true);
-            if (!is_array($existing_gallery)) {
-                $existing_gallery = [];
-            }
-            error_log("Gallery meta for listing $listing_id: " . print_r($existing_gallery, true));
-
-            // Remove selected gallery photos
-            if (isset($_POST['remove_gallery']) && is_array($_POST['remove_gallery'])) {
-                foreach ($_POST['remove_gallery'] as $remove_index) {
-                    if (isset($existing_gallery[$remove_index])) {
-                        unset($existing_gallery[$remove_index]);
-                    }
-                }
-                // Re-index the array after removing items
-                $existing_gallery = array_values($existing_gallery);
-            }
-
-            // Handle new gallery uploads
-            if (!empty($_FILES['gallery']['name'][0])) {
-                foreach ($_FILES['gallery']['name'] as $key => $value) {
-                    if (!empty($value)) {
-                        $file = array(
-                            'name' => $_FILES['gallery']['name'][$key],
-                            'type' => $_FILES['gallery']['type'][$key],
-                            'tmp_name' => $_FILES['gallery']['tmp_name'][$key],
-                            'error' => $_FILES['gallery']['error'][$key],
-                            'size' => $_FILES['gallery']['size'][$key],
-                        );
-                        $uploaded_file = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
-                        if (!is_wp_error($uploaded_file)) {
-                            $existing_gallery[] = $uploaded_file;
-                        } else {
-                            echo '<p style="color: red;">Error uploading gallery photo: ' . $uploaded_file->get_error_message() . '</p>';
-                        }
-                    }
-                }
-            }
-
-            // Update the gallery meta field
-            update_post_meta($listing_id, 'gallery', $existing_gallery);
-            error_log("Updated gallery meta for listing $listing_id: " . print_r($existing_gallery, true));
-        }
+         // Handle gallery updates
+         if (!empty($_POST['remove_gallery']) || !empty($_FILES['gallery']['name'][0])) {
+             $existing_gallery = get_post_meta($listing_id, 'gallery', true);
+             if (!is_array($existing_gallery)) {
+                 $existing_gallery = [];
+             }
+ 
+             // Remove selected gallery photos
+             if (!empty($_POST['remove_gallery'])) {
+                 foreach ($_POST['remove_gallery'] as $remove_index) {
+                     if (isset($existing_gallery[$remove_index])) {
+                         unset($existing_gallery[$remove_index]);
+                     }
+                 }
+                 $existing_gallery = array_values($existing_gallery); // Re-index
+             }
+ 
+             // Handle new uploads
+             if (!empty($_FILES['gallery']['name'][0])) {
+                 foreach ($_FILES['gallery']['name'] as $key => $value) {
+                     if (!empty($value) && count($existing_gallery) < 5) {
+                         $file = [
+                             'name' => $_FILES['gallery']['name'][$key],
+                             'type' => $_FILES['gallery']['type'][$key],
+                             'tmp_name' => $_FILES['gallery']['tmp_name'][$key],
+                             'error' => $_FILES['gallery']['error'][$key],
+                             'size' => $_FILES['gallery']['size'][$key],
+                         ];
+                         $uploaded_file = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
+                         if (!is_wp_error($uploaded_file)) {
+                             $existing_gallery[] = $uploaded_file;
+                         } else {
+                             echo '<p style="color: red;">Error uploading photo: ' . $uploaded_file->get_error_message() . '</p>';
+                         }
+                     }
+                 }
+             }
+ 
+             // Update gallery meta
+             update_post_meta($listing_id, 'gallery', $existing_gallery);
+         }
 
         // Create a complete post data array with all post content
         $post_data = array(
