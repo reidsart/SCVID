@@ -292,3 +292,11 @@ function sb_enqueue_smooth_scroll() {
     );
 }
 add_action('wp_enqueue_scripts', 'sb_enqueue_smooth_scroll');
+
+// Modify the main query for taxonomy pages to sort listings alphabetically by title
+add_action('pre_get_posts', function ($query) {
+    if ($query->is_main_query() && !is_admin() && $query->is_tax('business_tag')) {
+        $query->set('orderby', 'title');
+        $query->set('order', 'ASC');
+    }
+});
