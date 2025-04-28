@@ -1,29 +1,33 @@
 <?php
 // Function to handle file uploads
 function sb_handle_file_upload($file, $max_size) {
-    // Check for upload errors
+    // Log the file data
+    error_log("File data: " . print_r($file, true));
+
     if ($file['error'] !== UPLOAD_ERR_OK) {
+        error_log("File upload error: " . $file['error']);
         return new WP_Error('upload_error', 'File upload failed.');
     }
 
-    // Validate file size
     if ($file['size'] > $max_size) {
+        error_log("File size exceeds limit: " . $file['size']);
         return new WP_Error('file_size_error', 'File exceeds the maximum allowed size.');
     }
 
-    // Validate file type (allow only JPEG and PNG)
     $allowed_types = array('image/jpeg', 'image/png');
     if (!in_array($file['type'], $allowed_types)) {
+        error_log("Invalid file type: " . $file['type']);
         return new WP_Error('file_type_error', 'Invalid file type. Only JPEG and PNG are allowed.');
     }
 
-    // Upload the file to WordPress uploads directory
     $upload = wp_handle_upload($file, array('test_form' => false));
     if (isset($upload['error'])) {
+        error_log("Upload error: " . $upload['error']);
         return new WP_Error('upload_error', $upload['error']);
     }
 
-    return $upload['url']; // Return the file URL on success
+    error_log("File uploaded successfully: " . $upload['url']);
+    return $upload['url'];
 }
 
 // Function to sanitize business phone number
@@ -280,10 +284,14 @@ add_action('init', function () {
 });
 
 // Function to handle editing listing updates
-// Function to handle editing listing updates
 function sb_handle_edit_form_submission() {
     global $sb_is_updating_post;
-
+//debugging
+if (!empty($_FILES['logo'])) {
+    error_log("Logo file data: " . print_r($_FILES['logo'], true));
+} else {
+    error_log("No logo file uploaded.");
+}
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_listing'])) {
         // Set the flag to prevent recursive updates
         if ($sb_is_updating_post) {
@@ -327,7 +335,31 @@ function sb_handle_edit_form_submission() {
              if (!is_array($existing_gallery)) {
                  $existing_gallery = [];
              }
- 
+ // Handle logo upload
+if (!empty($_FILES['logo']['name'])) {
+    $file = [
+        'name' => $_FILES['logo']['name'],
+        'type' => $_FILES['logo']['type'],
+        'tmp_name' => $_FILES['logo']['tmp_name'],
+        'error' => $_FILES['logo']['error'],
+        'size' => $_FILES['logo']['size'],
+    ];
+
+    // Use the sb_handle_file_upload function
+    $uploaded_logo = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
+
+    if (!is_wp_error($uploaded_logo)) {
+        update_post_meta($listing_id, 'logo', $uploaded_logo);
+        error_log("Logo URL saved: " . $uploaded_logo);
+    } else {
+        error_log("Error saving logo URL: " . $uploaded_logo->get_error_message());
+}
+}
+
+// Handle logo removal
+if (!empty($_POST['remove_logo'])) {
+    delete_post_meta($listing_id, 'logo'); // Remove logo meta
+}
              // Remove selected gallery photos
              if (!empty($_POST['remove_gallery'])) {
                  foreach ($_POST['remove_gallery'] as $remove_index) {
