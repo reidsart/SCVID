@@ -7,7 +7,7 @@ function sb_render_directory_listing() {
     // Check for success message
     if (isset($_GET['submission']) && $_GET['submission'] === 'pending') {
         echo '<div class="notice notice-success" style="background-color: #d4edda; padding: 10px; border: 1px solid #c3e6cb; border-radius: 5px; color: #155724; margin-bottom: 20px;">';
-        echo '<p>Your business listing has been submitted and is pending review.</p>';
+        echo '<p>Your business listing has been submitted and is pending review. Once it is approved, you will be able to edit it and add more photos.</p>';
         echo '</div>';
     }
 
@@ -45,6 +45,16 @@ function sb_render_directory_listing() {
         while ($sandbaai_query->have_posts()) {
             $sandbaai_query->the_post();
             $logo = get_post_meta(get_the_ID(), 'logo', true); // Fetch logo meta
+
+            if (is_wp_error($logo)) {
+            // Log the error and set a default or empty value
+            error_log("Error fetching logo URL for listing ID " . get_the_ID() . ": " . $logo->get_error_message());
+            $logo = ''; // Fallback to an empty string or default image
+        }
+
+        // Use esc_url only on valid URLs
+        echo '<img src="' . esc_url($logo) . '" alt="Logo" style="width: 20px; height: 20px; margin-right: 10px; vertical-align: middle;">';
+
             $default_logo = SB_DIR_URL . 'assets/icons/generic-business-icon.png'; // Default logo path
             echo '<li>';
             if (!empty($logo)) {
