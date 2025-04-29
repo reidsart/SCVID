@@ -44,17 +44,16 @@ function sb_render_directory_listing() {
         echo '<ul class="business-listing" style="list-style-type: none;">';
         while ($sandbaai_query->have_posts()) {
             $sandbaai_query->the_post();
-            $logo = get_post_meta(get_the_ID(), 'logo', true); // Fetch logo meta
+$logo = get_post_meta(get_the_ID(), 'logo', true);
 
-            if (is_wp_error($logo)) {
-            // Log the error and set a default or empty value
-            error_log("Error fetching logo URL for listing ID " . get_the_ID() . ": " . $logo->get_error_message());
-            $logo = ''; // Fallback to an empty string or default image
-        }
+if (is_wp_error($logo)) {
+    // Log the error and set a default or empty value
+    error_log("Error fetching logo URL for listing ID " . get_the_ID() . ": " . $logo->get_error_message());
+    $logo = ''; // Fallback to an empty string or default image
+}
 
-        // Use esc_url only on valid URLs
-        echo '<img src="' . esc_url($logo) . '" alt="Logo" style="width: 20px; height: 20px; margin-right: 10px; vertical-align: middle;">';
-
+// Use esc_url only on valid URLs
+echo '<img src="' . esc_url($logo) . '" alt="Logo" style="width: 20px; height: 20px; margin-right: 10px; vertical-align: middle;">';
             $default_logo = SB_DIR_URL . 'assets/icons/generic-business-icon.png'; // Default logo path
             echo '<li>';
             if (!empty($logo)) {
