@@ -309,6 +309,7 @@ if ($listing_id > 0) {
     return; // Prevent further execution if no valid listing ID is found
 }
     global $sb_is_updating_post;
+    
 //debugging
 if (!empty($_FILES['logo']['name'])) {
     $file = $_FILES['logo'];
