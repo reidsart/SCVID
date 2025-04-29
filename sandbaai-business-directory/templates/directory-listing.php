@@ -53,16 +53,17 @@ if (is_wp_error($logo)) {
 }
 
 // Use esc_url only on valid URLs
-echo '<img src="' . esc_url($logo) . '" alt="Logo" style="width: 20px; height: 20px; margin-right: 10px; vertical-align: middle;">';
-            $default_logo = SB_DIR_URL . 'assets/icons/generic-business-icon.png'; // Default logo path
-            echo '<li>';
-            if (!empty($logo)) {
-                echo '<img src="' . esc_url($logo) . '" alt="Logo" style="width: 20px; height: 20px; margin-right: 10px; vertical-align: middle;">';
-            } else {
-                echo '<img src="' . esc_url($default_logo) . '" alt="Generic Business Icon" style="width: 20px; height: 20px; margin-right: 10px; vertical-align: middle;">';
-            }
-            echo '<a href="' . esc_url(get_permalink()) . '">' . esc_html(get_the_title()) . '</a>';
-            echo '</li>';
+$logo = get_post_meta(get_the_ID(), 'logo', true);
+$default_logo = SB_DIR_URL . 'assets/icons/generic-business-icon.png'; // Default logo path
+
+echo '<li style="display: flex; align-items: center; gap: 10px;">'; // Flexbox for inline layout
+if (!empty($logo)) {
+    echo '<img src="' . esc_url($logo) . '" alt="Logo" style="width: 20px; height: 20px; vertical-align: middle;">';
+} else {
+    echo '<img src="' . esc_url($default_logo) . '" alt="Generic Business Icon" style="width: 20px; height: 20px; vertical-align: middle;">';
+}
+echo '<a href="' . esc_url(get_permalink()) . '">' . esc_html(get_the_title()) . '</a>';
+echo '</li>';
         }
         echo '</ul>';
     }
