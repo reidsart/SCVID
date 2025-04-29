@@ -202,6 +202,23 @@
     /* Ensure the logo maintains its aspect ratio */
 }
 
+/* Adjust logo styling for linked logos within taxonomy pages */
+.taxonomy-business-logo a img {
+    width: 80px;
+    /* Ensure consistent width for logos */
+    height: auto;
+    margin-right: 15px;
+    border-radius: 4px;
+    object-fit: contain;
+    /* Maintain aspect ratio */
+}
+
+/* Ensure the logo link doesn’t affect the layout */
+.taxonomy-business-logo a {
+    display: inline-block;
+    /* Adjust the anchor tag to behave like an image container */
+}
+
 .taxonomy-business-details {
     flex: 1;
     /* Allow business details to take up remaining space */
