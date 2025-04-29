@@ -145,7 +145,6 @@ function save_business_listing_categories($post_id) {
  */
 add_action('init', function () {
     $taxonomies = get_object_taxonomies('business_listing');
-    error_log('Registered taxonomies for business_listing: ' . implode(', ', $taxonomies));
 });
 
 /**
