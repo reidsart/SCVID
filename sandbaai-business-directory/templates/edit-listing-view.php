@@ -88,15 +88,17 @@ echo '</div>';
          // Logo Handling
          $logo = get_post_meta($listing_id, 'logo', true);
          echo '<div class="logo-section">';
-         echo '<label for="logo">Upload New Logo:</label>';
-         if (!empty($logo)) {
-             echo '<div>';
-             echo '<img src="' . esc_url($logo) . '" alt="Logo" style="max-width: 150px;"><br>';
-             echo '<input type="checkbox" name="remove_logo" value="1"> Remove Logo';
-             echo '</div>';
-         }
-         echo '<input type="file" id="logo" name="logo"><br>';
-         echo '</div>';
+if (!empty($logo)) {
+    echo '<div>';
+    echo '<img src="' . esc_url($logo) . '" alt="Logo" style="max-width: 150px;">';
+    echo '</div>';
+}
+
+// Inline styling for "Upload New Logo" and "Choose File"
+echo '<div style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">';
+echo '<label for="logo"">Change Your Logo:</label>';
+echo '<input type="file" id="logo" name="logo">';
+echo '</div><hr>';
  
          // Gallery Handling
          $gallery = get_post_meta($listing_id, 'gallery', true);
@@ -113,7 +115,7 @@ echo '</div>';
              echo '</div>';
          }
         echo '<input type="file" id="gallery" name="gallery[]" multiple accept="image/*" onchange="validateGalleryUpload(this, 5)"><br>';
-        echo '</div>';
+        echo '</div><hr>';
 
         // Add JavaScript for validation
         echo '<script>
@@ -125,6 +127,7 @@ echo '</div>';
              }
      </script>';
      
+echo '<i>Select 1 to 2 categories that best fit your business<BR>';     
 // Retrieve all available tags
 $tags = get_terms(array(
     'taxonomy' => 'business_tag',
@@ -137,9 +140,9 @@ $selected_tag_1 = isset($selected_tags[0]) ? $selected_tags[0] : '';
 $selected_tag_2 = isset($selected_tags[1]) ? $selected_tags[1] : '';
 
 // Dropdown for the first tag
-echo '<label for="business_tag_1">Select Tag 1:</label>';
+echo '<label for="business_tag_1">Select Category 1:</label>';
 echo '<select name="business_tag_1" id="business_tag_1" required>';
-echo '<option value="" disabled>Select the first tag</option>';
+echo '<option value="" disabled>Select the first Category</option>';
 foreach ($tags as $tag) {
     $selected = $tag->term_id == $selected_tag_1 ? 'selected' : '';
     echo '<option value="' . esc_attr($tag->term_id) . '" ' . $selected . '>' . esc_html($tag->name) . '</option>';
@@ -147,9 +150,9 @@ foreach ($tags as $tag) {
 echo '</select>';
 
 // Dropdown for the second tag
-echo '<label for="business_tag_2">Select Tag 2:</label>';
+echo '<label for="business_tag_2">Select Category 2:</label>';
 echo '<select name="business_tag_2" id="business_tag_2">';
-echo '<option value="" selected>Select the second tag (optional)</option>'; // Default blank option
+echo '<option value="" selected>Select the second category (optional)</option>'; // Default blank option
 foreach ($tags as $tag) {
     $selected = $tag->term_id == $selected_tag_2 ? 'selected' : '';
     echo '<option value="' . esc_attr($tag->term_id) . '" ' . $selected . '>' . esc_html($tag->name) . '</option>';
@@ -177,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_listing'])) {
         echo '</div>';
     }
 
-    echo '</div>';
+    echo '</div><br><i>If you have any problems with your listing or wish to remove your listing, email info@sandbaaicommunity.co.za for help.</i>';
 } else {
     echo '<p>You have not created any listings yet.</p>';
 }
