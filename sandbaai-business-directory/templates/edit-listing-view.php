@@ -61,29 +61,84 @@ echo '</div>';
         echo '<input type="radio" name="address_privacy" value="0" ' . checked($address_privacy, '0', false) . '> No';
         echo '<br>';
 
-        // Business Phone
-        echo '<label for="listing_phone_' . esc_attr($listing_id) . '">Business Phone:</label>';
-        echo '<input type="text" id="listing_phone_' . esc_attr($listing_id) . '" name="business_phone" value="' . esc_attr($listing_phone) . '" required>';
+// Business Phone
+echo '<div style="display: flex; align-items: center; gap: 5px;">';
+echo '<span style="
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-image: url(\'/wp-content/plugins/sandbaai-business-directory/assets/icons/phone.png\') !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;">
+</span>';
+echo '<label for="listing_phone_' . esc_attr($listing_id) . '">Business Phone:</label>';
+echo '</div>';
+echo '<input type="text" id="listing_phone_' . esc_attr($listing_id) . '" name="business_phone" value="' . esc_attr($listing_phone) . '" required>';
 
-        // Business Email
-        echo '<label for="listing_email_' . esc_attr($listing_id) . '">Business Email:</label>';
-        echo '<input type="email" id="listing_email_' . esc_attr($listing_id) . '" name="business_email" value="' . esc_attr($listing_email) . '" required>';
+// Business Email
+echo '<div style="display: flex; align-items: center; gap: 5px;">';
+echo '<span style="
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-image: url(\'/wp-content/plugins/sandbaai-business-directory/assets/icons/email.png\') !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;">
+</span>';
+echo '<label for="listing_email_' . esc_attr($listing_id) . '">Business Email:</label>';
+echo '</div>';
+echo '<input type="email" id="listing_email_' . esc_attr($listing_id) . '" name="business_email" value="' . esc_attr($listing_email) . '" required>';
 
          // Business Description
         echo '<label for="listing_description_' . esc_attr($listing_id) . '">Business Description:</label>';
         echo '<textarea id="listing_description_' . esc_attr($listing_id) . '" name="business_description" required>' . esc_textarea($listing_description) . '</textarea>';
 
-        // Business Website
-        echo '<label for="listing_website_' . esc_attr($listing_id) . '">Business Website:</label>';
-        echo '<input type="text" id="listing_website_' . esc_attr($listing_id) . '" name="business_website" value="' . esc_attr($listing_website) . '" placeholder="Enter your website (e.g., https://example.com)">';
+// Business Website
+echo '<div style="display: flex; align-items: center; gap: 5px;">';
+echo '<span style="
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-image: url(\'/wp-content/plugins/sandbaai-business-directory/assets/icons/website.png\') !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;">
+</span>';
+echo '<label for="listing_website_' . esc_attr($listing_id) . '">Business Website:</label>';
+echo '</div>';
+echo '<input type="text" id="listing_website_' . esc_attr($listing_id) . '" name="business_website" value="' . esc_attr($listing_website) . '" placeholder="Enter your website (e.g., https://example.com)">';
 
-        // Facebook Page
-        echo '<label for="facebook_' . esc_attr($listing_id) . '">Business Facebook Page:</label>';
-        echo '<input type="text" id="facebook_' . esc_attr($listing_id) . '" name="facebook" value="' . esc_attr($facebook) . '" placeholder="Enter your Facebook page (e.g., facebook.com/yourpage)">';
-        
-        // WhatsApp Number
-        echo '<label for="listing_whatsapp_' . esc_attr($listing_id) . '">Business WhatsApp Number:</label>';
-        echo '<input type="text" id="listing_whatsapp_' . esc_attr($listing_id) . '" name="business_whatsapp" value="' . esc_attr($listing_whatsapp) . '">';
+// Facebook Page
+echo '<div style="display: flex; align-items: center; gap: 5px;">';
+echo '<span style="
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-image: url(\'/wp-content/plugins/sandbaai-business-directory/assets/icons/facebook.png\') !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;">
+</span>';
+echo '<label for="facebook_' . esc_attr($listing_id) . '">Business Facebook Page:</label>';
+echo '</div>';
+echo '<input type="text" id="facebook_' . esc_attr($listing_id) . '" name="facebook" value="' . esc_attr($facebook) . '" placeholder="Enter your Facebook page (e.g., facebook.com/yourpage)">';
+
+// WhatsApp Number
+echo '<div style="display: flex; align-items: center; gap: 5px;">';
+echo '<span style="
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-image: url(\'/wp-content/plugins/sandbaai-business-directory/assets/icons/whatsapp.png\') !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;">
+</span>';
+echo '<label for="listing_whatsapp_' . esc_attr($listing_id) . '">Business WhatsApp Number:</label>';
+echo '</div>';
+echo '<input type="text" id="listing_whatsapp_' . esc_attr($listing_id) . '" name="business_whatsapp" value="' . esc_attr($listing_whatsapp) . '">';
 
          // Logo Handling
          $logo = get_post_meta($listing_id, 'logo', true);
@@ -103,7 +158,7 @@ echo '</div><hr>';
          // Gallery Handling
          $gallery = get_post_meta($listing_id, 'gallery', true);
          echo '<div class="gallery-section">';
-         echo '<label for="gallery">Upload New Photos (Max: 5):</label>';
+         echo '<label for="gallery">Upload New Photos (Up to 5 photos/no larger than 4mb filesize each):</label>';
          if (!empty($gallery) && is_array($gallery)) {
              echo '<div style="display: flex; flex-wrap: wrap; gap: 10px;">';
              foreach ($gallery as $key => $photo_url) {
