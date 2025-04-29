@@ -47,9 +47,20 @@ echo '</div>';
         echo '<input type="hidden" name="listing_id" value="' . esc_attr($listing_id) . '">';
         echo '<input type="hidden" name="post_title" value="' . esc_attr($listing_title) . '">';
 
-        // Business Address
-        echo '<label for="listing_address_' . esc_attr($listing_id) . '">Business Address:</label>';
-        echo '<input type="text" id="listing_address_' . esc_attr($listing_id) . '" name="business_address" value="' . esc_attr($listing_address) . '" required>';
+// Business Address with Icon
+echo '<div style="display: flex; align-items: center; gap: 5px;">';
+echo '<span style="
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-image: url(\'/wp-content/plugins/sandbaai-business-directory/assets/icons/address.png\') !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;">
+</span>';
+echo '<label for="listing_address_' . esc_attr($listing_id) . '" style="margin: 0;">Business Address:</label>';
+echo '</div>';
+echo '<input type="text" id="listing_address_' . esc_attr($listing_id) . '" name="business_address" value="' . esc_attr($listing_address) . '" required>';
 
         // Suburb Field
         echo '<label for="listing_suburb_' . esc_attr($listing_id) . '">Business Suburb:</label>';
