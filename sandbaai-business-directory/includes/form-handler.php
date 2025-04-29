@@ -85,12 +85,10 @@ function sb_render_add_business_form() {
 
         <label for="logo">Upload Business Logo:</label>
         <input type="file" id="logo" name="logo">
-
+<?php /**disable photo upload on add listing form
         <label for="gallery">Upload photos for your business:</label>
-        <input type="file" id="gallery" name="gallery[]" multiple><br>
-
-        <label>**<i>add more photos on the edit page once your business is approved</i></label><br><br>
-<?php
+        <input type="file" id="gallery" name="gallery[]" multiple><br> **/
+echo '<label>**<i>you may add more photos on the edit page once your business is approved</i></label><br><br>';
 // Display the tag selection dropdowns
 echo '<label for="business_tag_1">Select Tag 1: (required to list your business)</label>';
 echo '<select name="business_tag_1" id="business_tag_1" required>';
@@ -132,12 +130,6 @@ function sb_handle_form_submission() {
         error_log("Submitted POST data: " . print_r($_POST, true));
         error_log("Uploaded FILES data: " . print_r($_FILES, true));
 
-        // Debugging: Log the remove_logo checkbox value
-        if (isset($_POST['remove_logo'])) {
-            error_log("Remove logo value: " . print_r($_POST['remove_logo'], true));
-        } else {
-            error_log("Remove logo checkbox not set.");
-        }
         global $wp_filter;
 
         // Remove Paystack's save_post_meta hook temporarily
@@ -231,6 +223,26 @@ if (!$post_id || is_wp_error($post_id)) {
     wp_set_object_terms($post_id, $category_slug, 'business_category');
     error_log("Category '$category_slug' assigned to post ID $post_id");
 }
+// Add logo upload function
+if (!empty($_FILES['logo']['name'])) {
+    $file = $_FILES['logo'];
+
+    error_log("Logo file data: " . print_r($file, true));
+
+    $uploaded_logo = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
+
+    if (is_wp_error($uploaded_logo)) {
+        error_log("Logo upload error: " . $uploaded_logo->get_error_message());
+    } else {
+        error_log("Uploaded logo URL: " . $uploaded_logo);
+
+        // Save logo URL as post meta
+        if ($post_id > 0) { // Ensure we have a valid post ID
+            update_post_meta($post_id, 'logo', $uploaded_logo);
+        }
+    }
+}
+
 // Process selected tags from two dropdowns
 $selected_tags = array();
 
@@ -309,7 +321,7 @@ if ($listing_id > 0) {
     return; // Prevent further execution if no valid listing ID is found
 }
     global $sb_is_updating_post;
-    
+
 //debugging
 if (!empty($_FILES['logo']['name'])) {
     $file = $_FILES['logo'];
