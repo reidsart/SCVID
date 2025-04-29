@@ -50,8 +50,9 @@ add_action('init', 'sb_register_add_business_form_shortcode');
 function sb_render_add_business_form() {
     ob_start(); // Start output buffering
     ?>
+    <h3>Add Your Business Listing</h3>
     <form method="post" enctype="multipart/form-data" action="">
-        <label for="business_name">Business Name* (cannot be changed later):</label>
+        <label for="business_name">Business Name* (required/cannot be changed later):</label>
         <input type="text" id="business_name" name="business_name" required>
 
         <label for="business_address">Business Address (required):</label>
@@ -64,35 +65,97 @@ function sb_render_add_business_form() {
         <label for="business_suburb">Business Suburb (required):</label>
         <input type="text" id="business_suburb" name="business_suburb" value="Sandbaai" required>
 
-        <label for="business_phone">Business Phone (required):</label>
-        <input type="text" id="business_phone" name="business_phone" required>
+<div style="display: flex; align-items: center; gap: 5px;">
+    <span style="
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background-image: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/phone.png') !important;
+        background-size: contain !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;">
+    </span>
+    <label for="business_phone">Business Phone (required):</label>
+</div>
+<input type="text" id="business_phone" name="business_phone" required>
 
+    <!-- Business Email -->
+    <div style="display: flex; align-items: center; gap: 5px;">
+        <span style="
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-image: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/email.png') !important;
+            background-size: contain !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;">
+        </span>
         <label for="business_email">Business Email (required):</label>
-        <input type="email" id="business_email" name="business_email" required>
+    </div>
+    <input type="email" id="business_email" name="business_email" required>
+
 
         <label for="business_description">Business Description (required):</label>
         <textarea id="business_description" name="business_description" required></textarea>
 
         <hr>
+    <!-- Business Website -->
+    <div style="display: flex; align-items: center; gap: 5px;">
+        <span style="
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-image: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/website.png') !important;
+            background-size: contain !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;">
+        </span>
         <label for="business_website">Business Website: (optional)</label>
-        <input type="text" id="business_website" name="business_website">
+    </div>
+    <input type="text" id="business_website" name="business_website">
 
+
+    <!-- WhatsApp Number -->
+    <div style="display: flex; align-items: center; gap: 5px;">
+        <span style="
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-image: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/whatsapp.png') !important;
+            background-size: contain !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;">
+        </span>
         <label for="business_whatsapp">WhatsApp Number: (optional)</label>
-        <input type="text" id="business_whatsapp" name="business_whatsapp">
+    </div>
+    <input type="text" id="business_whatsapp" name="business_whatsapp">
 
+    <!-- Business Facebook Page -->
+    <div style="display: flex; align-items: center; gap: 5px;">
+        <span style="
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-image: url('/wp-content/plugins/sandbaai-business-directory/assets/icons/facebook.png') !important;
+            background-size: contain !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;">
+        </span>
         <label for="facebook">Business Facebook Page: (optional)</label>
-        <input type="text" id="facebook" name="facebook">
+    </div>
+    <input type="text" id="facebook" name="facebook">
 
-        <label for="logo">Upload Business Logo:</label>
+        <label for="logo">Upload Business Logo: (must be less than 2mb)</label>
         <input type="file" id="logo" name="logo">
 <?php /**disable photo upload on add listing form
         <label for="gallery">Upload photos for your business:</label>
         <input type="file" id="gallery" name="gallery[]" multiple><br> **/
-echo '<label>**<i>you may add more photos on the edit page once your business is approved</i></label><br><br>';
+echo '<br><label>**<i>you may add your business photos once your business is approved</i></label><br><br>';
 // Display the tag selection dropdowns
-echo '<label for="business_tag_1">Select Tag 1: (required to list your business)</label>';
+echo '<i>Select 1 to 2 categories that best fit your business<BR>';
+echo '<label for="business_tag_1">Select Category 1: (required to list your business)</label>';
 echo '<select name="business_tag_1" id="business_tag_1" required>';
-echo '<option value="" disabled selected>Select the first tag</option>';
+echo '<option value="" disabled selected>Select the first category</option>';
 $tags = get_terms(array(
     'taxonomy' => 'business_tag',
     'hide_empty' => false,
@@ -102,9 +165,9 @@ foreach ($tags as $tag) {
 }
 echo '</select>';
 
-echo '<label for="business_tag_2">Select Tag 2: (optional)</label>';
+echo '<label for="business_tag_2">Select Category 2: (optional)</label>';
 echo '<select name="business_tag_2" id="business_tag_2">';
-echo '<option value="" disabled selected>Select the second tag (optional)</option>';
+echo '<option value="" disabled selected>Select the second category (optional)</option>';
 foreach ($tags as $tag) {
     echo '<option value="' . esc_attr($tag->term_id) . '">' . esc_html($tag->name) . '</option>';
 }
@@ -160,7 +223,7 @@ function sb_handle_form_submission() {
         $business_email = sanitize_email($_POST['business_email']);
         $business_description = sanitize_textarea_field($_POST['business_description']);
         $business_website = sanitize_text_field($_POST['business_website'] ?? '');
-        $business_whatsapp = sanitize_text_field($_POST['business_whatsapp']);
+        $business_whatsapp = sb_sanitize_phone_number(sanitize_text_field($_POST['business_whatsapp']));
         $facebook = sanitize_text_field($_POST['facebook'] ?? '');
         $address_privacy = isset($_POST['address_privacy']) ? '1' : '0';
         $suggestions = sanitize_textarea_field($_POST['suggestions']);
@@ -487,7 +550,7 @@ error_log("Upload result: " . print_r($upload, true));
                              'error' => $_FILES['gallery']['error'][$key],
                              'size' => $_FILES['gallery']['size'][$key],
                          ];
-                         $uploaded_file = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
+                         $uploaded_file = sb_handle_file_upload($file, 4 * 1024 * 1024); // 4MB limit
                          if (!is_wp_error($uploaded_file)) {
                              $existing_gallery[] = $uploaded_file;
                          } else {
