@@ -1,8 +1,6 @@
 <?php
 // Function to handle file uploads
 function sb_handle_file_upload($file, $max_size) {
-    error_log("File data received in sb_handle_file_upload: " . print_r($file, true));
-
     if ($file['error'] !== UPLOAD_ERR_OK) {
         error_log("File upload error: " . $file['error']);
         return new WP_Error('upload_error', 'File upload failed.');
@@ -20,16 +18,11 @@ function sb_handle_file_upload($file, $max_size) {
     }
 
     $upload = wp_handle_upload($file, array('test_form' => false));
-    error_log("Upload result inside sb_handle_file_upload: " . print_r($upload, true));
 
     if (isset($upload['error'])) {
         error_log("Upload error: " . $upload['error']);
         return new WP_Error('upload_error', $upload['error']);
     }
-
-    // Debugging: Log the full upload path
-    $upload_dir = wp_upload_dir();
-    error_log("Expected upload path: " . $upload_dir['basedir'] . '/' . basename($upload['url']));
 
     return $upload['url'];
 }
@@ -189,10 +182,6 @@ echo '</select>';
 // Handle form submission for adding business
 function sb_handle_form_submission() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sb_submit_business'])) {
-        // Debugging: Log the POST data and uploaded files
-        error_log("Submitted POST data: " . print_r($_POST, true));
-        error_log("Uploaded FILES data: " . print_r($_FILES, true));
-
         global $wp_filter;
 
         // Remove Paystack's save_post_meta hook temporarily
@@ -284,21 +273,17 @@ if (!$post_id || is_wp_error($post_id)) {
 } else {
     // Assign the category to the post
     wp_set_object_terms($post_id, $category_slug, 'business_category');
-    error_log("Category '$category_slug' assigned to post ID $post_id");
 }
+
 // Add logo upload function
 if (!empty($_FILES['logo']['name'])) {
     $file = $_FILES['logo'];
-
-    error_log("Logo file data: " . print_r($file, true));
 
     $uploaded_logo = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
 
     if (is_wp_error($uploaded_logo)) {
         error_log("Logo upload error: " . $uploaded_logo->get_error_message());
     } else {
-        error_log("Uploaded logo URL: " . $uploaded_logo);
-
         // Save logo URL as post meta
         if ($post_id > 0) { // Ensure we have a valid post ID
             update_post_meta($post_id, 'logo', $uploaded_logo);
@@ -376,13 +361,6 @@ add_action('init', function () {
 function sb_handle_edit_form_submission() {
     $listing_id = intval($_POST['listing_id'] ?? 0);
 
-// Debugging: Log the listing ID
-if ($listing_id > 0) {
-    error_log("Listing ID retrieved: " . $listing_id);
-} else {
-    error_log("Error: Listing ID could not be retrieved.");
-    return; // Prevent further execution if no valid listing ID is found
-}
     global $sb_is_updating_post;
 
 //debugging
@@ -420,9 +398,6 @@ if (!empty($_FILES['logo']['name'])) {
 
         // Use the correct field name for the listing ID
         $listing_id = intval($_POST['listing_id']);
-
-        // Debug the submitted data
-        error_log("Submitted POST data: " . print_r($_POST, true));
 
         // Check if the current user is the author of the listing
         $current_user_id = get_current_user_id();
@@ -462,26 +437,8 @@ if (!empty($_FILES['logo']['name'])) {
         'error' => $_FILES['logo']['error'],
         'size' => $_FILES['logo']['size'],
     ];
-
-    // Debugging: Log file data
-    error_log("Logo file data: " . print_r($file, true));
-
     // Call the upload function
     $uploaded_logo = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
-
-    // Debugging: Log upload result
-    if (is_wp_error($uploaded_logo)) {
-        error_log("Logo upload error: " . $uploaded_logo->get_error_message());
-    } else {
-        error_log("Uploaded logo URL: " . $uploaded_logo);
-    }
-
-    // Update the meta field
-    if (!is_wp_error($uploaded_logo) && update_post_meta($listing_id, 'logo', $uploaded_logo)) {
-        error_log("Logo meta updated successfully for listing ID: " . $listing_id);
-    } else {
-        error_log("Failed to update logo meta for listing ID: " . $listing_id);
-    }
 }
 
 // Handle logo removal
@@ -509,25 +466,7 @@ if (!empty($_FILES['logo']['name'])) {
         'error' => $_FILES['logo']['error'],
         'size' => $_FILES['logo']['size'],
     ];
-
-    // Debugging: Log file data
-    error_log("Logo file data: " . print_r($file, true));
-error_log("Upload result: " . print_r($upload, true));
     $uploaded_logo = sb_handle_file_upload($file, 2 * 1024 * 1024); // 2MB limit
-
-    // Debugging: Log upload result
-    if (is_wp_error($uploaded_logo)) {
-        error_log("Logo upload error: " . $uploaded_logo->get_error_message());
-    } else {
-        error_log("Uploaded logo URL: " . $uploaded_logo);
-    }
-
-    // Update the meta field
-    if (!is_wp_error($uploaded_logo) && update_post_meta($listing_id, 'logo', $uploaded_logo)) {
-        error_log("Logo meta updated successfully for listing ID: " . $listing_id);
-    } else {
-        error_log("Failed to update logo meta for listing ID: " . $listing_id);
-    }
 }
              // Remove selected gallery photos
              if (!empty($_POST['remove_gallery'])) {
@@ -562,12 +501,6 @@ error_log("Upload result: " . print_r($upload, true));
  
              // Update gallery meta
              update_post_meta($listing_id, 'gallery', $existing_gallery);
-             // Debug after update_post_meta
-if (update_post_meta($listing_id, 'logo', $uploaded_logo)) {
-    error_log("Logo meta updated successfully for listing ID: " . $listing_id);
-} else {
-    error_log("Failed to update logo meta for listing ID: " . $listing_id);
-}
          }
 
         // Create a complete post data array with all post content
@@ -580,37 +513,15 @@ if (update_post_meta($listing_id, 'logo', $uploaded_logo)) {
         // Update the post
         $update_result = wp_update_post($post_data, true);
 
-        // Log any errors or success from wp_update_post
-        if (is_wp_error($update_result)) {
-            error_log("Post update error: " . $update_result->get_error_message());
-        } else {
-            error_log("Post updated successfully with ID: " . $update_result);
-        }
-
 // Save meta fields explicitly
 update_post_meta($listing_id, 'business_description', $updated_description);
-error_log("Updated business_description for listing ID: $listing_id");
-
 update_post_meta($listing_id, 'business_phone', $updated_phone);
-error_log("Updated business_phone for listing ID: $listing_id");
-
 update_post_meta($listing_id, 'business_email', $updated_email);
-error_log("Updated business_email for listing ID: $listing_id");
-
 update_post_meta($listing_id, 'business_address', $updated_address);
-error_log("Updated business_address for listing ID: $listing_id");
-
 update_post_meta($listing_id, 'business_website', $updated_website);
-error_log("Updated business_website for listing ID: $listing_id");
-
 update_post_meta($listing_id, 'address_privacy', $updated_address_privacy);
-error_log("Updated address_privacy for listing ID: $listing_id");
-
 update_post_meta($listing_id, 'business_whatsapp', $updated_whatsapp);
-error_log("Updated business_whatsapp for listing ID: $listing_id");
-
 update_post_meta($listing_id, 'facebook', $updated_facebook);
-error_log("Updated facebook for listing ID: $listing_id");
 
 error_log("Meta fields updated for listing ID: $listing_id");
 

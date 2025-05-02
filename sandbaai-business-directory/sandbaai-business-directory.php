@@ -4,9 +4,8 @@ Plugin Name: Sandbaai Business Directory
 Plugin URI: https://sandbaaicommunity.co.za
 Description: A WordPress plugin for managing a business directory focused on Sandbaai and Overberg businesses.
 Version: 1.0
-Author: reidsart
+Author: Christopher Reid
 Author URI: https://reidsart.com
-License: GPL2
 */
 
 // Global flag to prevent recursive post updates

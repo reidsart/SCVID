@@ -80,8 +80,8 @@ function sb_render_sidebar() {
         }
     } else {
         // Non-logged-in users
-        echo '<span style="font-weight: bold;">Add Your Business</span><br>';
-        echo '<span style="font-size: 12px; color: grey;">Members Only</span><br>';
+        echo '<span style="font-weight: bold;">Add Your Business *</span><br>';
+        echo '<span style="font-size: 12px; color: grey;">* Members Only</span><br>';
         echo '<a href="https://sandbaaicommunity.co.za/register/" style="font-size: 16px; color: white; font-weight: bold;">Join</a>';
         echo ' | ';
         echo '<a href="https://sandbaaicommunity.co.za/login/" style="font-size: 16px; color: white; font-weight: bold;">Login</a>';

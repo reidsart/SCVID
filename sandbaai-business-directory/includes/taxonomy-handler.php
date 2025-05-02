@@ -29,27 +29,48 @@ function sb_render_taxonomy_with_sidebar($content) {
     $current_tag = get_queried_object();
     echo '<h2>Businesses Tagged: ' . esc_html($current_tag->name) . '</h2>';
 
-    if (have_posts()) {
+    // Custom query to fetch posts
+    add_filter('posts_orderby', 'sb_case_insensitive_orderby'); // Apply case-insensitive sorting
+    $args = array(
+        'post_type' => 'business_listing',
+        'tax_query' => array(
+            array(
+                'taxonomy' => 'business_tag',
+                'field' => 'slug',
+                'terms' => $current_tag->slug,
+            ),
+        ),
+        'orderby' => 'title', // Order by title
+        'order' => 'ASC', // Alphabetical order
+    );
+
+    $query = new WP_Query($args);
+
+    if ($query->have_posts()) {
         echo '<ul class="business-listing">';
-        while (have_posts()) {
-            the_post();
-            echo '<li class="business-item">';
-            echo '<h3><a href="' . esc_url(get_permalink()) . '">' . esc_html(get_the_title()) . '</a></h3>';
-            $description = get_the_excerpt();
-            if (!empty($description)) {
-                echo '<p class="business-description">' . esc_html(wp_trim_words($description, 20, '...')) . '</p>';
-            }
+        while ($query->have_posts()) {
+            $query->the_post();
+            echo '<li>';
+            echo '<a href="' . esc_url(get_permalink()) . '">' . esc_html(get_the_title()) . '</a>';
             echo '</li>';
         }
         echo '</ul>';
+        wp_reset_postdata(); // Reset the query
     } else {
         echo '<p>No businesses found with this tag.</p>';
     }
+    remove_filter('posts_orderby', 'sb_case_insensitive_orderby'); // Remove the filter after usage
 
     echo '</div>'; // End Main Content
     echo '</div>'; // End Layout Wrapper
 
     return ob_get_clean();
+}
+
+// Case-insensitive orderby filter
+function sb_case_insensitive_orderby($orderby) {
+    global $wpdb;
+    return "LOWER({$wpdb->posts}.post_title) ASC";
 }
 
 // Add a custom template for taxonomy pages

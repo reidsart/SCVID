@@ -27,7 +27,8 @@ get_header();
 
                 echo '<li class="taxonomy-business-item">'; // Updated class name
                 if (!empty($logo)) {
-                    echo '<div class="taxonomy-business-logo"><img src="' . esc_url($logo) . '" alt="Logo"></div>';
+                    // Wrap the logo in a link to the business page
+                    echo '<div class="taxonomy-business-logo"><a href="' . get_permalink() . '"><img src="' . esc_url($logo) . '" alt="Logo"></a></div>';
                 }
                 echo '<div class="taxonomy-business-details">';
                 echo '<h3 class="taxonomy-business-title"><a href="' . get_permalink() . '">' . get_the_title() . '</a></h3>';

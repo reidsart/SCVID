@@ -114,44 +114,51 @@ get_header(); ?>
             <?php endif; ?>
 
             <!-- Comments Section -->
-            <div class="comments-section">
-                <h2>Reviews</h2>
+<div class="comments-section">
+    <h2>Reviews</h2>
 
-                <?php
-                // Fetch and display comments
-                $comments = get_comments(array(
-                    'post_id' => get_the_ID(),
-                    'status' => 'approve',
-                    'orderby' => 'comment_date',
-                    'order' => 'DESC',
-                ));
+    <?php
+    // Fetch and display comments
+    $comments = get_comments(array(
+        'post_id' => get_the_ID(),
+        'status' => 'approve',
+        'orderby' => 'comment_date',
+        'order' => 'DESC',
+    ));
 
-                if (!empty($comments)) {
-                    echo '<div class="comments-box">';
-                    foreach ($comments as $comment) {
-                        $comment_author = get_userdata($comment->user_id);
-                        $comment_author_name = $comment_author->first_name ? $comment_author->first_name : $comment_author->display_name;
-                        $comment_content = $comment->comment_content;
+    if (!empty($comments)) {
+        echo '<div class="comments-box">';
+        foreach ($comments as $comment) {
+            $comment_author = get_userdata($comment->user_id);
+            $comment_author_name = $comment_author->first_name ? $comment_author->first_name : $comment_author->display_name;
+            $comment_content = $comment->comment_content;
 
-                        echo '<div class="comment">';
-                        echo '<p><strong>' . esc_html($comment_author_name) . ':</strong> ' . esc_html($comment_content) . '</p>';
-                        echo '</div>';
-                    }
-                    echo '</div>';
-                } else {
-                    echo '<p>No reviews yet. Be the first to leave a review!</p>';
-                }
-                ?>
+            echo '<div class="comment">';
+            echo '<p><strong>' . esc_html($comment_author_name) . ':</strong> ' . esc_html($comment_content) . '</p>';
+            echo '</div>';
+        }
+        echo '</div>';
+    } else {
+        echo '<p>No reviews yet. Be the first to leave a review!</p>';
+    }
+    ?>
 
-                <!-- Comment Form -->
-                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-                    <input type="hidden" name="action" value="process_comment">
-                    <input type="hidden" name="post_id" value="<?php echo esc_attr(get_the_ID()); ?>">
-                    <textarea name="comment_content" placeholder="Write your review here..." required></textarea><br>
-                    <button type="submit" name="submit_comment">Submit Review</button>
-                </form>
-            </div>
-
+    <!-- Comment Form -->
+    <?php if (is_user_logged_in()) : ?>
+        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+            <input type="hidden" name="action" value="process_comment">
+            <input type="hidden" name="post_id" value="<?php echo esc_attr(get_the_ID()); ?>">
+            <textarea name="comment_content" placeholder="Write your review here..." required></textarea><br>
+            <button type="submit" name="submit_comment">Submit Review</button>
+        </form>
+    <?php else : ?>
+        <p style="font-style: italic;">
+            Only SCVID members can leave reviews. 
+            <a href="/register/">Join</a> | 
+            <a href="/login/">Login</a>
+        </p>
+    <?php endif; ?>
+</div>
     <?php
         endwhile;
     endif;
